@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using EventPlanning.Domain.Interfaces;
+using EventPlanning.Infrastructure.Repositories;
 namespace EventPlanning.Infrastructure;
 
 public static class DependencyInjection
@@ -27,7 +28,10 @@ public static class DependencyInjection
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
-
+        
+        services.AddScoped<IEventRepository, EventRepository>();
+        services.AddScoped<IVenueRepository, VenueRepository>();
+        
         return services;
     }
 }
