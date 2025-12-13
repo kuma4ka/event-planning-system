@@ -22,12 +22,16 @@ public class HomeController(IEventService eventService) : Controller
     [HttpPost]
     public async Task<IActionResult> Create(CreateEventDto model, CancellationToken cancellationToken)
     {
+        var modelWithUser = model with { OrganizerId = "test-user-1" };
+
+        ModelState.Remove(nameof(model.OrganizerId));
+
         if (!ModelState.IsValid)
             return View(model);
 
         try 
         {
-            await eventService.CreateEventAsync(model, cancellationToken);
+            await eventService.CreateEventAsync(modelWithUser, cancellationToken);
             return RedirectToAction(nameof(Index));
         }
         catch (FluentValidation.ValidationException ex)
