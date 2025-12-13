@@ -1,8 +1,39 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using EventPlanning.Application.DTOs
+@model List<EventDto>
+
+@{
+    ViewData["Title"] = "Events";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Upcoming Events</h1>
+        <a asp-action="Create" class="btn btn-primary">Create Event</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No events found. Be the first to create one!</div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.Name</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">@item.Date.ToString("g")</h6>
+                            <p class="card-text">@item.Description</p>
+                            <span class="badge bg-secondary">@item.Type</span>
+                        </div>
+                        <div class="card-footer text-muted">
+                            Venue: @item.VenueName
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>

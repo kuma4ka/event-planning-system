@@ -1,24 +1,42 @@
-using System.Diagnostics;
+using EventPlanning.Application.Interfaces;
+using EventPlanning.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using EventPlanning.Web.Models;
 
 namespace EventPlanning.Web.Controllers;
 
-public class HomeController : Controller
+public class HomeController(IEventService eventService) : Controller
 {
-    public IActionResult Index()
+    [HttpGet]
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    {
+        var events = await eventService.GetAllEventsAsync(cancellationToken);
+        return View(events);
+    }
+    
+    [HttpGet]
+    public IActionResult Create()
     {
         return View();
     }
 
-    public IActionResult Privacy()
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateEventDto model, CancellationToken cancellationToken)
     {
-        return View();
-    }
+        if (!ModelState.IsValid)
+            return View(model);
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        try 
+        {
+            await eventService.CreateEventAsync(model, cancellationToken);
+            return RedirectToAction(nameof(Index));
+        }
+        catch (FluentValidation.ValidationException ex)
+        {
+            foreach (var error in ex.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+            return View(model);
+        }
     }
 }
