@@ -42,6 +42,14 @@
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
 
+                    <div class="mb-3">
+                        <label asp-for="VenueId" class="form-label">Venue (Optional)</label>
+                        <select asp-for="VenueId" class="form-select" asp-items="@ViewBag.Venues">
+                            <option value="">-- Select a Venue (TBD) --</option>
+                        </select>
+                        <span asp-validation-for="VenueId" class="text-danger"></span>
+                    </div>
+                    
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg">Create Event</button>
                         <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
