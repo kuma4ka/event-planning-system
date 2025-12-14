@@ -80,4 +80,35 @@ public class EventService(
             e.Guests.Count
         )).ToList();
     }
+    
+    public async Task UpdateEventAsync(string userId, UpdateEventDto dto, CancellationToken cancellationToken = default)
+    {
+        var eventEntity = await eventRepository.GetByIdAsync(dto.Id, cancellationToken);
+
+        if (eventEntity == null)
+            throw new KeyNotFoundException($"Event with ID {dto.Id} not found.");
+
+        if (eventEntity.OrganizerId != userId)
+            throw new UnauthorizedAccessException("You are not the organizer of this event.");
+
+        eventEntity.Name = dto.Name;
+        eventEntity.Description = dto.Description;
+        eventEntity.Date = dto.Date;
+        eventEntity.Type = dto.Type;
+        eventEntity.VenueId = dto.VenueId;
+
+        await eventRepository.UpdateAsync(eventEntity, cancellationToken);
+    }
+
+    public async Task DeleteEventAsync(string userId, int eventId, CancellationToken cancellationToken = default)
+    {
+        var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
+
+        if (eventEntity == null) return;
+
+        if (eventEntity.OrganizerId != userId)
+            throw new UnauthorizedAccessException("You are not the organizer of this event.");
+
+        await eventRepository.DeleteAsync(eventEntity, cancellationToken);
+    }
 }
