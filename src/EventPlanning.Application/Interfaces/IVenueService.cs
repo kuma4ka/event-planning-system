@@ -5,4 +5,8 @@ namespace EventPlanning.Application.Interfaces;
 public interface IVenueService
 {
     Task<List<VenueDto>> GetVenuesAsync(CancellationToken cancellationToken = default);
+    Task<UpdateVenueDto?> GetVenueByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task CreateVenueAsync(string adminId, CreateVenueDto dto, CancellationToken cancellationToken = default);
+    Task UpdateVenueAsync(UpdateVenueDto dto, CancellationToken cancellationToken = default);
+    Task DeleteVenueAsync(int id, CancellationToken cancellationToken = default);
 }

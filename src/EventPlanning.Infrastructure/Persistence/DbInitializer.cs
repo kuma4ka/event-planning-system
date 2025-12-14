@@ -16,8 +16,15 @@ public static class DbInitializer
         var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
         var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
+        var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
         await context.Database.MigrateAsync();
 
+        if (!await roleManager.RoleExistsAsync("Admin"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("Admin"));
+        }
+        
         if (await context.Venues.AnyAsync()) return;
 
         var adminEmail = configuration["Seed:AdminEmail"];
@@ -46,10 +53,19 @@ public static class DbInitializer
             
             var result = await userManager.CreateAsync(systemUser, adminPassword);
             
+            await userManager.AddToRoleAsync(systemUser, "Admin");
+            
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 throw new Exception($"Failed to create admin user: {errors}");
+            }
+        }
+        else 
+        {
+            if (!await userManager.IsInRoleAsync(systemUser, "Admin"))
+            {
+                await userManager.AddToRoleAsync(systemUser, "Admin");
             }
         }
 
