@@ -45,7 +45,7 @@ This project follows **Clean Architecture** to ensure separation of concerns and
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/kuma4ka/EventPlanningSystem.git
+    git clone https://github.com/kuma4ka/event-planning-system.git
     cd EventPlanningSystem
     ```
 
