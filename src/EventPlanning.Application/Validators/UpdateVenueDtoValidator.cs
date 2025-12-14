@@ -23,9 +23,10 @@ public class UpdateVenueDtoValidator : AbstractValidator<UpdateVenueDto>
         RuleFor(x => x.Description)
             .MaximumLength(1000);
 
-        RuleFor(x => x.ImageUrl)
-            .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _))
-            .When(x => !string.IsNullOrEmpty(x.ImageUrl))
-            .WithMessage("Image URL must be a valid absolute URL (e.g., https://example.com/image.jpg).");
+        RuleFor(x => x.ImageFile)
+            .Must(file => file == null || file.Length <= 5 * 1024 * 1024)
+            .WithMessage("Image size must be less than 5MB.")
+            .Must(file => file == null || file.ContentType.StartsWith("image/"))
+            .WithMessage("File must be a valid image.");
     }
 }

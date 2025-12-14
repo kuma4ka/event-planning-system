@@ -8,6 +8,7 @@ namespace EventPlanning.Application.Services;
 
 public class VenueService(
     IVenueRepository venueRepository, 
+    IImageService imageService,
     IValidator<CreateVenueDto> validator) : IVenueService
 {
     public async Task<List<VenueDto>> GetVenuesAsync(CancellationToken cancellationToken = default)
@@ -27,7 +28,8 @@ public class VenueService(
             venue.Address, 
             venue.Capacity, 
             venue.Description, 
-            venue.ImageUrl
+            venue.ImageUrl,
+            null
         );
     }
 
@@ -36,13 +38,20 @@ public class VenueService(
         var validationResult = await validator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
+        string? imageUrl = null;
+        
+        if (dto.ImageFile != null)
+        {
+            imageUrl = await imageService.UploadImageAsync(dto.ImageFile, "venues", cancellationToken);
+        }
+
         var venue = new Venue
         {
             Name = dto.Name,
             Address = dto.Address,
             Capacity = dto.Capacity,
             Description = dto.Description,
-            ImageUrl = dto.ImageUrl,
+            ImageUrl = imageUrl,
             OrganizerId = adminId
         };
 
@@ -54,11 +63,20 @@ public class VenueService(
         var venue = await venueRepository.GetByIdAsync(dto.Id, cancellationToken);
         if (venue == null) throw new KeyNotFoundException($"Venue {dto.Id} not found");
 
+        if (dto.ImageFile != null)
+        {
+            if (!string.IsNullOrEmpty(venue.ImageUrl))
+            {
+                imageService.DeleteImage(venue.ImageUrl);
+            }
+
+            venue.ImageUrl = await imageService.UploadImageAsync(dto.ImageFile, "venues", cancellationToken);
+        }
+
         venue.Name = dto.Name;
         venue.Address = dto.Address;
         venue.Capacity = dto.Capacity;
         venue.Description = dto.Description;
-        venue.ImageUrl = dto.ImageUrl;
 
         await venueRepository.UpdateAsync(venue, cancellationToken);
     }
@@ -67,6 +85,11 @@ public class VenueService(
     {
         var venue = await venueRepository.GetByIdAsync(id, cancellationToken);
         if (venue == null) return;
+
+        if (!string.IsNullOrEmpty(venue.ImageUrl))
+        {
+            imageService.DeleteImage(venue.ImageUrl);
+        }
 
         await venueRepository.DeleteAsync(venue, cancellationToken);
     }
