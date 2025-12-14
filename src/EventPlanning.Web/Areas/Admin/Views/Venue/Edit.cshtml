@@ -12,8 +12,9 @@
                     <h3 class="card-title mb-0">Edit Venue</h3>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Edit" method="post">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
                         <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="CurrentImageUrl" />
                         
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -36,10 +37,25 @@
                             <span asp-validation-for="Address" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="ImageUrl" class="form-label">Image URL</label>
-                            <input asp-for="ImageUrl" class="form-control" />
-                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        <div class="mb-4 p-3 bg-light rounded border">
+                            <label class="form-label fw-bold">Venue Image</label>
+                            
+                            @if (!string.IsNullOrEmpty(Model.CurrentImageUrl))
+                            {
+                                <div class="mb-3">
+                                    <p class="text-muted small">Current image:</p>
+                                    <img src="@Model.CurrentImageUrl" alt="Current Venue Image" 
+                                         class="img-thumbnail" style="max-height: 200px;" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning py-1 px-2 mb-2 d-inline-block">No image uploaded</div>
+                            }
+
+                            <label asp-for="ImageFile" class="form-label">Upload new image (leave empty to keep current)</label>
+                            <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
+                            <span asp-validation-for="ImageFile" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
@@ -48,7 +64,7 @@
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
 
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between mt-4">
                             <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>

@@ -8,11 +8,17 @@ public class CreateVenueDtoValidator : AbstractValidator<CreateVenueDto>
     public CreateVenueDtoValidator()
     {
         RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
-        
+
         RuleFor(x => x.Address).NotEmpty().MaximumLength(200);
-        
+
         RuleFor(x => x.Capacity).GreaterThan(0);
-        
+
         RuleFor(x => x.Description).MaximumLength(1000);
+
+        RuleFor(x => x.ImageFile)
+            .Must(file => file == null || file.Length <= 5 * 1024 * 1024)
+            .WithMessage("Image size must be less than 5MB.")
+            .Must(file => file == null || file.ContentType.StartsWith("image/"))
+            .WithMessage("File must be a valid image.");
     }
 }

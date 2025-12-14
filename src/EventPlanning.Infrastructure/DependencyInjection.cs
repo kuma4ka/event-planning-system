@@ -1,4 +1,5 @@
-﻿using EventPlanning.Infrastructure.Identity;
+﻿using EventPlanning.Application.Interfaces;
+using EventPlanning.Infrastructure.Identity;
 using EventPlanning.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using EventPlanning.Domain.Interfaces;
 using EventPlanning.Infrastructure.Repositories;
+using EventPlanning.Infrastructure.Services;
+
 namespace EventPlanning.Infrastructure;
 
 public static class DependencyInjection
@@ -32,6 +35,8 @@ public static class DependencyInjection
         services.AddScoped<IEventRepository, EventRepository>();
         services.AddScoped<IVenueRepository, VenueRepository>();
         services.AddScoped<IGuestRepository, GuestRepository>();
+        
+        services.AddScoped<IImageService, ImageService>();
         
         return services;
     }
