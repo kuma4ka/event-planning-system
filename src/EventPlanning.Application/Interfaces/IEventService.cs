@@ -10,4 +10,5 @@ public interface IEventService
     Task CreateEventAsync(CreateEventDto createEventDto, CancellationToken cancellationToken = default);
     Task UpdateEventAsync(string userId, UpdateEventDto dto, CancellationToken cancellationToken = default);
     Task DeleteEventAsync(string userId, int eventId, CancellationToken cancellationToken = default);
+    Task<EventDetailsDto?> GetEventDetailsAsync(int id, CancellationToken cancellationToken = default);
 }

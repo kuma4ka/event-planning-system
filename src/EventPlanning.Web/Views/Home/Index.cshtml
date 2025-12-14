@@ -24,26 +24,30 @@
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0">@item.Name</h5>
+                                <h5 class="card-title mb-0">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">
+                                        @item.Name
+                                    </a>
+                                </h5>
                                 <span class="badge bg-secondary">@item.Type</span>
                             </div>
                             <h6 class="card-subtitle mb-2 text-muted">@item.Date.ToString("g")</h6>
                             <p class="card-text mt-3">@item.Description</p>
                         </div>
-                        
+
                         <div class="card-footer bg-white border-top-0">
                             <div class="d-flex justify-content-between align-items-center">
                                 <small class="text-muted">
                                     <strong>Venue:</strong> @item.VenueName
                                 </small>
-                                
+
                                 <div class="btn-group">
                                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
                                         Edit
                                     </a>
-                                    
-                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" 
-                                          onsubmit="return confirm('Are you sure you want to delete the event \'@item.Name\'?');" 
+
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post"
+                                          onsubmit="return confirm('Are you sure you want to delete the event \'@item.Name\'?');"
                                           style="display:inline;">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                                     </form>
