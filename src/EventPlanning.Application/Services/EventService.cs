@@ -111,4 +111,26 @@ public class EventService(
 
         await eventRepository.DeleteAsync(eventEntity, cancellationToken);
     }
+    
+    public async Task<EventDetailsDto?> GetEventDetailsAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var eventEntity = await eventRepository.GetByIdAsync(id, cancellationToken);
+        if (eventEntity == null) return null;
+
+        return new EventDetailsDto(
+            eventEntity.Id,
+            eventEntity.Name,
+            eventEntity.Description ?? string.Empty,
+            eventEntity.Date,
+            eventEntity.Type,
+            eventEntity.OrganizerId,
+            eventEntity.Venue?.Name ?? "TBD",
+            eventEntity.Guests.Select(g => new GuestDto(
+                g.Id, 
+                $"{g.FirstName} {g.LastName}", 
+                g.Email, 
+                g.PhoneNumber
+            )).ToList()
+        );
+    }
 }
