@@ -1,6 +1,6 @@
 # 📅 Event Planning System
 
-[![Build & Test](https://github.com/kuma4ka/EventPlanningSystem/actions/workflows/ci.yml/badge.svg)](https://github.com/kuma4ka/EventPlanningSystem/actions/workflows/ci.yml)
+[![.NET 10 Build & Test](https://github.com/kuma4ka/event-planning-system/actions/workflows/ci.yml/badge.svg)](https://github.com/kuma4ka/event-planning-system/actions/workflows/ci.yml)
 ![.NET 10](https://img.shields.io/badge/.NET-10.0-purple)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
