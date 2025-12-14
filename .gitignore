@@ -8,6 +8,9 @@
 *.userosscache
 *.sln.docstates
 
+# Ignore user uploads
+src/EventPlanning.Web/wwwroot/images/venues/
+
 # .slnx (Dotnet 10 / VS 2022+)
 # The .slnx file itself is the solution definition and MUST be committed.
 # However, we ignore user-specific overrides for it.

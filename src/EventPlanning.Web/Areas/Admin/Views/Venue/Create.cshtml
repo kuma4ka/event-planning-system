@@ -8,7 +8,7 @@
     <h2>Create New Venue</h2>
     <div class="row">
         <div class="col-md-6">
-            <form asp-action="Create" method="post">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label asp-for="Name" class="form-label">Name</label>
                     <input asp-for="Name" class="form-control" />
@@ -26,18 +26,25 @@
                 </div>
                 <div class="mb-3">
                     <label asp-for="Description" class="form-label">Description</label>
-                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
+
                 <div class="mb-3">
-                    <label asp-for="ImageUrl" class="form-label">Image URL</label>
-                    <input asp-for="ImageUrl" class="form-control" placeholder="https://..." />
-                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                    <label asp-for="ImageFile" class="form-label">Venue Image</label>
+                    <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
+                    <span asp-validation-for="ImageFile" class="text-danger"></span>
                 </div>
-                
-                <button type="submit" class="btn btn-success">Save</button>
-                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
             </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
