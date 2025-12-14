@@ -1,18 +1,29 @@
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.DTOs;
+using EventPlanning.Infrastructure.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventPlanning.Web.Controllers;
 
-public class HomeController(IEventService eventService) : Controller
+[Authorize]
+public class HomeController(
+    IEventService eventService,
+    UserManager<User> userManager) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var events = await eventService.GetAllEventsAsync(cancellationToken);
+        var userId = userManager.GetUserId(User);
+
+        if (userId == null) return RedirectToAction("Login", "Account");
+
+        var events = await eventService.GetEventsByUserIdAsync(userId, cancellationToken);
+
         return View(events);
     }
-    
+
     [HttpGet]
     public IActionResult Create()
     {
@@ -29,17 +40,14 @@ public class HomeController(IEventService eventService) : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        try 
+        try
         {
             await eventService.CreateEventAsync(modelWithUser, cancellationToken);
             return RedirectToAction(nameof(Index));
         }
         catch (FluentValidation.ValidationException ex)
         {
-            foreach (var error in ex.Errors)
-            {
-                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            }
+            foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
             return View(model);
         }
     }

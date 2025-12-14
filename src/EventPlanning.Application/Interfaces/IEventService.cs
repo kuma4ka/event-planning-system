@@ -7,4 +7,5 @@ public interface IEventService
     Task<List<EventDto>> GetAllEventsAsync(CancellationToken cancellationToken = default);
     Task<EventDto?> GetEventByIdAsync(int id, CancellationToken cancellationToken = default);
     Task CreateEventAsync(CreateEventDto createEventDto, CancellationToken cancellationToken = default);
+    Task<List<EventDto>> GetEventsByUserIdAsync(string userId, CancellationToken cancellationToken = default);
 }

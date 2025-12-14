@@ -64,4 +64,20 @@ public class EventService(
 
         await eventRepository.AddAsync(newEvent, cancellationToken);
     }
+    
+    public async Task<List<EventDto>> GetEventsByUserIdAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        var events = await eventRepository.GetByOrganizerAsync(userId, cancellationToken);
+
+        return events.Select(e => new EventDto(
+            e.Id,
+            e.Name,
+            e.Description ?? string.Empty,
+            e.Date,
+            e.Type,
+            e.OrganizerId,
+            e.Venue?.Name ?? "TBD",
+            e.Guests.Count
+        )).ToList();
+    }
 }
