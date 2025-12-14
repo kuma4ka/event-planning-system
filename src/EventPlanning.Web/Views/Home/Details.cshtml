@@ -1,0 +1,81 @@
+﻿@model EventPlanning.Application.DTOs.EventDetailsDto
+
+@{
+    ViewData["Title"] = "Event Details";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>@Model.Name</h1>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit Event</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Event Info</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Date:</strong> @Model.Date.ToString("f")</p>
+                    <p><strong>Type:</strong> <span class="badge bg-info text-dark">@Model.Type</span></p>
+                    <p><strong>Venue:</strong> @Model.VenueName</p>
+                    <p class="text-muted">@Model.Description</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Guests (@Model.Guests.Count)</h5>
+                    <a asp-controller="Guest" asp-action="Create" asp-route-eventId="@Model.Id" class="btn btn-sm btn-success">
+                        + Add Guest
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Guests.Any())
+                    {
+                        <p class="text-muted text-center py-3">No guests invited yet.</p>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var guest in Model.Guests)
+                                    {
+                                        <tr>
+                                            <td>@guest.FullName</td>
+                                            <td>@guest.Email</td>
+                                            <td>@guest.PhoneNumber</td>
+                                            <td class="text-end">
+                                                <form asp-controller="Guest" asp-action="Delete" method="post" 
+                                                      onsubmit="return confirm('Remove @guest.FullName from list?');">
+                                                    <input type="hidden" name="guestId" value="@guest.Id" />
+                                                    <input type="hidden" name="eventId" value="@Model.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

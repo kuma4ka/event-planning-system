@@ -136,4 +136,18 @@ public class HomeController(
             Text = v.Name 
         }).ToList();
     }
+    
+    [HttpGet]
+    public async Task<IActionResult> Details(int id, CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User);
+        
+        var eventDetails = await eventService.GetEventDetailsAsync(id, cancellationToken);
+
+        if (eventDetails == null) return NotFound();
+        
+        if (eventDetails.OrganizerId != userId) return Forbid();
+
+        return View(eventDetails);
+    }
 }
