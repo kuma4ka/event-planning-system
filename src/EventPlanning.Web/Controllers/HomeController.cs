@@ -1,33 +1,34 @@
-using FluentValidation;
-using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.DTOs;
+using EventPlanning.Application.Interfaces;
 using EventPlanning.Infrastructure.Identity;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace EventPlanning.Web.Controllers;
 
 [Authorize]
 public class HomeController(
     IEventService eventService,
+    IVenueService venueService,
     UserManager<User> userManager) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
-
         if (userId == null) return RedirectToAction("Login", "Account");
 
         var events = await eventService.GetEventsByUserIdAsync(userId, cancellationToken);
-
         return View(events);
     }
 
     [HttpGet]
-    public IActionResult Create()
+    public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
+        await LoadVenuesToViewBag(cancellationToken);
         return View();
     }
 
@@ -35,13 +36,15 @@ public class HomeController(
     public async Task<IActionResult> Create(CreateEventDto model, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
-        
         var modelWithUser = model with { OrganizerId = userId! };
         
         ModelState.Remove(nameof(model.OrganizerId));
 
         if (!ModelState.IsValid)
+        {
+            await LoadVenuesToViewBag(cancellationToken);
             return View(model);
+        }
 
         try 
         {
@@ -54,6 +57,7 @@ public class HomeController(
             {
                 ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
             }
+            await LoadVenuesToViewBag(cancellationToken);
             return View(model);
         }
     }
@@ -62,12 +66,12 @@ public class HomeController(
     public async Task<IActionResult> Edit(int id, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
-        
         var eventDto = await eventService.GetEventByIdAsync(id, cancellationToken);
 
         if (eventDto == null) return NotFound();
-        
         if (eventDto.OrganizerId != userId) return Forbid();
+
+        await LoadVenuesToViewBag(cancellationToken);
 
         var updateModel = new UpdateEventDto(
             eventDto.Id,
@@ -84,7 +88,11 @@ public class HomeController(
     [HttpPost]
     public async Task<IActionResult> Edit(UpdateEventDto model, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid) return View(model);
+        if (!ModelState.IsValid) 
+        {
+            await LoadVenuesToViewBag(cancellationToken);
+            return View(model);
+        }
 
         var userId = userManager.GetUserId(User);
 
@@ -116,5 +124,16 @@ public class HomeController(
         {
             return Forbid();
         }
+    }
+
+    private async Task LoadVenuesToViewBag(CancellationToken token)
+    {
+        var venues = await venueService.GetVenuesAsync(token);
+
+        ViewBag.Venues = venues.Select(v => new SelectListItem 
+        { 
+            Value = v.Id.ToString(), 
+            Text = v.Name 
+        }).ToList();
     }
 }

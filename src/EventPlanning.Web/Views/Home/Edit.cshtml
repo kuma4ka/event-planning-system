@@ -37,6 +37,14 @@
                     </div>
 
                     <div class="mb-3">
+                        <label asp-for="VenueId" class="form-label">Venue</label>
+                        <select asp-for="VenueId" class="form-select" asp-items="@ViewBag.Venues">
+                            <option value="">-- Select a Venue --</option>
+                        </select>
+                        <span asp-validation-for="VenueId" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label asp-for="Description" class="form-label">Description</label>
                         <textarea asp-for="Description" class="form-control" rows="4"></textarea>
                         <span asp-validation-for="Description" class="text-danger"></span>
