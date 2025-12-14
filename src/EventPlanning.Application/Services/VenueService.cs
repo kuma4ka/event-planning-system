@@ -1,15 +1,73 @@
 ﻿using EventPlanning.Application.DTOs;
 using EventPlanning.Application.Interfaces;
+using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
+using FluentValidation;
 
 namespace EventPlanning.Application.Services;
 
-public class VenueService(IVenueRepository venueRepository) : IVenueService
+public class VenueService(
+    IVenueRepository venueRepository, 
+    IValidator<CreateVenueDto> validator) : IVenueService
 {
     public async Task<List<VenueDto>> GetVenuesAsync(CancellationToken cancellationToken = default)
     {
         var venues = await venueRepository.GetAllAsync(cancellationToken);
-        
         return venues.Select(v => new VenueDto(v.Id, v.Name)).ToList();
+    }
+
+    public async Task<UpdateVenueDto?> GetVenueByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var venue = await venueRepository.GetByIdAsync(id, cancellationToken);
+        if (venue == null) return null;
+
+        return new UpdateVenueDto(
+            venue.Id, 
+            venue.Name, 
+            venue.Address, 
+            venue.Capacity, 
+            venue.Description, 
+            venue.ImageUrl
+        );
+    }
+
+    public async Task CreateVenueAsync(string adminId, CreateVenueDto dto, CancellationToken cancellationToken = default)
+    {
+        var validationResult = await validator.ValidateAsync(dto, cancellationToken);
+        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
+        var venue = new Venue
+        {
+            Name = dto.Name,
+            Address = dto.Address,
+            Capacity = dto.Capacity,
+            Description = dto.Description,
+            ImageUrl = dto.ImageUrl,
+            OrganizerId = adminId
+        };
+
+        await venueRepository.AddAsync(venue, cancellationToken);
+    }
+
+    public async Task UpdateVenueAsync(UpdateVenueDto dto, CancellationToken cancellationToken = default)
+    {
+        var venue = await venueRepository.GetByIdAsync(dto.Id, cancellationToken);
+        if (venue == null) throw new KeyNotFoundException($"Venue {dto.Id} not found");
+
+        venue.Name = dto.Name;
+        venue.Address = dto.Address;
+        venue.Capacity = dto.Capacity;
+        venue.Description = dto.Description;
+        venue.ImageUrl = dto.ImageUrl;
+
+        await venueRepository.UpdateAsync(venue, cancellationToken);
+    }
+
+    public async Task DeleteVenueAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var venue = await venueRepository.GetByIdAsync(id, cancellationToken);
+        if (venue == null) return;
+
+        await venueRepository.DeleteAsync(venue, cancellationToken);
     }
 }
