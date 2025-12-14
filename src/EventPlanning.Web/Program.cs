@@ -10,6 +10,20 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+// SECURE DB SEEDING
+using (var scope = app.Services.CreateScope())
+{
+    try 
+    {
+        await EventPlanning.Infrastructure.Persistence.DbInitializer.SeedAsync(scope.ServiceProvider);
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database. Ensure User Secrets are configured.");
+    }
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
