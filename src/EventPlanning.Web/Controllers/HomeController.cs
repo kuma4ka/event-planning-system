@@ -159,8 +159,6 @@ public class HomeController(
 
         if (eventDetails == null) return NotFound();
 
-        if (eventDetails.OrganizerId != userId) return Forbid();
-
         return View(eventDetails);
     }
 

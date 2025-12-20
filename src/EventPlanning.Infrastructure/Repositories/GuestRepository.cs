@@ -7,16 +7,22 @@ namespace EventPlanning.Infrastructure.Repositories;
 
 public class GuestRepository(ApplicationDbContext context) : IGuestRepository
 {
-    public async Task<Guest?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Guest?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         return await context.Guests
-            .Include(g => g.Event) 
+            .Include(g => g.Event)
             .FirstOrDefaultAsync(g => g.Id == id, cancellationToken);
     }
 
     public async Task AddAsync(Guest guest, CancellationToken cancellationToken = default)
     {
         await context.Guests.AddAsync(guest, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateAsync(Guest guest, CancellationToken cancellationToken = default)
+    {
+        context.Guests.Update(guest);
         await context.SaveChangesAsync(cancellationToken);
     }
 

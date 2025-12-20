@@ -7,10 +7,9 @@
 @{
     ViewData["Title"] = "Event Details";
 
-    var currentUserIdString = UserManager.GetUserId(User);
-    int.TryParse(currentUserIdString, out var currentUserId);
+    var currentUserId = UserManager.GetUserId(User);
 
-    var isOrganizer = Model.OrganizerId == currentUserIdString;
+    var isOrganizer = Model.OrganizerId == currentUserId;
 
     var isJoined = Model.Guests.Any(g => g.Id == currentUserId);
 }

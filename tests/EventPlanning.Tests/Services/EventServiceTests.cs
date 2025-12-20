@@ -2,6 +2,7 @@
 using EventPlanning.Application.Services;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
+using EventPlanning.Domain.Interfaces;
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
