@@ -7,12 +7,13 @@ namespace EventPlanning.Domain.Interfaces;
 public interface IEventRepository
 {
     Task<Event?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
-    Task AddAsync(Event eventEntity, CancellationToken cancellationToken = default);
+    Task<int> AddAsync(Event eventEntity, CancellationToken cancellationToken = default);
     Task UpdateAsync(Event eventEntity, CancellationToken cancellationToken = default);
     Task DeleteAsync(Event eventEntity, CancellationToken cancellationToken = default);
 
     Task<PagedList<Event>> GetFilteredAsync(
         string? organizerId,
+        string? viewerId,
         string? searchTerm,
         DateTime? from,
         DateTime? to,
