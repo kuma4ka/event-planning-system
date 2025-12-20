@@ -16,7 +16,7 @@ public class GuestController(
     [HttpGet]
     public IActionResult Create(int eventId)
     {
-        return View(new CreateGuestDto(eventId, "", "", "", ""));
+        return View(new CreateGuestDto(eventId)); 
     }
 
     [HttpPost]
@@ -44,7 +44,7 @@ public class GuestController(
     }
 
     [HttpPost]
-    public async Task<IActionResult> Delete(int guestId, int eventId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(string guestId, int eventId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         try
