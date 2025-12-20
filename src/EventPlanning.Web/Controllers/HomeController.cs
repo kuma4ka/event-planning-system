@@ -1,6 +1,5 @@
 using EventPlanning.Application.DTOs;
 using EventPlanning.Application.Interfaces;
-using EventPlanning.Application.Models;
 using EventPlanning.Domain.Enums;
 using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
@@ -54,25 +53,24 @@ public class HomeController(
     [HttpPost]
     public async Task<IActionResult> Create(CreateEventDto model, CancellationToken cancellationToken)
     {
-        var userId = userManager.GetUserId(User);
-        var modelWithUser = model with { OrganizerId = userId! };
-
-        ModelState.Remove(nameof(model.OrganizerId));
-
         if (!ModelState.IsValid)
         {
             await LoadVenuesToViewBag(cancellationToken);
             return View(model);
         }
 
+        var userId = userManager.GetUserId(User);
+
         try
         {
-            await eventService.CreateEventAsync(modelWithUser, cancellationToken);
+            await eventService.CreateEventAsync(userId!, model, cancellationToken);
             return RedirectToAction(nameof(Index));
         }
         catch (ValidationException ex)
         {
-            foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            foreach (var error in ex.Errors) 
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            
             await LoadVenuesToViewBag(cancellationToken);
             return View(model);
         }
@@ -153,11 +151,13 @@ public class HomeController(
     [HttpGet]
     public async Task<IActionResult> Details(int id, CancellationToken cancellationToken)
     {
-        var userId = userManager.GetUserId(User);
-
         var eventDetails = await eventService.GetEventDetailsAsync(id, cancellationToken);
-
         if (eventDetails == null) return NotFound();
+
+        var organizer = await userManager.FindByIdAsync(eventDetails.OrganizerId);
+        
+        ViewBag.OrganizerName = organizer != null ? $"{organizer.FirstName} {organizer.LastName}" : "Unknown Organizer";
+        ViewBag.OrganizerEmail = organizer?.Email ?? "";
 
         return View(eventDetails);
     }

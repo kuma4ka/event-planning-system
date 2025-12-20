@@ -1,8 +1,23 @@
 ﻿@using EventPlanning.Domain.Enums
+@using System.ComponentModel.DataAnnotations
+@using System.Reflection
 @model EventPlanning.Application.DTOs.CreateEventDto
 
 @{
     ViewData["Title"] = "Create Event";
+
+    var eventTypes = Enum.GetValues<EventType>().Select(e =>
+    {
+        var field = e.GetType().GetField(e.ToString());
+        var attribute = field?.GetCustomAttribute<DisplayAttribute>();
+
+        return new SelectListItem
+        {
+            Value = e.ToString(),
+
+            Text = attribute?.Name ?? e.ToString()
+        };
+    });
 }
 
 <div class="row justify-content-center">
@@ -10,27 +25,26 @@
         <div class="card shadow-sm mt-4">
             <div class="card-body">
                 <h2 class="card-title text-center mb-4">Create New Event</h2>
-                
+
                 <form asp-action="Create" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label">Event Name</label>
-                        <input asp-for="Name" class="form-control" placeholder="Ex: Tech Conference 2025" />
+                        <input asp-for="Name" class="form-control" placeholder="Ex: Tech Conference 2025"/>
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Date" class="form-label">Date & Time</label>
-                        <input asp-for="Date" type="datetime-local" class="form-control" 
-                               value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-ddTHH:mm")" />
+                        <input asp-for="Date" type="datetime-local" class="form-control"
+                               value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-ddTHH:mm")"/>
                         <span asp-validation-for="Date" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Type" class="form-label">Event Type</label>
-                        <select asp-for="Type" class="form-select" 
-                                asp-items="Html.GetEnumSelectList<EventType>()">
+                        <select asp-for="Type" class="form-select" asp-items="eventTypes">
                             <option value="">-- Select Type --</option>
                         </select>
                         <span asp-validation-for="Type" class="text-danger"></span>
@@ -49,7 +63,14 @@
                         </select>
                         <span asp-validation-for="VenueId" class="text-danger"></span>
                     </div>
-                    
+
+                    <div class="mb-3 form-check">
+                        <input asp-for="IsPrivate" class="form-check-input" id="IsPrivate"/>
+                        <label asp-for="IsPrivate" class="form-check-label" for="IsPrivate">
+                            Private Event (Hidden from public feed)
+                        </label>
+                    </div>
+
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg">Create Event</button>
                         <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
@@ -61,5 +82,5 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

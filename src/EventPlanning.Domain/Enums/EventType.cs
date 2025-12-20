@@ -1,19 +1,25 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace EventPlanning.Domain.Enums;
 
 public enum EventType
 {
-    [Description("Conference")] Conference,
-    [Description("Seminar")] Seminar,
-    [Description("Workshop")] Workshop,
-    [Description("Networking Event")] NetworkingEvent,
-    [Description("Concert")] Concert,
-    [Description("Exhibition")] Exhibition,
-    [Description("Webinar")] Webinar,
-    [Description("Hackathon")] Hackathon,
-    [Description("Gala Dinner")] GalaDinner,
-    [Description("Charity Event")] CharityEvent,
-    [Description("Sports Event")] SportsEvent,
-    [Description("Product Launch")] ProductLaunch
+    Conference,
+    Seminar,
+    Workshop,
+    
+    [Display(Name = "Networking Event")] NetworkingEvent,
+
+    Concert,
+    Exhibition,
+    Webinar,
+    Hackathon,
+
+    [Display(Name = "Gala Dinner")] GalaDinner,
+
+    [Display(Name = "Charity Event")] CharityEvent,
+
+    [Display(Name = "Sports Event")] SportsEvent,
+
+    [Display(Name = "Product Launch")] ProductLaunch
 }

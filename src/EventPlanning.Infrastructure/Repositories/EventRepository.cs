@@ -38,10 +38,12 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task AddAsync(Event eventEntity, CancellationToken cancellationToken = default)
+    public async Task<int> AddAsync(Event eventEntity, CancellationToken cancellationToken = default)
     {
         await context.Events.AddAsync(eventEntity, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
+
+        return eventEntity.Id;
     }
 
     public async Task UpdateAsync(Event eventEntity, CancellationToken cancellationToken = default)
@@ -57,13 +59,14 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
     }
 
     public async Task<PagedList<Event>> GetFilteredAsync(
-        string? organizerId,
-        string? searchTerm,
-        DateTime? from,
-        DateTime? to,
-        EventType? type,
-        int pageNumber,
-        int pageSize,
+        string? organizerId, 
+        string? viewerId,
+        string? searchTerm, 
+        DateTime? from, 
+        DateTime? to, 
+        EventType? type, 
+        int pageNumber, 
+        int pageSize, 
         CancellationToken cancellationToken = default)
     {
         var query = context.Events
@@ -71,11 +74,24 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .AsNoTracking()
             .AsQueryable();
 
-        if (!string.IsNullOrEmpty(organizerId)) query = query.Where(e => e.OrganizerId == organizerId);
+        if (!string.IsNullOrEmpty(viewerId))
+        {
+            query = query.Where(e => !e.IsPrivate || e.OrganizerId == viewerId);
+        }
+        else
+        {
+            query = query.Where(e => !e.IsPrivate);
+        }
+
+        if (!string.IsNullOrEmpty(organizerId))
+        {
+            query = query.Where(e => e.OrganizerId == organizerId);
+        }
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
-            query = query.Where(e =>
-                e.Name.Contains(searchTerm) || (e.Description != null && e.Description.Contains(searchTerm)));
+        {
+            query = query.Where(e => e.Name.Contains(searchTerm) || (e.Description != null && e.Description.Contains(searchTerm)));
+        }
 
         if (from.HasValue) query = query.Where(e => e.Date >= from.Value);
         if (to.HasValue) query = query.Where(e => e.Date <= to.Value);

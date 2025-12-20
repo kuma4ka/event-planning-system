@@ -1,4 +1,5 @@
 ﻿using EventPlanning.Application.DTOs;
+using EventPlanning.Domain.Enums;
 using FluentValidation;
 
 namespace EventPlanning.Application.Validators;
@@ -18,10 +19,14 @@ public class CreateEventDtoValidator : AbstractValidator<CreateEventDto>
         RuleFor(x => x.Date)
             .GreaterThan(DateTime.Now).WithMessage("Event date cannot be in the past.");
 
+        // Оскільки Type у DTO - це string, перевіряємо, чи існує таке ім'я в Enum
         RuleFor(x => x.Type)
-            .IsInEnum().WithMessage("Invalid event type.");
-            
-        RuleFor(x => x.OrganizerId)
-            .NotEmpty().WithMessage("Organizer ID is required.");
+            .IsEnumName(typeof(EventType), caseSensitive: false)
+            .WithMessage("Invalid event type.");
+
+        // Валідація VenueId (якщо воно вказане, має бути більше 0)
+        RuleFor(x => x.VenueId)
+            .GreaterThan(0).When(x => x.VenueId.HasValue)
+            .WithMessage("Invalid Venue ID.");
     }
 }
