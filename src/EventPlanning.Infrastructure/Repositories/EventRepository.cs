@@ -59,14 +59,15 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
     }
 
     public async Task<PagedList<Event>> GetFilteredAsync(
-        string? organizerId, 
+        string? organizerId,
         string? viewerId,
-        string? searchTerm, 
-        DateTime? from, 
-        DateTime? to, 
-        EventType? type, 
-        int pageNumber, 
-        int pageSize, 
+        string? searchTerm,
+        DateTime? from,
+        DateTime? to,
+        EventType? type,
+        string? sortOrder,
+        int pageNumber,
+        int pageSize,
         CancellationToken cancellationToken = default)
     {
         var query = context.Events
@@ -75,66 +76,64 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(viewerId))
-        {
             query = query.Where(e => !e.IsPrivate || e.OrganizerId == viewerId);
-        }
         else
-        {
             query = query.Where(e => !e.IsPrivate);
-        }
 
-        if (!string.IsNullOrEmpty(organizerId))
-        {
-            query = query.Where(e => e.OrganizerId == organizerId);
-        }
+        if (!string.IsNullOrEmpty(organizerId)) query = query.Where(e => e.OrganizerId == organizerId);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
-        {
-            query = query.Where(e => e.Name.Contains(searchTerm) || (e.Description != null && e.Description.Contains(searchTerm)));
-        }
+            query = query.Where(e =>
+                e.Name.Contains(searchTerm) || (e.Description != null && e.Description.Contains(searchTerm)));
 
         if (from.HasValue) query = query.Where(e => e.Date >= from.Value);
         if (to.HasValue) query = query.Where(e => e.Date <= to.Value);
         if (type.HasValue) query = query.Where(e => e.Type == type.Value);
 
-        query = query.OrderBy(e => e.Date);
+        query = sortOrder switch
+        {
+            "name_asc" => query.OrderBy(e => e.Name),
+            "name_desc" => query.OrderByDescending(e => e.Name),
+            "date_asc" => query.OrderBy(e => e.Date),
+            "newest" => query.OrderByDescending(e => e.CreatedAt),
+            _ => query.OrderByDescending(e => e.Date)
+        };
 
         return await query.ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
 
     public async Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
-        return await context.Events
-            .Include(e => e.Guests)
-            .AnyAsync(e => e.Id == eventId && e.Guests.Any(g => g.Id == userId), cancellationToken);
+        var user = await context.Users.FindAsync(new object[] { userId }, cancellationToken);
+        if (user == null || string.IsNullOrEmpty(user.Email)) return false;
+
+        return await context.Guests
+            .AnyAsync(g => g.EventId == eventId && g.Email == user.Email, cancellationToken);
     }
 
     public async Task AddGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
-        var eventEntity = await context.Events
-            .Include(e => e.Guests)
-            .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
+        var user = await context.Users.FindAsync(new object[] { userId }, cancellationToken);
+        if (user == null) throw new KeyNotFoundException("User not found");
 
-        if (eventEntity == null) throw new KeyNotFoundException("Event not found");
+        if (string.IsNullOrEmpty(user.Email))
+            throw new InvalidOperationException("User does not have an email address.");
 
-        var identityUser = await context.Users.FindAsync(new object[] { userId }, cancellationToken);
-        if (identityUser == null) throw new KeyNotFoundException("User not found");
-
-        if (!eventEntity.Guests.Any(g => g.Id == userId))
+        var guest = new Guest
         {
-            var newGuest = new Guest
-            {
-                Id = identityUser.Id,
-                FirstName = identityUser.FirstName,
-                LastName = identityUser.LastName,
-                Email = identityUser.Email!,
-                PhoneNumber = identityUser.PhoneNumber,
-                EventId = eventId
-            };
+            Id = Guid.NewGuid().ToString(),
 
-            eventEntity.Guests.Add(newGuest);
-            await context.SaveChangesAsync(cancellationToken);
-        }
+            EventId = eventId,
+            FirstName = user.FirstName ?? "Unknown",
+            LastName = user.LastName ?? "User",
+
+            Email = user.Email,
+
+            PhoneNumber = user.PhoneNumber
+        };
+
+        await context.Guests.AddAsync(guest, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RemoveGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default)
