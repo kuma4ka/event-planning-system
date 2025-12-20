@@ -1,69 +1,173 @@
 ﻿@using EventPlanning.Application.Models
 @using EventPlanning.Application.DTOs
+@using EventPlanning.Domain.Enums
+@using System.ComponentModel.DataAnnotations
+@using System.Reflection
 @model PagedResult<EventDto>
 
 @{
     ViewData["Title"] = "My Events";
+
+    var eventTypes = Enum.GetValues<EventType>().Select(e =>
+    {
+        var field = e.GetType().GetField(e.ToString());
+        var attribute = field?.GetCustomAttribute<DisplayAttribute>();
+        return new SelectListItem
+        {
+            Value = e.ToString(),
+            Text = attribute?.Name ?? e.ToString(),
+            Selected = ViewBag.CurrentType != null && (EventType)ViewBag.CurrentType == e
+        };
+    });
 }
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="bi bi-calendar-range"></i> My Events Dashboard</h1>
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i> Create New Event
+        <div>
+            <h1 class="mb-0"><i class="bi bi-speedometer2"></i> My Dashboard</h1>
+            <p class="text-muted">Manage your upcoming and past events</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+            <i class="bi bi-plus-lg"></i> Create Event
         </a>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4 bg-light">
+        <div class="card-body">
+            <form method="get" asp-action="MyEvents" class="row g-3">
+                <input type="hidden" name="sortOrder" value="@ViewBag.CurrentSort" />
+
+                <div class="col-md-3">
+                    <input type="text" name="searchTerm" class="form-control" placeholder="Search by name..."
+                           value="@ViewBag.CurrentSearch">
+                </div>
+                <div class="col-md-3">
+                    <select name="type" class="form-select" asp-items="eventTypes">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="from" class="form-control" value="@ViewBag.CurrentFrom" placeholder="From">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="to" class="form-control" value="@ViewBag.CurrentTo" placeholder="To">
+                </div>
+                <div class="col-md-2 d-grid gap-2">
+                    <button type="submit" class="btn btn-outline-primary">Filter</button>
+                    <a asp-action="MyEvents" class="btn btn-link text-decoration-none btn-sm">Clear</a>
+                </div>
+            </form>
+        </div>
     </div>
 
     @if (!Model.Items.Any())
     {
-        <div class="text-center py-5 text-muted">
-            <i class="bi bi-calendar-x display-4"></i>
-            <p class="mt-3">You haven't created any events yet.</p>
-            <a asp-action="Create" class="btn btn-outline-primary">Get Started</a>
+        <div class="text-center py-5">
+            <div class="mb-3 text-muted">
+                <i class="bi bi-calendar-x display-1 opacity-25"></i>
+            </div>
+            <h3>No events found</h3>
+            <p class="text-muted">Try adjusting your filters or create a new event.</p>
+            @if (ViewBag.CurrentSearch == null && ViewBag.CurrentType == null)
+            {
+                <a asp-action="Create" class="btn btn-primary mt-2">Get Started</a>
+            }
         </div>
     }
     else
     {
-        <div class="card shadow-sm">
+        <div class="card shadow-sm border-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead class="bg-light">
                     <tr>
-                        <th>Date</th>
-                        <th>Event Name</th>
+                        <th class="ps-4">
+                            <a asp-action="MyEvents"
+                               asp-route-sortOrder="@ViewBag.DateSortParam"
+                               asp-route-searchTerm="@ViewBag.CurrentSearch"
+                               asp-route-type="@ViewBag.CurrentType"
+                               class="text-decoration-none text-dark user-select-none">
+                                Date
+                                @if (ViewBag.CurrentSort == "date_asc") { <i class="bi bi-arrow-up-short"></i> }
+                                else if (string.IsNullOrEmpty(ViewBag.CurrentSort) || ViewBag.CurrentSort == "date_desc") { <i class="bi bi-arrow-down-short"></i> }
+                                else { <i class="bi bi-arrow-down-up text-muted opacity-25"></i> }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-action="MyEvents"
+                               asp-route-sortOrder="@ViewBag.NameSortParam"
+                               asp-route-searchTerm="@ViewBag.CurrentSearch"
+                               asp-route-type="@ViewBag.CurrentType"
+                               class="text-decoration-none text-dark user-select-none">
+                                Event Info
+                                @if (ViewBag.CurrentSort == "name_asc") { <i class="bi bi-arrow-up-short"></i> }
+                                else if (ViewBag.CurrentSort == "name_desc") { <i class="bi bi-arrow-down-short"></i> }
+                                else { <i class="bi bi-arrow-down-up text-muted opacity-25"></i> }
+                            </a>
+                        </th>
                         <th>Venue</th>
-                        <th>Type</th>
-                        <th class="text-end">Actions</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach (var item in Model.Items)
                     {
+                        var isPast = item.Date < DateTime.Now;
+
                         <tr>
-                            <td style="width: 15%">
-                                <div class="d-flex flex-column">
-                                    <span class="fw-bold">@item.Date.ToString("MMM dd, yyyy")</span>
-                                    <small class="text-muted">@item.Date.ToString("HH:mm")</small>
+                            <td class="ps-4" style="width: 15%">
+                                <div class="d-flex flex-column text-center border rounded p-2 bg-light @(isPast ? "opacity-50" : "")">
+                                    <span class="fw-bold fs-5">@item.Date.ToString("dd")</span>
+                                    <span class="small text-uppercase text-muted">@item.Date.ToString("MMM")</span>
+                                    <span class="small text-muted">@item.Date.ToString("yyyy")</span>
                                 </div>
                             </td>
                             <td>
-                                <a asp-action="Details" asp-route-id="@item.Id"
-                                   class="text-decoration-none fw-bold text-dark">
-                                    @item.Name
-                                </a>
+                                <div class="@(isPast ? "opacity-75" : "")">
+                                    <a asp-action="Details" asp-route-id="@item.Id"
+                                       class="text-decoration-none fw-bold text-dark fs-5">
+                                        @item.Name
+                                    </a>
+                                    <div class="mt-1">
+                                        <span class="badge bg-secondary font-monospace">@item.Type</span>
+                                    </div>
+                                </div>
                             </td>
-                            <td><i class="bi bi-geo-alt text-muted"></i> @item.VenueName</td>
-                            <td><span class="badge bg-secondary">@item.Type</span></td>
-                            <td class="text-end">
-                                <div class="btn-group">
+                            <td>
+                                <i class="bi bi-geo-alt text-danger"></i> @item.VenueName
+                            </td>
+                            <td>
+                                @if (isPast)
+                                {
+                                    <span class="badge bg-secondary">Completed</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Upcoming</span>
+                                }
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <button onclick="copyLink('@Url.Action("Details", "Home", new { id = item.Id }, Context.Request.Scheme)')"
+                                            class="btn btn-sm btn-outline-info"
+                                            title="Copy Link">
+                                        <i class="bi bi-share"></i>
+                                    </button>
+
                                     <a asp-action="Details" asp-route-id="@item.Id"
                                        class="btn btn-sm btn-outline-secondary" title="View">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning"
-                                       title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
+
+                                    @if (!isPast)
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    }
+
                                     <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
                                             data-bs-target="#deleteModal-@item.Id" title="Delete">
                                         <i class="bi bi-trash"></i>
@@ -75,19 +179,14 @@
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title">Delete Event?</h5>
-                                                <button type="button" class="btn-close"
-                                                        data-bs-dismiss="modal"></button>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body text-start">
-                                                Are you sure you want to delete <strong>@item.Name</strong>? This cannot
-                                                be undone.
+                                                Are you sure you want to delete <strong>@item.Name</strong>? This cannot be undone.
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                    Cancel
-                                                </button>
-                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post"
-                                                      class="d-inline">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
                                                     <button type="submit" class="btn btn-danger">Delete</button>
                                                 </form>
                                             </div>
@@ -102,20 +201,58 @@
             </div>
         </div>
 
-        <div class="mt-3">
+        <div class="mt-4">
             @if (Model.TotalPages > 1)
             {
                 <nav>
                     <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="MyEvents"
+                               asp-route-page="@(Model.PageNumber - 1)"
+                               asp-route-sortOrder="@ViewBag.CurrentSort"
+                               asp-route-searchTerm="@ViewBag.CurrentSearch"
+                               asp-route-type="@ViewBag.CurrentType"
+                               asp-route-from="@ViewBag.CurrentFrom"
+                               asp-route-to="@ViewBag.CurrentTo">Previous</a>
+                        </li>
+
                         @for (var i = 1; i <= Model.TotalPages; i++)
                         {
                             <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                                <a class="page-link" asp-action="MyEvents" asp-route-page="@i">@i</a>
+                                <a class="page-link" asp-action="MyEvents"
+                                   asp-route-page="@i"
+                                   asp-route-sortOrder="@ViewBag.CurrentSort"
+                                   asp-route-searchTerm="@ViewBag.CurrentSearch"
+                                   asp-route-type="@ViewBag.CurrentType"
+                                   asp-route-from="@ViewBag.CurrentFrom"
+                                   asp-route-to="@ViewBag.CurrentTo">@i</a>
                             </li>
                         }
+
+                        <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="MyEvents"
+                               asp-route-page="@(Model.PageNumber + 1)"
+                               asp-route-sortOrder="@ViewBag.CurrentSort"
+                               asp-route-searchTerm="@ViewBag.CurrentSearch"
+                               asp-route-type="@ViewBag.CurrentType"
+                               asp-route-from="@ViewBag.CurrentFrom"
+                               asp-route-to="@ViewBag.CurrentTo">Next</a>
+                        </li>
                     </ul>
                 </nav>
             }
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        function copyLink(url) {
+            navigator.clipboard.writeText(url).then(function() {
+                alert('Link copied to clipboard!');
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+    </script>
+}

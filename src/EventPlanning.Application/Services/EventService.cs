@@ -17,6 +17,7 @@ public class EventService(
         string userId,
         string? organizerIdFilter,
         EventSearchDto searchDto,
+        string? sortOrder,
         CancellationToken cancellationToken = default)
     {
         var pagedEvents = await eventRepository.GetFilteredAsync(
@@ -26,6 +27,7 @@ public class EventService(
             searchDto.FromDate,
             searchDto.ToDate,
             searchDto.Type,
+            sortOrder,
             searchDto.PageNumber,
             searchDto.PageSize,
             cancellationToken
@@ -114,6 +116,9 @@ public class EventService(
 
         if (eventEntity.OrganizerId != userId) throw new UnauthorizedAccessException("Not your event");
 
+        if (eventEntity.Date < DateTime.Now)
+            throw new InvalidOperationException("Cannot edit an event that has already ended.");
+
         eventEntity.Name = dto.Name;
         eventEntity.Description = dto.Description;
         eventEntity.Date = dto.Date;
@@ -137,7 +142,11 @@ public class EventService(
     public async Task JoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
-        if (eventEntity == null) throw new KeyNotFoundException($"Event {eventId} not found");
+        if (eventEntity == null)
+            throw new KeyNotFoundException($"Event {eventId} not found");
+
+        if (eventEntity.Date < DateTime.UtcNow)
+            throw new InvalidOperationException("Cannot join an event that has already ended.");
 
         if (eventEntity.OrganizerId == userId)
             throw new InvalidOperationException("You cannot join your own event as a guest.");
@@ -145,7 +154,8 @@ public class EventService(
         if (eventEntity.Venue != null && eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
             throw new InvalidOperationException("Sorry, this event is fully booked.");
 
-        if (eventEntity.Guests.Any(g => g.Id == userId))
+        var isAlreadyJoined = await eventRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);
+        if (isAlreadyJoined)
             throw new InvalidOperationException("You are already registered for this event.");
 
         await eventRepository.AddGuestAsync(eventId, userId, cancellationToken);

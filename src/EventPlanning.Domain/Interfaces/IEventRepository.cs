@@ -18,6 +18,7 @@ public interface IEventRepository
         DateTime? from,
         DateTime? to,
         EventType? type,
+        string? sortOrder,
         int pageNumber,
         int pageSize,
         CancellationToken cancellationToken = default);

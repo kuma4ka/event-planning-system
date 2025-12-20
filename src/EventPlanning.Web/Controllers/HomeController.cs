@@ -38,7 +38,7 @@ public class HomeController(
             PageSize = 9
         };
 
-        var result = await eventService.GetEventsAsync(userId, null, searchDto, cancellationToken);
+        var result = await eventService.GetEventsAsync(userId, null, searchDto, null, cancellationToken);
 
         return View(result);
     }
@@ -68,9 +68,9 @@ public class HomeController(
         }
         catch (ValidationException ex)
         {
-            foreach (var error in ex.Errors) 
+            foreach (var error in ex.Errors)
                 ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            
+
             await LoadVenuesToViewBag(cancellationToken);
             return View(model);
         }
@@ -118,9 +118,13 @@ public class HomeController(
         catch (ValidationException ex)
         {
             foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-
             await LoadVenuesToViewBag(cancellationToken);
-
+            return View(model);
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+            await LoadVenuesToViewBag(cancellationToken);
             return View(model);
         }
         catch (UnauthorizedAccessException)
@@ -155,7 +159,7 @@ public class HomeController(
         if (eventDetails == null) return NotFound();
 
         var organizer = await userManager.FindByIdAsync(eventDetails.OrganizerId);
-        
+
         ViewBag.OrganizerName = organizer != null ? $"{organizer.FirstName} {organizer.LastName}" : "Unknown Organizer";
         ViewBag.OrganizerEmail = organizer?.Email ?? "";
 
@@ -191,22 +195,40 @@ public class HomeController(
 
         return RedirectToAction(nameof(Details), new { id });
     }
-    
+
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> MyEvents(
-        int page = 1, 
+        string? searchTerm,
+        EventType? type,
+        DateTime? from,
+        DateTime? to,
+        string? sortOrder,
+        int page = 1,
         CancellationToken cancellationToken = default)
     {
         var userId = userManager.GetUserId(User);
-        
+
         var searchDto = new EventSearchDto
         {
+            SearchTerm = searchTerm,
+            Type = type,
+            FromDate = from,
+            ToDate = to,
             PageNumber = page,
             PageSize = 10
         };
 
-        var result = await eventService.GetEventsAsync(userId!, userId, searchDto, cancellationToken);
+        ViewBag.CurrentSearch = searchTerm;
+        ViewBag.CurrentType = type;
+        ViewBag.CurrentFrom = from?.ToString("yyyy-MM-dd");
+        ViewBag.CurrentTo = to?.ToString("yyyy-MM-dd");
+
+        ViewBag.CurrentSort = sortOrder;
+        ViewBag.DateSortParam = string.IsNullOrEmpty(sortOrder) || sortOrder == "date_desc" ? "date_asc" : "date_desc";
+        ViewBag.NameSortParam = sortOrder == "name_asc" ? "name_desc" : "name_asc";
+
+        var result = await eventService.GetEventsAsync(userId!, userId, searchDto, sortOrder, cancellationToken);
 
         return View(result);
     }
