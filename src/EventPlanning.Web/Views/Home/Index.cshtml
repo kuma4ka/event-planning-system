@@ -1,12 +1,18 @@
 ﻿@using EventPlanning.Domain.Enums
+@using Microsoft.AspNetCore.Identity
+@using EventPlanning.Infrastructure.Identity
+
+@inject UserManager<User> UserManager
+
 @model EventPlanning.Application.Models.PagedResult<EventPlanning.Application.DTOs.EventDto>
 
 @{
-    ViewData["Title"] = "My Events";
+    ViewData["Title"] = "All Events";
+    var currentUserId = UserManager.GetUserId(User);
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>My Events</h1>
+    <h1>All Events</h1>
     <a asp-action="Create" class="btn btn-primary">Create Event</a>
 </div>
 
@@ -14,7 +20,8 @@
     <div class="card-body">
         <form method="get" asp-action="Index" class="row g-3">
             <div class="col-md-3">
-                <input type="text" name="searchTerm" class="form-control" placeholder="Search by name..." value="@Context.Request.Query["searchTerm"]">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Search by name..."
+                       value="@Context.Request.Query["searchTerm"]">
             </div>
             <div class="col-md-2">
                 <select name="type" class="form-select" asp-items="Html.GetEnumSelectList<EventType>()">
@@ -42,7 +49,7 @@
 else
 {
     <div class="row row-cols-1 row-cols-md-3 g-4">
-        @foreach (var item in Model.Items) // 👈 Звертаємось до .Items
+        @foreach (var item in Model.Items)
         {
             <div class="col">
                 <div class="card h-100 shadow-sm">
@@ -53,17 +60,26 @@ else
                         </div>
                         <h6 class="card-subtitle mb-2 text-muted">@item.Date.ToString("g")</h6>
                         <p class="card-text text-truncate">@item.Description</p>
-                        <p class="card-text"><small class="text-muted"><i class="bi bi-geo-alt"></i> @item.VenueName</small></p>
+                        <p class="card-text"><small class="text-muted"><i class="bi bi-geo-alt"></i> @item.VenueName
+                            </small></p>
                     </div>
-                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Details</a>
-                        <div>
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">Edit</a>
 
-                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure?');">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                            </form>
-                        </div>
+                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+                        <a asp-action="Details" asp-route-id="@item.Id"
+                           class="btn btn-sm btn-outline-primary">Details</a>
+
+                        @if (item.OrganizerId == currentUserId)
+                        {
+                            <div>
+                                <a asp-action="Edit" asp-route-id="@item.Id"
+                                   class="btn btn-sm btn-outline-warning">Edit</a>
+
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline"
+                                      onsubmit="return confirm('Are you sure?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
