@@ -1,62 +1,104 @@
-﻿@using EventPlanning.Application.DTOs
-@model List<EventDto>
+﻿@using EventPlanning.Domain.Enums
+@model EventPlanning.Application.Models.PagedResult<EventPlanning.Application.DTOs.EventDto>
 
 @{
-    ViewData["Title"] = "Events";
+    ViewData["Title"] = "My Events";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Upcoming Events</h1>
-        <a asp-action="Create" class="btn btn-primary">Create Event</a>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>My Events</h1>
+    <a asp-action="Create" class="btn btn-primary">Create Event</a>
+</div>
+
+<div class="card mb-4 bg-light">
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-3">
+            <div class="col-md-3">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Search by name..." value="@Context.Request.Query["searchTerm"]">
+            </div>
+            <div class="col-md-2">
+                <select name="type" class="form-select" asp-items="Html.GetEnumSelectList<EventType>()">
+                    <option value="">All Types</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="from" class="form-control" value="@Context.Request.Query["from"]">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="to" class="form-control" value="@Context.Request.Query["to"]">
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1">Filter</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </form>
     </div>
+</div>
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info">No events found. Be the first to create one!</div>
-    }
-    else
-    {
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            @foreach (var item in Model)
-            {
-                <div class="col">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">
-                                        @item.Name
-                                    </a>
-                                </h5>
-                                <span class="badge bg-secondary">@item.Type</span>
-                            </div>
-                            <h6 class="card-subtitle mb-2 text-muted">@item.Date.ToString("g")</h6>
-                            <p class="card-text mt-3">@item.Description</p>
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-info">No events found matching your criteria.</div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var item in Model.Items) // 👈 Звертаємось до .Items
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">@item.Name</h5>
+                            <span class="badge bg-secondary">@item.Type</span>
                         </div>
+                        <h6 class="card-subtitle mb-2 text-muted">@item.Date.ToString("g")</h6>
+                        <p class="card-text text-truncate">@item.Description</p>
+                        <p class="card-text"><small class="text-muted"><i class="bi bi-geo-alt"></i> @item.VenueName</small></p>
+                    </div>
+                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Details</a>
+                        <div>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">Edit</a>
 
-                        <div class="card-footer bg-white border-top-0">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">
-                                    <strong>Venue:</strong> @item.VenueName
-                                </small>
-
-                                <div class="btn-group">
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
-                                        Edit
-                                    </a>
-
-                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post"
-                                          onsubmit="return confirm('Are you sure you want to delete the event \'@item.Name\'?');"
-                                          style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                    </form>
-                                </div>
-                            </div>
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
                         </div>
                     </div>
                 </div>
-            }
-        </div>
-    }
-</div>
+            </div>
+        }
+    </div>
+
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(Model.PageNumber - 1)"
+                   asp-route-searchTerm="@Context.Request.Query["searchTerm"]"
+                   asp-route-type="@Context.Request.Query["type"]"
+                   asp-route-from="@Context.Request.Query["from"]"
+                   asp-route-to="@Context.Request.Query["to"]">
+                    Previous
+                </a>
+            </li>
+
+            <li class="page-item disabled">
+                <span class="page-link">Page @Model.PageNumber of @Model.TotalPages</span>
+            </li>
+
+            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(Model.PageNumber + 1)"
+                   asp-route-searchTerm="@Context.Request.Query["searchTerm"]"
+                   asp-route-type="@Context.Request.Query["type"]"
+                   asp-route-from="@Context.Request.Query["from"]"
+                   asp-route-to="@Context.Request.Query["to"]">
+                    Next
+                </a>
+            </li>
+        </ul>
+    </nav>
+}
