@@ -68,9 +68,9 @@ public class HomeController(
         }
         catch (ValidationException ex)
         {
-            foreach (var error in ex.Errors) 
+            foreach (var error in ex.Errors)
                 ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            
+
             await LoadVenuesToViewBag(cancellationToken);
             return View(model);
         }
@@ -155,7 +155,7 @@ public class HomeController(
         if (eventDetails == null) return NotFound();
 
         var organizer = await userManager.FindByIdAsync(eventDetails.OrganizerId);
-        
+
         ViewBag.OrganizerName = organizer != null ? $"{organizer.FirstName} {organizer.LastName}" : "Unknown Organizer";
         ViewBag.OrganizerEmail = organizer?.Email ?? "";
 
@@ -191,20 +191,33 @@ public class HomeController(
 
         return RedirectToAction(nameof(Details), new { id });
     }
-    
+
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> MyEvents(
-        int page = 1, 
+        string? searchTerm,
+        EventType? type,
+        DateTime? from,
+        DateTime? to,
+        int page = 1,
         CancellationToken cancellationToken = default)
     {
         var userId = userManager.GetUserId(User);
-        
+
         var searchDto = new EventSearchDto
         {
+            SearchTerm = searchTerm,
+            Type = type,
+            FromDate = from,
+            ToDate = to,
             PageNumber = page,
             PageSize = 10
         };
+
+        ViewBag.CurrentSearch = searchTerm;
+        ViewBag.CurrentType = type;
+        ViewBag.CurrentFrom = from?.ToString("yyyy-MM-dd");
+        ViewBag.CurrentTo = to?.ToString("yyyy-MM-dd");
 
         var result = await eventService.GetEventsAsync(userId!, userId, searchDto, cancellationToken);
 
