@@ -2,22 +2,25 @@
 using EventPlanning.Domain.Enums;
 using EventPlanning.Domain.Models;
 
+namespace EventPlanning.Domain.Interfaces;
+
 public interface IEventRepository
 {
     Task<Event?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
     Task AddAsync(Event eventEntity, CancellationToken cancellationToken = default);
     Task UpdateAsync(Event eventEntity, CancellationToken cancellationToken = default);
     Task DeleteAsync(Event eventEntity, CancellationToken cancellationToken = default);
-    
+
     Task<PagedList<Event>> GetFilteredAsync(
-        string userId, 
-        string? searchTerm, 
-        DateTime? from, 
-        DateTime? to, 
-        EventType? type, 
-        int pageNumber, 
-        int pageSize, 
+        string? organizerId,
+        string? searchTerm,
+        DateTime? from,
+        DateTime? to,
+        EventType? type,
+        int pageNumber,
+        int pageSize,
         CancellationToken cancellationToken = default);
+
     Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default);
     Task AddGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default);
     Task RemoveGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default);
