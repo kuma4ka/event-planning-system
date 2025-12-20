@@ -17,6 +17,7 @@ public class HomeController(
     UserManager<User> userManager) : Controller
 {
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> Index(
         string? searchTerm,
         EventType? type,
@@ -25,8 +26,7 @@ public class HomeController(
         int page = 1,
         CancellationToken cancellationToken = default)
     {
-        var userId = userManager.GetUserId(User);
-        if (userId == null) return RedirectToAction("Login", "Account");
+        var userId = userManager.GetUserId(User) ?? string.Empty;
 
         var searchDto = new EventSearchDto
         {
@@ -38,7 +38,7 @@ public class HomeController(
             PageSize = 9
         };
 
-        var result = await eventService.GetEventsAsync(userId, searchDto, cancellationToken);
+        var result = await eventService.GetEventsAsync(userId, null, searchDto, cancellationToken);
 
         return View(result);
     }
@@ -190,5 +190,24 @@ public class HomeController(
         }
 
         return RedirectToAction(nameof(Details), new { id });
+    }
+    
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> MyEvents(
+        int page = 1, 
+        CancellationToken cancellationToken = default)
+    {
+        var userId = userManager.GetUserId(User);
+        
+        var searchDto = new EventSearchDto
+        {
+            PageNumber = page,
+            PageSize = 10
+        };
+
+        var result = await eventService.GetEventsAsync(userId!, userId, searchDto, cancellationToken);
+
+        return View(result);
     }
 }

@@ -13,11 +13,14 @@ public class EventService(
     IValidator<CreateEventDto> createValidator,
     IValidator<UpdateEventDto> updateValidator) : IEventService
 {
-    public async Task<PagedResult<EventDto>> GetEventsAsync(string userId, EventSearchDto searchDto,
+    public async Task<PagedResult<EventDto>> GetEventsAsync(
+        string userId,
+        string? organizerIdFilter,
+        EventSearchDto searchDto,
         CancellationToken cancellationToken = default)
     {
         var pagedEvents = await eventRepository.GetFilteredAsync(
-            null,
+            organizerIdFilter,
             userId,
             searchDto.SearchTerm,
             searchDto.FromDate,
@@ -34,10 +37,7 @@ public class EventService(
         )).ToList();
 
         return new PagedResult<EventDto>(
-            eventDtos,
-            pagedEvents.TotalCount,
-            pagedEvents.PageNumber,
-            pagedEvents.PageSize
+            eventDtos, pagedEvents.TotalCount, pagedEvents.PageNumber, pagedEvents.PageSize
         );
     }
 
