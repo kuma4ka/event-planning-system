@@ -1,5 +1,6 @@
 ﻿using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
+using EventPlanning.Domain.Interfaces;
 using EventPlanning.Domain.Models;
 using EventPlanning.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -56,7 +57,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
     }
 
     public async Task<PagedList<Event>> GetFilteredAsync(
-        string userId,
+        string? organizerId,
         string? searchTerm,
         DateTime? from,
         DateTime? to,
@@ -67,9 +68,10 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
     {
         var query = context.Events
             .Include(e => e.Venue)
-            .Where(e => e.OrganizerId == userId)
             .AsNoTracking()
             .AsQueryable();
+
+        if (!string.IsNullOrEmpty(organizerId)) query = query.Where(e => e.OrganizerId == organizerId);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
             query = query.Where(e =>
@@ -86,48 +88,48 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
 
     public async Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
-        if (!int.TryParse(userId, out var userIdInt)) return false;
-
         return await context.Events
             .Include(e => e.Guests)
-            .AnyAsync(e => e.Id == eventId && e.Guests.Any(g => g.Id == userIdInt), cancellationToken);
+            .AnyAsync(e => e.Id == eventId && e.Guests.Any(g => g.Id == userId), cancellationToken);
     }
 
     public async Task AddGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
-        if (!int.TryParse(userId, out var userIdInt))
-            throw new ArgumentException($"User ID '{userId}' is not a valid integer.");
-
         var eventEntity = await context.Events
             .Include(e => e.Guests)
             .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
 
         if (eventEntity == null) throw new KeyNotFoundException("Event not found");
 
-        var guest = await context.Set<Guest>()
-            .FindAsync(new object[] { userIdInt }, cancellationToken);
+        var identityUser = await context.Users.FindAsync(new object[] { userId }, cancellationToken);
+        if (identityUser == null) throw new KeyNotFoundException("User not found");
 
-        if (guest == null) throw new KeyNotFoundException($"Guest with ID {userIdInt} not found");
-
-        if (!eventEntity.Guests.Any(g => g.Id == userIdInt))
+        if (!eventEntity.Guests.Any(g => g.Id == userId))
         {
-            eventEntity.Guests.Add(guest);
+            var newGuest = new Guest
+            {
+                Id = identityUser.Id,
+                FirstName = identityUser.FirstName,
+                LastName = identityUser.LastName,
+                Email = identityUser.Email!,
+                PhoneNumber = identityUser.PhoneNumber,
+                EventId = eventId
+            };
+
+            eventEntity.Guests.Add(newGuest);
             await context.SaveChangesAsync(cancellationToken);
         }
     }
 
     public async Task RemoveGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
-        if (!int.TryParse(userId, out var userIdInt)) return;
-
         var eventEntity = await context.Events
             .Include(e => e.Guests)
             .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
 
         if (eventEntity == null) return;
 
-        var guest = eventEntity.Guests.FirstOrDefault(g => g.Id == userIdInt);
-
+        var guest = eventEntity.Guests.FirstOrDefault(g => g.Id == userId);
         if (guest != null)
         {
             eventEntity.Guests.Remove(guest);

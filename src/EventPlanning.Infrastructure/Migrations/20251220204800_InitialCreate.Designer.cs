@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventPlanning.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251213184902_InitialCreate")]
+    [Migration("20251220204800_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -68,11 +68,8 @@ namespace EventPlanning.Infrastructure.Migrations
 
             modelBuilder.Entity("EventPlanning.Domain.Entities.Guest", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
                         .IsRequired()
