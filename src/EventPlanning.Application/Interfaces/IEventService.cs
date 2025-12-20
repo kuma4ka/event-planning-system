@@ -6,9 +6,10 @@ namespace EventPlanning.Application.Interfaces;
 public interface IEventService
 {
     Task<PagedResult<EventDto>> GetEventsAsync(
-        string viewerId,
+        string userId,
         string? organizerIdFilter,
         EventSearchDto searchDto,
+        string? sortOrder,
         CancellationToken cancellationToken = default);
 
     Task<EventDto?> GetEventByIdAsync(int id, CancellationToken cancellationToken = default);

@@ -38,7 +38,7 @@ public class HomeController(
             PageSize = 9
         };
 
-        var result = await eventService.GetEventsAsync(userId, null, searchDto, cancellationToken);
+        var result = await eventService.GetEventsAsync(userId, null, searchDto, null, cancellationToken);
 
         return View(result);
     }
@@ -118,9 +118,13 @@ public class HomeController(
         catch (ValidationException ex)
         {
             foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-
             await LoadVenuesToViewBag(cancellationToken);
-
+            return View(model);
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+            await LoadVenuesToViewBag(cancellationToken);
             return View(model);
         }
         catch (UnauthorizedAccessException)
@@ -199,6 +203,7 @@ public class HomeController(
         EventType? type,
         DateTime? from,
         DateTime? to,
+        string? sortOrder,
         int page = 1,
         CancellationToken cancellationToken = default)
     {
@@ -219,7 +224,11 @@ public class HomeController(
         ViewBag.CurrentFrom = from?.ToString("yyyy-MM-dd");
         ViewBag.CurrentTo = to?.ToString("yyyy-MM-dd");
 
-        var result = await eventService.GetEventsAsync(userId!, userId, searchDto, cancellationToken);
+        ViewBag.CurrentSort = sortOrder;
+        ViewBag.DateSortParam = string.IsNullOrEmpty(sortOrder) || sortOrder == "date_desc" ? "date_asc" : "date_desc";
+        ViewBag.NameSortParam = sortOrder == "name_asc" ? "name_desc" : "name_asc";
+
+        var result = await eventService.GetEventsAsync(userId!, userId, searchDto, sortOrder, cancellationToken);
 
         return View(result);
     }

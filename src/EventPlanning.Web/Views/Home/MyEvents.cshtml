@@ -35,6 +35,8 @@
     <div class="card shadow-sm border-0 mb-4 bg-light">
         <div class="card-body">
             <form method="get" asp-action="MyEvents" class="row g-3">
+                <input type="hidden" name="sortOrder" value="@ViewBag.CurrentSort" />
+
                 <div class="col-md-3">
                     <input type="text" name="searchTerm" class="form-control" placeholder="Search by name..."
                            value="@ViewBag.CurrentSearch">
@@ -79,8 +81,30 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light">
                     <tr>
-                        <th class="ps-4">Date</th>
-                        <th>Event Info</th>
+                        <th class="ps-4">
+                            <a asp-action="MyEvents"
+                               asp-route-sortOrder="@ViewBag.DateSortParam"
+                               asp-route-searchTerm="@ViewBag.CurrentSearch"
+                               asp-route-type="@ViewBag.CurrentType"
+                               class="text-decoration-none text-dark user-select-none">
+                                Date
+                                @if (ViewBag.CurrentSort == "date_asc") { <i class="bi bi-arrow-up-short"></i> }
+                                else if (string.IsNullOrEmpty(ViewBag.CurrentSort) || ViewBag.CurrentSort == "date_desc") { <i class="bi bi-arrow-down-short"></i> }
+                                else { <i class="bi bi-arrow-down-up text-muted opacity-25"></i> }
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-action="MyEvents"
+                               asp-route-sortOrder="@ViewBag.NameSortParam"
+                               asp-route-searchTerm="@ViewBag.CurrentSearch"
+                               asp-route-type="@ViewBag.CurrentType"
+                               class="text-decoration-none text-dark user-select-none">
+                                Event Info
+                                @if (ViewBag.CurrentSort == "name_asc") { <i class="bi bi-arrow-up-short"></i> }
+                                else if (ViewBag.CurrentSort == "name_desc") { <i class="bi bi-arrow-down-short"></i> }
+                                else { <i class="bi bi-arrow-down-up text-muted opacity-25"></i> }
+                            </a>
+                        </th>
                         <th>Venue</th>
                         <th>Status</th>
                         <th class="text-end pe-4">Actions</th>
@@ -93,8 +117,7 @@
 
                         <tr>
                             <td class="ps-4" style="width: 15%">
-                                <div
-                                    class="d-flex flex-column text-center border rounded p-2 bg-light @(isPast ? "opacity-50" : "")">
+                                <div class="d-flex flex-column text-center border rounded p-2 bg-light @(isPast ? "opacity-50" : "")">
                                     <span class="fw-bold fs-5">@item.Date.ToString("dd")</span>
                                     <span class="small text-uppercase text-muted">@item.Date.ToString("MMM")</span>
                                     <span class="small text-muted">@item.Date.ToString("yyyy")</span>
@@ -126,6 +149,12 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="btn-group shadow-sm">
+                                    <button onclick="copyLink('@Url.Action("Details", "Home", new { id = item.Id }, Context.Request.Scheme)')"
+                                            class="btn btn-sm btn-outline-info"
+                                            title="Copy Link">
+                                        <i class="bi bi-share"></i>
+                                    </button>
+
                                     <a asp-action="Details" asp-route-id="@item.Id"
                                        class="btn btn-sm btn-outline-secondary" title="View">
                                         <i class="bi bi-eye"></i>
@@ -150,19 +179,14 @@
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title">Delete Event?</h5>
-                                                <button type="button" class="btn-close"
-                                                        data-bs-dismiss="modal"></button>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body text-start">
-                                                Are you sure you want to delete <strong>@item.Name</strong>? This cannot
-                                                be undone.
+                                                Are you sure you want to delete <strong>@item.Name</strong>? This cannot be undone.
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                    Cancel
-                                                </button>
-                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post"
-                                                      class="d-inline">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
                                                     <button type="submit" class="btn btn-danger">Delete</button>
                                                 </form>
                                             </div>
@@ -185,6 +209,7 @@
                         <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
                             <a class="page-link" asp-action="MyEvents"
                                asp-route-page="@(Model.PageNumber - 1)"
+                               asp-route-sortOrder="@ViewBag.CurrentSort"
                                asp-route-searchTerm="@ViewBag.CurrentSearch"
                                asp-route-type="@ViewBag.CurrentType"
                                asp-route-from="@ViewBag.CurrentFrom"
@@ -196,6 +221,7 @@
                             <li class="page-item @(i == Model.PageNumber ? "active" : "")">
                                 <a class="page-link" asp-action="MyEvents"
                                    asp-route-page="@i"
+                                   asp-route-sortOrder="@ViewBag.CurrentSort"
                                    asp-route-searchTerm="@ViewBag.CurrentSearch"
                                    asp-route-type="@ViewBag.CurrentType"
                                    asp-route-from="@ViewBag.CurrentFrom"
@@ -206,6 +232,7 @@
                         <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
                             <a class="page-link" asp-action="MyEvents"
                                asp-route-page="@(Model.PageNumber + 1)"
+                               asp-route-sortOrder="@ViewBag.CurrentSort"
                                asp-route-searchTerm="@ViewBag.CurrentSearch"
                                asp-route-type="@ViewBag.CurrentType"
                                asp-route-from="@ViewBag.CurrentFrom"
@@ -217,3 +244,15 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        function copyLink(url) {
+            navigator.clipboard.writeText(url).then(function() {
+                alert('Link copied to clipboard!');
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+    </script>
+}
