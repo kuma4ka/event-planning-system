@@ -2,6 +2,7 @@
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
+using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 
 namespace EventPlanning.Application.Services;
@@ -15,7 +16,7 @@ public class EventService(
         CancellationToken cancellationToken = default)
     {
         var pagedEvents = await eventRepository.GetFilteredAsync(
-            userId,
+            null,
             searchDto.SearchTerm,
             searchDto.FromDate,
             searchDto.ToDate,
@@ -133,8 +134,6 @@ public class EventService(
 
     public async Task JoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
-        if (!int.TryParse(userId, out var userIdInt)) throw new ArgumentException("Invalid User ID format");
-
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException($"Event {eventId} not found");
 
@@ -144,7 +143,7 @@ public class EventService(
         if (eventEntity.Venue != null && eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
             throw new InvalidOperationException("Sorry, this event is fully booked.");
 
-        if (eventEntity.Guests.Any(g => g.Id == userIdInt))
+        if (eventEntity.Guests.Any(g => g.Id == userId))
             throw new InvalidOperationException("You are already registered for this event.");
 
         await eventRepository.AddGuestAsync(eventId, userId, cancellationToken);

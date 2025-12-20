@@ -17,12 +17,13 @@ public class GuestService(
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
         var eventEntity = await eventRepository.GetByIdAsync(dto.EventId, cancellationToken);
-        
+
         if (eventEntity == null) throw new KeyNotFoundException("Event not found");
         if (eventEntity.OrganizerId != userId) throw new UnauthorizedAccessException("Not your event");
 
         var guest = new Guest
         {
+            Id = Guid.NewGuid().ToString(),
             EventId = dto.EventId,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
@@ -33,14 +34,14 @@ public class GuestService(
         await guestRepository.AddAsync(guest, cancellationToken);
     }
 
-    public async Task RemoveGuestAsync(string userId, int guestId, CancellationToken cancellationToken = default)
+    public async Task RemoveGuestAsync(string userId, string guestId, CancellationToken cancellationToken = default)
     {
         var guest = await guestRepository.GetByIdAsync(guestId, cancellationToken);
         if (guest == null) return;
 
         if (guest.Event?.OrganizerId != userId)
             throw new UnauthorizedAccessException("Not your event");
-
+             
         await guestRepository.DeleteAsync(guest, cancellationToken);
     }
 }
