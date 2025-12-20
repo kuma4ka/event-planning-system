@@ -1,20 +1,31 @@
 ﻿using EventPlanning.Application.DTOs;
 using EventPlanning.Application.Interfaces;
+using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
-using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 
 namespace EventPlanning.Application.Services;
 
 public class EventService(
     IEventRepository eventRepository,
-    IValidator<CreateEventDto> validator) : IEventService
+    IValidator<CreateEventDto> createValidator,
+    IValidator<UpdateEventDto> updateValidator) : IEventService
 {
-    public async Task<List<EventDto>> GetAllEventsAsync(CancellationToken cancellationToken = default)
+    public async Task<PagedResult<EventDto>> GetEventsAsync(string userId, EventSearchDto searchDto,
+        CancellationToken cancellationToken = default)
     {
-        var events = await eventRepository.GetAllAsync(cancellationToken);
+        var pagedEvents = await eventRepository.GetFilteredAsync(
+            userId,
+            searchDto.SearchTerm,
+            searchDto.FromDate,
+            searchDto.ToDate,
+            searchDto.Type,
+            searchDto.PageNumber,
+            searchDto.PageSize,
+            cancellationToken
+        );
 
-        return events.Select(e => new EventDto(
+        var eventDtos = pagedEvents.Items.Select(e => new EventDto(
             e.Id,
             e.Name,
             e.Description ?? string.Empty,
@@ -22,54 +33,23 @@ public class EventService(
             e.Type,
             e.OrganizerId,
             e.Venue?.Name ?? "TBD",
-            e.Guests.Count
+            e.VenueId
         )).ToList();
+
+        return new PagedResult<EventDto>(
+            eventDtos,
+            pagedEvents.TotalCount,
+            pagedEvents.PageNumber,
+            pagedEvents.PageSize
+        );
     }
 
     public async Task<EventDto?> GetEventByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var eventEntity = await eventRepository.GetByIdAsync(id, cancellationToken);
-        if (eventEntity == null) return null;
+        var e = await eventRepository.GetByIdAsync(id, cancellationToken);
+        if (e == null) return null;
 
         return new EventDto(
-            eventEntity.Id,
-            eventEntity.Name,
-            eventEntity.Description ?? string.Empty,
-            eventEntity.Date,
-            eventEntity.Type,
-            eventEntity.OrganizerId,
-            eventEntity.Venue?.Name ?? "TBD",
-            eventEntity.Guests.Count
-        );
-    }
-
-    public async Task CreateEventAsync(CreateEventDto dto, CancellationToken cancellationToken = default)
-    {
-        var validationResult = await validator.ValidateAsync(dto, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            throw new ValidationException(validationResult.Errors);
-        }
-
-        var newEvent = new Event
-        {
-            Name = dto.Name,
-            Description = dto.Description,
-            Date = dto.Date,
-            Type = dto.Type,
-            VenueId = dto.VenueId,
-            OrganizerId = dto.OrganizerId,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        await eventRepository.AddAsync(newEvent, cancellationToken);
-    }
-    
-    public async Task<List<EventDto>> GetEventsByUserIdAsync(string userId, CancellationToken cancellationToken = default)
-    {
-        var events = await eventRepository.GetByOrganizerAsync(userId, cancellationToken);
-
-        return events.Select(e => new EventDto(
             e.Id,
             e.Name,
             e.Description ?? string.Empty,
@@ -77,41 +57,10 @@ public class EventService(
             e.Type,
             e.OrganizerId,
             e.Venue?.Name ?? "TBD",
-            e.Guests.Count
-        )).ToList();
-    }
-    
-    public async Task UpdateEventAsync(string userId, UpdateEventDto dto, CancellationToken cancellationToken = default)
-    {
-        var eventEntity = await eventRepository.GetByIdAsync(dto.Id, cancellationToken);
-
-        if (eventEntity == null)
-            throw new KeyNotFoundException($"Event with ID {dto.Id} not found.");
-
-        if (eventEntity.OrganizerId != userId)
-            throw new UnauthorizedAccessException("You are not the organizer of this event.");
-
-        eventEntity.Name = dto.Name;
-        eventEntity.Description = dto.Description;
-        eventEntity.Date = dto.Date;
-        eventEntity.Type = dto.Type;
-        eventEntity.VenueId = dto.VenueId;
-
-        await eventRepository.UpdateAsync(eventEntity, cancellationToken);
+            e.VenueId
+        );
     }
 
-    public async Task DeleteEventAsync(string userId, int eventId, CancellationToken cancellationToken = default)
-    {
-        var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
-
-        if (eventEntity == null) return;
-
-        if (eventEntity.OrganizerId != userId)
-            throw new UnauthorizedAccessException("You are not the organizer of this event.");
-
-        await eventRepository.DeleteAsync(eventEntity, cancellationToken);
-    }
-    
     public async Task<EventDetailsDto?> GetEventDetailsAsync(int id, CancellationToken cancellationToken = default)
     {
         var eventEntity = await eventRepository.GetByIdAsync(id, cancellationToken);
@@ -126,11 +75,59 @@ public class EventService(
             eventEntity.OrganizerId,
             eventEntity.Venue?.Name ?? "TBD",
             eventEntity.Guests.Select(g => new GuestDto(
-                g.Id, 
-                $"{g.FirstName} {g.LastName}", 
-                g.Email, 
+                g.Id,
+                $"{g.FirstName} {g.LastName}",
+                g.Email,
                 g.PhoneNumber
             )).ToList()
         );
+    }
+
+    public async Task CreateEventAsync(CreateEventDto dto, CancellationToken cancellationToken = default)
+    {
+        var validationResult = await createValidator.ValidateAsync(dto, cancellationToken);
+        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
+        var eventEntity = new Event
+        {
+            Name = dto.Name,
+            Description = dto.Description,
+            Date = dto.Date,
+            Type = dto.Type,
+            OrganizerId = dto.OrganizerId,
+            VenueId = dto.VenueId
+        };
+
+        await eventRepository.AddAsync(eventEntity, cancellationToken);
+    }
+
+    public async Task UpdateEventAsync(string userId, UpdateEventDto dto, CancellationToken cancellationToken = default)
+    {
+        var validationResult = await updateValidator.ValidateAsync(dto, cancellationToken);
+        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
+        var eventEntity = await eventRepository.GetByIdAsync(dto.Id, cancellationToken);
+        if (eventEntity == null) throw new KeyNotFoundException($"Event {dto.Id} not found");
+
+        if (eventEntity.OrganizerId != userId) throw new UnauthorizedAccessException("Not your event");
+
+        eventEntity.Name = dto.Name;
+        eventEntity.Description = dto.Description;
+        eventEntity.Date = dto.Date;
+        eventEntity.Type = dto.Type;
+        eventEntity.VenueId = dto.VenueId;
+
+        await eventRepository.UpdateAsync(eventEntity, cancellationToken);
+    }
+
+    public async Task DeleteEventAsync(string userId, int eventId, CancellationToken cancellationToken = default)
+    {
+        var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
+        if (eventEntity == null) return;
+
+        if (eventEntity.OrganizerId != userId)  
+            throw new UnauthorizedAccessException("Not your event");
+
+        await eventRepository.DeleteAsync(eventEntity, cancellationToken);
     }
 }
