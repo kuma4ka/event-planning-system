@@ -19,11 +19,11 @@ public class HomeController(
 {
     [HttpGet]
     public async Task<IActionResult> Index(
-        string? searchTerm, 
-        EventType? type, 
-        DateTime? from, 
-        DateTime? to, 
-        int page = 1, 
+        string? searchTerm,
+        EventType? type,
+        DateTime? from,
+        DateTime? to,
+        int page = 1,
         CancellationToken cancellationToken = default)
     {
         var userId = userManager.GetUserId(User);
@@ -56,7 +56,7 @@ public class HomeController(
     {
         var userId = userManager.GetUserId(User);
         var modelWithUser = model with { OrganizerId = userId! };
-        
+
         ModelState.Remove(nameof(model.OrganizerId));
 
         if (!ModelState.IsValid)
@@ -65,22 +65,19 @@ public class HomeController(
             return View(model);
         }
 
-        try 
+        try
         {
             await eventService.CreateEventAsync(modelWithUser, cancellationToken);
             return RedirectToAction(nameof(Index));
         }
         catch (ValidationException ex)
         {
-            foreach (var error in ex.Errors)
-            {
-                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            }
+            foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
             await LoadVenuesToViewBag(cancellationToken);
             return View(model);
         }
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> Edit(int id, CancellationToken cancellationToken)
     {
@@ -107,7 +104,7 @@ public class HomeController(
     [HttpPost]
     public async Task<IActionResult> Edit(UpdateEventDto model, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid) 
+        if (!ModelState.IsValid)
         {
             await LoadVenuesToViewBag(cancellationToken);
             return View(model);
@@ -122,13 +119,10 @@ public class HomeController(
         }
         catch (ValidationException ex)
         {
-            foreach (var error in ex.Errors)
-            {
-                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            }
-            
+            foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
             await LoadVenuesToViewBag(cancellationToken);
-            
+
             return View(model);
         }
         catch (UnauthorizedAccessException)
@@ -155,16 +149,16 @@ public class HomeController(
             return Forbid();
         }
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> Details(int id, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
-        
+
         var eventDetails = await eventService.GetEventDetailsAsync(id, cancellationToken);
 
         if (eventDetails == null) return NotFound();
-        
+
         if (eventDetails.OrganizerId != userId) return Forbid();
 
         return View(eventDetails);
@@ -174,10 +168,29 @@ public class HomeController(
     {
         var venues = await venueService.GetVenuesAsync(token);
 
-        ViewBag.Venues = venues.Select(v => new SelectListItem 
-        { 
-            Value = v.Id.ToString(), 
-            Text = v.Name 
+        ViewBag.Venues = venues.Select(v => new SelectListItem
+        {
+            Value = v.Id.ToString(),
+            Text = v.Name
         }).ToList();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Join(int id, CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User);
+        if (userId == null) return RedirectToAction("Login", "Account");
+
+        try
+        {
+            await eventService.JoinEventAsync(id, userId, cancellationToken);
+            TempData["SuccessMessage"] = "You have successfully joined the event!";
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Details), new { id });
     }
 }

@@ -83,4 +83,55 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
 
         return await query.ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
+
+    public async Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    {
+        if (!int.TryParse(userId, out var userIdInt)) return false;
+
+        return await context.Events
+            .Include(e => e.Guests)
+            .AnyAsync(e => e.Id == eventId && e.Guests.Any(g => g.Id == userIdInt), cancellationToken);
+    }
+
+    public async Task AddGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    {
+        if (!int.TryParse(userId, out var userIdInt))
+            throw new ArgumentException($"User ID '{userId}' is not a valid integer.");
+
+        var eventEntity = await context.Events
+            .Include(e => e.Guests)
+            .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
+
+        if (eventEntity == null) throw new KeyNotFoundException("Event not found");
+
+        var guest = await context.Set<Guest>()
+            .FindAsync(new object[] { userIdInt }, cancellationToken);
+
+        if (guest == null) throw new KeyNotFoundException($"Guest with ID {userIdInt} not found");
+
+        if (!eventEntity.Guests.Any(g => g.Id == userIdInt))
+        {
+            eventEntity.Guests.Add(guest);
+            await context.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    public async Task RemoveGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    {
+        if (!int.TryParse(userId, out var userIdInt)) return;
+
+        var eventEntity = await context.Events
+            .Include(e => e.Guests)
+            .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
+
+        if (eventEntity == null) return;
+
+        var guest = eventEntity.Guests.FirstOrDefault(g => g.Id == userIdInt);
+
+        if (guest != null)
+        {
+            eventEntity.Guests.Remove(guest);
+            await context.SaveChangesAsync(cancellationToken);
+        }
+    }
 }
