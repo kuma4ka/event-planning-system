@@ -16,7 +16,7 @@ public class GuestController(
     [HttpGet]
     public IActionResult Create(int eventId)
     {
-        return View(new CreateGuestDto(eventId)); 
+        return View(new CreateGuestDto(eventId));
     }
 
     [HttpPost]
@@ -41,6 +41,32 @@ public class GuestController(
         {
             return Forbid();
         }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddManually(AddGuestManuallyDto model, CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User);
+
+        try
+        {
+            await guestService.AddGuestManuallyAsync(userId!, model, cancellationToken);
+            TempData["SuccessMessage"] = $"{model.FirstName} has been added to the list.";
+        }
+        catch (ValidationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Errors.FirstOrDefault()?.ErrorMessage ?? "Validation failed.";
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
+
+        return RedirectToAction("Details", "Home", new { id = model.EventId });
     }
 
     [HttpPost]
