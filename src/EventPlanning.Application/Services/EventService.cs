@@ -114,6 +114,9 @@ public class EventService(
 
         if (eventEntity.OrganizerId != userId) throw new UnauthorizedAccessException("Not your event");
 
+        if (eventEntity.Date < DateTime.Now)
+            throw new InvalidOperationException("Cannot edit an event that has already ended.");
+
         eventEntity.Name = dto.Name;
         eventEntity.Description = dto.Description;
         eventEntity.Date = dto.Date;
@@ -138,6 +141,9 @@ public class EventService(
     {
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException($"Event {eventId} not found");
+
+        if (eventEntity.Date < DateTime.Now)
+            throw new InvalidOperationException("Cannot join an event that has already ended.");
 
         if (eventEntity.OrganizerId == userId)
             throw new InvalidOperationException("You cannot join your own event as a guest.");

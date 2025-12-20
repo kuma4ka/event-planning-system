@@ -8,7 +8,6 @@
 @{
     ViewData["Title"] = "My Events";
 
-    // Генерація списку типів для випадаючого списку (так само, як ми робили в Create)
     var eventTypes = Enum.GetValues<EventType>().Select(e =>
     {
         var field = e.GetType().GetField(e.ToString());

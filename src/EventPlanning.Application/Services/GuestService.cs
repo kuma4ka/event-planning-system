@@ -59,6 +59,9 @@ public class GuestService(
         if (eventEntity.OrganizerId != currentUserId)
             throw new UnauthorizedAccessException("Only the organizer can add guests manually.");
 
+        if (eventEntity.Date < DateTime.Now)
+            throw new InvalidOperationException("Cannot add guests to an event that has already ended.");
+
         if (eventEntity.Venue != null && eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
             throw new InvalidOperationException("Venue is fully booked.");
 

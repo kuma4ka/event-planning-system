@@ -17,6 +17,8 @@
     var isFull = capacity > 0 && spotsLeft <= 0;
 
     var fillPercent = capacity > 0 ? (int)((double)guestsCount / capacity * 100) : 0;
+
+    var isPast = Model.Date < DateTime.Now;
 }
 
 <div class="container mt-4">
@@ -107,15 +109,13 @@
 
                 <div class="col-lg-4 mt-4 mt-lg-0">
                     <div class="card bg-light border-0 rounded-3 p-3">
-                        <div class="text-center mb-3">
-                            <h2 class="fw-bold @(isFull ? "text-danger" : "text-success")">
-                                @(capacity > 0 ? spotsLeft.ToString() : "∞")
-                            </h2>
-                            <p class="text-muted small text-uppercase">Spots Remaining</p>
-                        </div>
-
+                        
                         @if (capacity > 0)
                         {
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="small text-muted">Availability</span>
+                                <span class="small fw-bold">@guestsCount / @capacity</span>
+                            </div>
                             <div class="progress mb-3" style="height: 8px;">
                                 <div class="progress-bar @(isFull ? "bg-danger" : "bg-success")" role="progressbar"
                                      style="width: @fillPercent%"></div>
@@ -123,7 +123,18 @@
                         }
 
                         <div class="d-grid gap-2">
-                            @if (isOrganizer)
+                            @if (isPast)
+                            {
+                                <button class="btn btn-secondary" disabled>Event Completed</button>
+
+                                @if (isOrganizer)
+                                {
+                                    <div class="alert alert-info py-2 mb-0 text-center small">
+                                        <i class="bi bi-info-circle"></i> Editing is disabled for past events.
+                                    </div>
+                                }
+                            }
+                            else if (isOrganizer)
                             {
                                 <button class="btn btn-secondary" disabled>You are the Organizer</button>
 
@@ -192,7 +203,7 @@
     </div>
 </div>
 
-@if (isOrganizer)
+@if (isOrganizer && !isPast)
 {
     <div class="modal fade" id="addGuestModal" tabindex="-1" aria-labelledby="addGuestModalLabel" aria-hidden="true">
         <div class="modal-dialog">
