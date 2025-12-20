@@ -2,6 +2,7 @@
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
+using EventPlanning.Domain.Enums;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 
@@ -17,6 +18,7 @@ public class EventService(
     {
         var pagedEvents = await eventRepository.GetFilteredAsync(
             null,
+            userId,
             searchDto.SearchTerm,
             searchDto.FromDate,
             searchDto.ToDate,
@@ -27,13 +29,7 @@ public class EventService(
         );
 
         var eventDtos = pagedEvents.Items.Select(e => new EventDto(
-            e.Id,
-            e.Name,
-            e.Description ?? string.Empty,
-            e.Date,
-            e.Type,
-            e.OrganizerId,
-            e.Venue?.Name ?? "TBD",
+            e.Id, e.Name, e.Description ?? string.Empty, e.Date, e.Type, e.OrganizerId, e.Venue?.Name ?? "TBD",
             e.VenueId
         )).ToList();
 
@@ -72,9 +68,12 @@ public class EventService(
             eventEntity.Name,
             eventEntity.Description ?? string.Empty,
             eventEntity.Date,
-            eventEntity.Type,
+            eventEntity.Type.ToString(),
             eventEntity.OrganizerId,
-            eventEntity.Venue?.Name ?? "TBD",
+            eventEntity.Venue?.Name ?? "Online / TBD",
+            eventEntity.Venue?.ImageUrl,
+            eventEntity.Venue?.Capacity ?? 0,
+            eventEntity.IsPrivate,
             eventEntity.Guests.Select(g => new GuestDto(
                 g.Id,
                 $"{g.FirstName} {g.LastName}",
@@ -84,7 +83,8 @@ public class EventService(
         );
     }
 
-    public async Task CreateEventAsync(CreateEventDto dto, CancellationToken cancellationToken = default)
+    public async Task<int> CreateEventAsync(string userId, CreateEventDto dto,
+        CancellationToken cancellationToken = default)
     {
         var validationResult = await createValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
@@ -94,12 +94,14 @@ public class EventService(
             Name = dto.Name,
             Description = dto.Description,
             Date = dto.Date,
-            Type = dto.Type,
-            OrganizerId = dto.OrganizerId,
-            VenueId = dto.VenueId
+            Type = Enum.Parse<EventType>(dto.Type),
+            VenueId = dto.VenueId,
+            OrganizerId = userId,
+            IsPrivate = dto.IsPrivate,
+            CreatedAt = DateTime.UtcNow
         };
 
-        await eventRepository.AddAsync(eventEntity, cancellationToken);
+        return await eventRepository.AddAsync(eventEntity, cancellationToken);
     }
 
     public async Task UpdateEventAsync(string userId, UpdateEventDto dto, CancellationToken cancellationToken = default)
