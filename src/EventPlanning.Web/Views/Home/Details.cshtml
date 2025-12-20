@@ -1,81 +1,110 @@
-﻿@model EventPlanning.Application.DTOs.EventDetailsDto
+﻿@using Microsoft.AspNetCore.Identity
+@using EventPlanning.Infrastructure.Identity
+@model EventPlanning.Application.DTOs.EventDetailsDto
+
+@inject UserManager<User> UserManager
 
 @{
     ViewData["Title"] = "Event Details";
+
+    var currentUserIdString = UserManager.GetUserId(User);
+    int.TryParse(currentUserIdString, out var currentUserId);
+
+    var isOrganizer = Model.OrganizerId == currentUserIdString;
+
+    var isJoined = Model.Guests.Any(g => g.Id == currentUserId);
 }
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>@Model.Name</h1>
-        <div>
-            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit Event</a>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">Event Info</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Date:</strong> @Model.Date.ToString("f")</p>
-                    <p><strong>Type:</strong> <span class="badge bg-info text-dark">@Model.Type</span></p>
-                    <p><strong>Venue:</strong> @Model.VenueName</p>
-                    <p class="text-muted">@Model.Description</p>
-                </div>
-            </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Guests (@Model.Guests.Count)</h5>
-                    <a asp-controller="Guest" asp-action="Create" asp-route-eventId="@Model.Id" class="btn btn-sm btn-success">
-                        + Add Guest
-                    </a>
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0 fs-4">@Model.Name</h2>
+            <span class="badge bg-light text-primary">@Model.Type</span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5 class="text-muted mb-3">@Model.Date.ToString("f")</h5>
+                    <p class="lead text-break">@Model.Description</p>
+
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <p class="mb-1"><strong><i class="bi bi-geo-alt-fill text-danger"></i>
+                                Venue:</strong> @Model.VenueName</p>
+                        <p class="mb-0"><strong><i class="bi bi-person-fill text-primary"></i> Organizer
+                                ID:</strong> @Model.OrganizerId</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    @if (!Model.Guests.Any())
-                    {
-                        <p class="text-muted text-center py-3">No guests invited yet.</p>
-                    }
-                    else
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Phone</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var guest in Model.Guests)
-                                    {
-                                        <tr>
-                                            <td>@guest.FullName</td>
-                                            <td>@guest.Email</td>
-                                            <td>@guest.PhoneNumber</td>
-                                            <td class="text-end">
-                                                <form asp-controller="Guest" asp-action="Delete" method="post" 
-                                                      onsubmit="return confirm('Remove @guest.FullName from list?');">
-                                                    <input type="hidden" name="guestId" value="@guest.Id" />
-                                                    <input type="hidden" name="eventId" value="@Model.Id" />
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+
+                <div class="col-md-4 mt-4 mt-md-0">
+                    <div class="card border-0 bg-light mb-4">
+                        <div class="card-body text-center">
+                            @if (isOrganizer)
+                            {
+                                <button class="btn btn-secondary w-100" disabled>You are the Organizer</button>
+                            }
+                            else if (isJoined)
+                            {
+                                <button class="btn btn-outline-success w-100" disabled>
+                                    <i class="bi bi-check-circle-fill"></i> You are going!
+                                </button>
+                            }
+                            else
+                            {
+                                <form asp-action="Join" asp-route-id="@Model.Id" method="post">
+                                    <button type="submit" class="btn btn-success w-100 btn-lg shadow-sm">
+                                        Join Event
+                                    </button>
+                                </form>
+                            }
                         </div>
-                    }
+                    </div>
+
+                    <h5 class="mb-3 border-bottom pb-2">Guests <span
+                            class="badge bg-secondary rounded-pill">@Model.Guests.Count</span></h5>
+                    <div class="list-group list-group-flush">
+                        @foreach (var guest in Model.Guests)
+                        {
+                            <div class="list-group-item bg-transparent d-flex align-items-center px-0">
+                                <div
+                                    class="avatar me-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                    style="width: 32px; height: 32px; font-size: 14px;">
+                                    @guest.FullName.Substring(0, 1).ToUpper()
+                                </div>
+                                <div>
+                                    <div class="fw-bold">@guest.FullName</div>
+                                    <small class="text-muted">@guest.Email</small>
+                                </div>
+                            </div>
+                        }
+                        @if (!Model.Guests.Any())
+                        {
+                            <div class="text-center text-muted py-3">
+                                <i class="bi bi-people display-6 d-block mb-2"></i>
+                                <span>No guests yet. Be the first!</span>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
+        </div>
+        <div class="card-footer bg-white">
+            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
         </div>
     </div>
 </div>
