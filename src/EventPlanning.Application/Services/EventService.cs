@@ -125,9 +125,33 @@ public class EventService(
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
         if (eventEntity == null) return;
 
-        if (eventEntity.OrganizerId != userId)  
+        if (eventEntity.OrganizerId != userId)
             throw new UnauthorizedAccessException("Not your event");
 
         await eventRepository.DeleteAsync(eventEntity, cancellationToken);
+    }
+
+    public async Task JoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    {
+        if (!int.TryParse(userId, out var userIdInt)) throw new ArgumentException("Invalid User ID format");
+
+        var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
+        if (eventEntity == null) throw new KeyNotFoundException($"Event {eventId} not found");
+
+        if (eventEntity.OrganizerId == userId)
+            throw new InvalidOperationException("You cannot join your own event as a guest.");
+
+        if (eventEntity.Venue != null && eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
+            throw new InvalidOperationException("Sorry, this event is fully booked.");
+
+        if (eventEntity.Guests.Any(g => g.Id == userIdInt))
+            throw new InvalidOperationException("You are already registered for this event.");
+
+        await eventRepository.AddGuestAsync(eventId, userId, cancellationToken);
+    }
+
+    public async Task LeaveEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    {
+        await eventRepository.RemoveGuestAsync(eventId, userId, cancellationToken);
     }
 }

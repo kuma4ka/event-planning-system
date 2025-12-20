@@ -18,4 +18,7 @@ public interface IEventRepository
         int pageNumber, 
         int pageSize, 
         CancellationToken cancellationToken = default);
+    Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default);
+    Task AddGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default);
+    Task RemoveGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default);
 }
