@@ -1,5 +1,7 @@
 using EventPlanning.Application.DTOs;
 using EventPlanning.Application.Interfaces;
+using EventPlanning.Application.Models;
+using EventPlanning.Domain.Enums;
 using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -16,13 +18,30 @@ public class HomeController(
     UserManager<User> userManager) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    public async Task<IActionResult> Index(
+        string? searchTerm, 
+        EventType? type, 
+        DateTime? from, 
+        DateTime? to, 
+        int page = 1, 
+        CancellationToken cancellationToken = default)
     {
         var userId = userManager.GetUserId(User);
         if (userId == null) return RedirectToAction("Login", "Account");
 
-        var events = await eventService.GetEventsByUserIdAsync(userId, cancellationToken);
-        return View(events);
+        var searchDto = new EventSearchDto
+        {
+            SearchTerm = searchTerm,
+            Type = type,
+            FromDate = from,
+            ToDate = to,
+            PageNumber = page,
+            PageSize = 9
+        };
+
+        var result = await eventService.GetEventsAsync(userId, searchDto, cancellationToken);
+
+        return View(result);
     }
 
     [HttpGet]
@@ -79,7 +98,7 @@ public class HomeController(
             eventDto.Description,
             eventDto.Date,
             eventDto.Type,
-            null
+            eventDto.VenueId
         );
 
         return View(updateModel);
@@ -100,6 +119,17 @@ public class HomeController(
         {
             await eventService.UpdateEventAsync(userId!, model, cancellationToken);
             return RedirectToAction(nameof(Index));
+        }
+        catch (ValidationException ex)
+        {
+            foreach (var error in ex.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+            
+            await LoadVenuesToViewBag(cancellationToken);
+            
+            return View(model);
         }
         catch (UnauthorizedAccessException)
         {
@@ -125,17 +155,6 @@ public class HomeController(
             return Forbid();
         }
     }
-
-    private async Task LoadVenuesToViewBag(CancellationToken token)
-    {
-        var venues = await venueService.GetVenuesAsync(token);
-
-        ViewBag.Venues = venues.Select(v => new SelectListItem 
-        { 
-            Value = v.Id.ToString(), 
-            Text = v.Name 
-        }).ToList();
-    }
     
     [HttpGet]
     public async Task<IActionResult> Details(int id, CancellationToken cancellationToken)
@@ -149,5 +168,16 @@ public class HomeController(
         if (eventDetails.OrganizerId != userId) return Forbid();
 
         return View(eventDetails);
+    }
+
+    private async Task LoadVenuesToViewBag(CancellationToken token)
+    {
+        var venues = await venueService.GetVenuesAsync(token);
+
+        ViewBag.Venues = venues.Select(v => new SelectListItem 
+        { 
+            Value = v.Id.ToString(), 
+            Text = v.Name 
+        }).ToList();
     }
 }

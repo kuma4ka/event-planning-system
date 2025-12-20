@@ -10,5 +10,5 @@ public record EventDto(
     EventType Type,
     string OrganizerId,
     string VenueName,
-    int GuestCount
+    int? VenueId
 );

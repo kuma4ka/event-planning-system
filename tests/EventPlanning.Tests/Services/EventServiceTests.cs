@@ -2,28 +2,31 @@
 using EventPlanning.Application.Services;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
-using EventPlanning.Domain.Interfaces;
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using Moq;
-using Xunit;
 
 namespace EventPlanning.Tests.Services;
 
 public class EventServiceTests
 {
     private readonly Mock<IEventRepository> _eventRepoMock;
-    private readonly Mock<IValidator<CreateEventDto>> _validatorMock;
-    
+    private readonly Mock<IValidator<CreateEventDto>> _createValidatorMock;
+
     private readonly EventService _service;
 
     public EventServiceTests()
     {
         _eventRepoMock = new Mock<IEventRepository>();
-        _validatorMock = new Mock<IValidator<CreateEventDto>>();
+        _createValidatorMock = new Mock<IValidator<CreateEventDto>>();
+        Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
 
-        _service = new EventService(_eventRepoMock.Object, _validatorMock.Object);
+        _service = new EventService(
+            _eventRepoMock.Object, 
+            _createValidatorMock.Object,
+            updateValidatorMock.Object
+        );
     }
 
     [Fact]
@@ -35,11 +38,11 @@ public class EventServiceTests
             "Description", 
             DateTime.Now.AddDays(1), 
             EventType.Conference, 
-            1, 
-            "user-1"
+            1, // VenueId
+            "user-1" // OrganizerId
         );
 
-        _validatorMock
+        _createValidatorMock
             .Setup(v => v.ValidateAsync(dto, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
 
@@ -57,7 +60,7 @@ public class EventServiceTests
         var dto = new CreateEventDto("", "", DateTime.Now, EventType.Conference, null, "");
 
         var validationFailure = new ValidationResult(new[] { new ValidationFailure("Name", "Required") });
-        _validatorMock
+        _createValidatorMock
             .Setup(v => v.ValidateAsync(dto, It.IsAny<CancellationToken>()))
             .ReturnsAsync(validationFailure);
 
