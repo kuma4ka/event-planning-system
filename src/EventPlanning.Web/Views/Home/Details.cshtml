@@ -9,7 +9,8 @@
     var currentUserId = UserManager.GetUserId(User);
 
     var isOrganizer = Model.OrganizerId == currentUserId;
-    var isJoined = Model.Guests != null && Model.Guests.Any(g => g.Id == currentUserId);
+
+    var isJoined = ViewBag.IsJoined as bool? ?? false;
 
     var capacity = Model.VenueCapacity;
     var guestsCount = Model.Guests?.Count ?? 0;
@@ -109,7 +110,7 @@
 
                 <div class="col-lg-4 mt-4 mt-lg-0">
                     <div class="card bg-light border-0 rounded-3 p-3">
-                        
+
                         @if (capacity > 0)
                         {
                             <div class="d-flex justify-content-between mb-1">
