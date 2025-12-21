@@ -30,15 +30,14 @@
                      || !string.IsNullOrEmpty(currentTo);
 }
 
-<div class="bg-dark text-white text-center py-5 mb-5 rounded-3 position-relative overflow-hidden"
-     style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+<div class="hero-gradient-ocean text-center py-5 mb-5 rounded-3 position-relative overflow-hidden">
 
-    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10"
+    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-25"
          style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); z-index: 0; pointer-events: none;"></div>
 
     <div class="container position-relative" style="z-index: 10;">
         <h1 class="display-4 fw-bold mb-3">Discover Amazing Events</h1>
-        <p class="lead mb-4 opacity-75">Join the community and find the perfect event for you.</p>
+        <p class="lead mb-4 fw-medium text-white-50">Join the community and find the perfect event for you.</p>
 
         <div class="card p-4 shadow-lg border-0 mx-auto" style="max-width: 1100px; border-radius: 1rem;">
             <form method="get" asp-action="Index" class="row g-3 align-items-center">
@@ -113,7 +112,7 @@
             @foreach (var item in Model.Items)
             {
                 <div class="col">
-                    <div class="card h-100 shadow-sm border-0 hover-effect transition-transform">
+                    <div class="card h-100 shadow-sm hover-effect transition-transform">
                         <div class="position-relative" style="height: 200px; overflow: hidden; background-color: #eee;">
                             @if (!string.IsNullOrEmpty(item.VenueImageUrl))
                             {
@@ -124,7 +123,7 @@
                             {
                                 var hue = item.Id * 50 % 360;
                                 <div class="w-100 h-100 d-flex align-items-center justify-content-center text-white"
-                                     style="background: linear-gradient(45deg, hsl(@hue, 60%, 50%), hsl(@(hue + 40), 60%, 40%));">
+                                     style="background: linear-gradient(45deg, var(--color-dark-teal), var(--color-air-force-blue));">
                                     <i class="bi bi-calendar-event fs-1 opacity-50"></i>
                                 </div>
                             }
@@ -135,7 +134,7 @@
                         </div>
 
                         <div class="card-body d-flex flex-column">
-                            <div class="text-uppercase text-primary fw-bold small mb-2">
+                            <div class="text-uppercase fw-bold small mb-2" style="color: var(--color-dark-teal);">
                                 <i class="bi bi-calendar3 me-1"></i> @item.Date.ToString("MMM dd, yyyy • HH:mm")
                             </div>
 
@@ -150,7 +149,7 @@
                                 @(item.Description?.Length > 100 ? item.Description.Substring(0, 97) + "..." : item.Description)
                             </p>
 
-                            <div class="d-flex align-items-center text-muted small pt-3 border-top mt-auto">
+                            <div class="d-flex align-items-center text-muted small pt-3 border-top mt-auto" style="border-color: var(--color-ash-grey) !important;">
                                 <i class="bi bi-geo-alt-fill me-2 text-danger"></i>
                                 <span class="text-truncate">@item.VenueName</span>
                             </div>
@@ -210,6 +209,16 @@
 
     .hover-effect:hover {
         transform: translateY(-5px);
-        box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+        box-shadow: 0 0.5rem 1rem rgba(1, 22, 30, 0.15) !important;
+    }
+    
+    .page-link {
+        color: var(--color-dark-teal);
+        background-color: #fff;
+    }
+    .page-item.active .page-link {
+        background-color: var(--color-dark-teal);
+        border-color: var(--color-dark-teal);
+        color: white;
     }
 </style>
