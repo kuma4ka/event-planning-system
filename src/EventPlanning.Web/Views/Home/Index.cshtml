@@ -1,120 +1,215 @@
-﻿@using EventPlanning.Domain.Enums
-@using Microsoft.AspNetCore.Identity
-@using EventPlanning.Infrastructure.Identity
-
-@inject UserManager<User> UserManager
-
-@model EventPlanning.Application.Models.PagedResult<EventPlanning.Application.DTOs.EventDto>
+﻿@using EventPlanning.Application.Models
+@using EventPlanning.Application.DTOs
+@using EventPlanning.Domain.Enums
+@using System.ComponentModel.DataAnnotations
+@using System.Reflection
+@model PagedResult<EventDto>
 
 @{
-    ViewData["Title"] = "All Events";
-    var currentUserId = UserManager.GetUserId(User);
-}
+    ViewData["Title"] = "Find Events";
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>All Events</h1>
-    <a asp-action="Create" class="btn btn-primary">Create Event</a>
-</div>
-
-<div class="card mb-4 bg-light">
-    <div class="card-body">
-        <form method="get" asp-action="Index" class="row g-3">
-            <div class="col-md-3">
-                <input type="text" name="searchTerm" class="form-control" placeholder="Search by name..."
-                       value="@Context.Request.Query["searchTerm"]">
-            </div>
-            <div class="col-md-2">
-                <select name="type" class="form-select" asp-items="Html.GetEnumSelectList<EventType>()">
-                    <option value="">All Types</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <input type="date" name="from" class="form-control" value="@Context.Request.Query["from"]">
-            </div>
-            <div class="col-md-2">
-                <input type="date" name="to" class="form-control" value="@Context.Request.Query["to"]">
-            </div>
-            <div class="col-md-3 d-flex gap-2">
-                <button type="submit" class="btn btn-primary flex-grow-1">Filter</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
-            </div>
-        </form>
-    </div>
-</div>
-
-@if (!Model.Items.Any())
-{
-    <div class="alert alert-info">No events found matching your criteria.</div>
-}
-else
-{
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        @foreach (var item in Model.Items)
+    var eventTypes = Enum.GetValues<EventType>().Select(e =>
+    {
+        var field = e.GetType().GetField(e.ToString());
+        var attribute = field?.GetCustomAttribute<DisplayAttribute>();
+        return new SelectListItem
         {
-            <div class="col">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title mb-0">@item.Name</h5>
-                            <span class="badge bg-secondary">@item.Type</span>
-                        </div>
-                        <h6 class="card-subtitle mb-2 text-muted">@item.Date.ToString("g")</h6>
-                        <p class="card-text text-truncate">@item.Description</p>
-                        <p class="card-text"><small class="text-muted"><i class="bi bi-geo-alt"></i> @item.VenueName
-                            </small></p>
-                    </div>
+            Value = e.ToString(),
+            Text = attribute?.Name ?? e.ToString(),
+            Selected = Context.Request.Query["type"] == e.ToString()
+        };
+    });
 
-                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
-                        <a asp-action="Details" asp-route-id="@item.Id"
-                           class="btn btn-sm btn-outline-primary">Details</a>
+    var currentSearch = Context.Request.Query["searchTerm"];
+    var currentFrom = Context.Request.Query["from"];
+    var currentTo = Context.Request.Query["to"];
 
-                        @if (item.OrganizerId == currentUserId)
-                        {
-                            <div>
-                                <a asp-action="Edit" asp-route-id="@item.Id"
-                                   class="btn btn-sm btn-outline-warning">Edit</a>
+    var hasFilters = !string.IsNullOrEmpty(currentSearch)
+                     || !string.IsNullOrEmpty(Context.Request.Query["type"])
+                     || !string.IsNullOrEmpty(currentFrom)
+                     || !string.IsNullOrEmpty(currentTo);
+}
 
-                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline"
-                                      onsubmit="return confirm('Are you sure?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                </form>
-                            </div>
-                        }
+<div class="bg-dark text-white text-center py-5 mb-5 rounded-3 position-relative overflow-hidden"
+     style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+
+    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10"
+         style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); z-index: 0; pointer-events: none;"></div>
+
+    <div class="container position-relative" style="z-index: 10;">
+        <h1 class="display-4 fw-bold mb-3">Discover Amazing Events</h1>
+        <p class="lead mb-4 opacity-75">Join the community and find the perfect event for you.</p>
+
+        <div class="card p-4 shadow-lg border-0 mx-auto" style="max-width: 1100px; border-radius: 1rem;">
+            <form method="get" asp-action="Index" class="row g-3 align-items-center">
+
+                <div class="col-12 col-lg-4">
+                    <div class="input-group shadow-sm rounded">
+                        <span class="input-group-text bg-light border-0 text-muted ps-3"><i
+                                class="bi bi-search"></i></span>
+                        <input type="text" name="searchTerm" class="form-control bg-light border-0 py-2"
+                               placeholder="Search events..." value="@currentSearch">
                     </div>
                 </div>
-            </div>
-        }
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="input-group shadow-sm rounded">
+                        <span class="input-group-text bg-light border-0 text-muted ps-3"><i
+                                class="bi bi-filter"></i></span>
+                        <select name="type" class="form-select bg-light border-0 py-2" asp-items="eventTypes"
+                                style="cursor: pointer;">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="input-group shadow-sm rounded">
+                        <input type="date" name="from" class="form-control bg-light border-0 py-2 text-muted"
+                               value="@currentFrom" title="From Date" style="font-size: 0.9rem;">
+                        <span class="input-group-text bg-light border-0 text-muted px-1 small">to</span>
+                        <input type="date" name="to" class="form-control bg-light border-0 py-2 text-muted"
+                               value="@currentTo" title="To Date" style="font-size: 0.9rem;">
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 fw-bold py-2 shadow-sm transition-transform">
+                        Find
+                    </button>
+
+                    @if (hasFilters)
+                    {
+                        <a asp-action="Index" class="btn btn-outline-danger py-2 shadow-sm" title="Clear Filters">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    }
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <nav class="mt-4">
-        <ul class="pagination justify-content-center">
-            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
-                <a class="page-link"
-                   asp-action="Index"
-                   asp-route-page="@(Model.PageNumber - 1)"
-                   asp-route-searchTerm="@Context.Request.Query["searchTerm"]"
-                   asp-route-type="@Context.Request.Query["type"]"
-                   asp-route-from="@Context.Request.Query["from"]"
-                   asp-route-to="@Context.Request.Query["to"]">
-                    Previous
-                </a>
-            </li>
+<div class="container mb-5">
+    @if (!Model.Items.Any())
+    {
+        <div class="text-center py-5">
+            <div class="mb-3">
+                <i class="bi bi-search display-1 text-muted opacity-25"></i>
+            </div>
+            <h3>No events found</h3>
+            <p class="text-muted">Try adjusting your filters or search criteria.</p>
+            <a asp-action="Index" class="btn btn-outline-secondary mt-2">Clear All Filters</a>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0 fw-bold text-secondary">Upcoming Events</h4>
+            <span class="badge bg-light text-dark border">@Model.TotalCount results</span>
+        </div>
 
-            <li class="page-item disabled">
-                <span class="page-link">Page @Model.PageNumber of @Model.TotalPages</span>
-            </li>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+            @foreach (var item in Model.Items)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 hover-effect transition-transform">
+                        <div class="position-relative" style="height: 200px; overflow: hidden; background-color: #eee;">
+                            @if (!string.IsNullOrEmpty(item.VenueImageUrl))
+                            {
+                                <img src="@item.VenueImageUrl" class="card-img-top w-100 h-100"
+                                     style="object-fit: cover;" alt="@item.Name">
+                            }
+                            else
+                            {
+                                var hue = item.Id * 50 % 360;
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center text-white"
+                                     style="background: linear-gradient(45deg, hsl(@hue, 60%, 50%), hsl(@(hue + 40), 60%, 40%));">
+                                    <i class="bi bi-calendar-event fs-1 opacity-50"></i>
+                                </div>
+                            }
 
-            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
-                <a class="page-link"
-                   asp-action="Index"
-                   asp-route-page="@(Model.PageNumber + 1)"
-                   asp-route-searchTerm="@Context.Request.Query["searchTerm"]"
-                   asp-route-type="@Context.Request.Query["type"]"
-                   asp-route-from="@Context.Request.Query["from"]"
-                   asp-route-to="@Context.Request.Query["to"]">
-                    Next
-                </a>
-            </li>
-        </ul>
-    </nav>
-}
+                            <span class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm">
+                                @item.Type
+                            </span>
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <div class="text-uppercase text-primary fw-bold small mb-2">
+                                <i class="bi bi-calendar3 me-1"></i> @item.Date.ToString("MMM dd, yyyy • HH:mm")
+                            </div>
+
+                            <h5 class="card-title fw-bold mb-2">
+                                <a asp-action="Details" asp-route-id="@item.Id"
+                                   class="text-decoration-none text-dark stretched-link">
+                                    @item.Name
+                                </a>
+                            </h5>
+
+                            <p class="card-text text-muted small mb-3 flex-grow-1">
+                                @(item.Description?.Length > 100 ? item.Description.Substring(0, 97) + "..." : item.Description)
+                            </p>
+
+                            <div class="d-flex align-items-center text-muted small pt-3 border-top mt-auto">
+                                <i class="bi bi-geo-alt-fill me-2 text-danger"></i>
+                                <span class="text-truncate">@item.VenueName</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="d-flex justify-content-center mt-4">
+                <ul class="pagination shadow-sm">
+                    <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                        <a class="page-link border-0" asp-action="Index"
+                           asp-route-page="@(Model.PageNumber - 1)"
+                           asp-route-searchTerm="@currentSearch"
+                           asp-route-type="@Context.Request.Query["type"]"
+                           asp-route-from="@currentFrom"
+                           asp-route-to="@currentTo">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    @for (var i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link border-0" asp-action="Index"
+                               asp-route-page="@i"
+                               asp-route-searchTerm="@currentSearch"
+                               asp-route-type="@Context.Request.Query["type"]"
+                               asp-route-from="@currentFrom"
+                               asp-route-to="@currentTo">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link border-0" asp-action="Index"
+                           asp-route-page="@(Model.PageNumber + 1)"
+                           asp-route-searchTerm="@currentSearch"
+                           asp-route-type="@Context.Request.Query["type"]"
+                           asp-route-from="@currentFrom"
+                           asp-route-to="@currentTo">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+</div>
+
+<style>
+    .hover-effect {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hover-effect:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+    }
+</style>

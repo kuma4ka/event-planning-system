@@ -34,8 +34,15 @@ public class EventService(
         );
 
         var eventDtos = pagedEvents.Items.Select(e => new EventDto(
-            e.Id, e.Name, e.Description ?? string.Empty, e.Date, e.Type, e.OrganizerId, e.Venue?.Name ?? "TBD",
-            e.VenueId
+            e.Id,
+            e.Name,
+            e.Description ?? string.Empty,
+            e.Date,
+            e.Type,
+            e.OrganizerId,
+            e.Venue?.Name ?? "TBD",
+            e.VenueId ?? 0,
+            e.Venue?.ImageUrl
         )).ToList();
 
         return new PagedResult<EventDto>(
@@ -56,7 +63,8 @@ public class EventService(
             e.Type,
             e.OrganizerId,
             e.Venue?.Name ?? "TBD",
-            e.VenueId
+            e.VenueId ?? 0,
+            e.Venue?.ImageUrl
         );
     }
 
@@ -165,7 +173,7 @@ public class EventService(
     {
         await eventRepository.RemoveGuestAsync(eventId, userId, cancellationToken);
     }
-    
+
     public async Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
         return await eventRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);

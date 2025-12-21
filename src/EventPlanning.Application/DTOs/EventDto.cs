@@ -10,5 +10,6 @@ public record EventDto(
     EventType Type,
     string OrganizerId,
     string VenueName,
-    int? VenueId
+    int? VenueId,
+    string? VenueImageUrl
 );
