@@ -20,11 +20,13 @@ public class EventService(
         string? sortOrder,
         CancellationToken cancellationToken = default)
     {
+        var fromDate = searchDto.FromDate ?? DateTime.Now;
+
         var pagedEvents = await eventRepository.GetFilteredAsync(
             organizerIdFilter,
             userId,
             searchDto.SearchTerm,
-            searchDto.FromDate,
+            fromDate,
             searchDto.ToDate,
             searchDto.Type,
             sortOrder,
@@ -34,12 +36,12 @@ public class EventService(
         );
 
         var eventDtos = pagedEvents.Items.Select(e => new EventDto(
-            e.Id,
-            e.Name,
-            e.Description ?? string.Empty,
-            e.Date,
-            e.Type,
-            e.OrganizerId,
+            e.Id, 
+            e.Name, 
+            e.Description ?? string.Empty, 
+            e.Date, 
+            e.Type, 
+            e.OrganizerId, 
             e.Venue?.Name ?? "TBD",
             e.VenueId ?? 0,
             e.Venue?.ImageUrl
