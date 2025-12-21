@@ -159,9 +159,18 @@ public class HomeController(
         if (eventDetails == null) return NotFound();
 
         var organizer = await userManager.FindByIdAsync(eventDetails.OrganizerId);
-
         ViewBag.OrganizerName = organizer != null ? $"{organizer.FirstName} {organizer.LastName}" : "Unknown Organizer";
         ViewBag.OrganizerEmail = organizer?.Email ?? "";
+
+        var userId = userManager.GetUserId(User);
+        var isJoined = false;
+
+        if (userId != null)
+        {
+            isJoined = await eventService.IsUserJoinedAsync(id, userId, cancellationToken);
+        }
+
+        ViewBag.IsJoined = isJoined;
 
         return View(eventDetails);
     }

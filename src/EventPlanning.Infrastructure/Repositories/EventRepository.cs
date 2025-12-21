@@ -151,4 +151,14 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             await context.SaveChangesAsync(cancellationToken);
         }
     }
+    
+    public async Task<int> CountJoinedEventsAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        var user = await context.Users.FindAsync(new object[] { userId }, cancellationToken);
+        if (user == null || string.IsNullOrEmpty(user.Email)) return 0;
+
+        return await context.Guests
+            .AsNoTracking()
+            .CountAsync(g => g.Email == user.Email, cancellationToken);
+    }
 }
