@@ -1,0 +1,152 @@
+﻿@using EventPlanning.Application.DTOs
+@model EditProfileDto
+
+@{
+    ViewData["Title"] = "My Profile";
+
+    var initials = !string.IsNullOrEmpty(Model.FirstName) && !string.IsNullOrEmpty(Model.LastName)
+        ? $"{Model.FirstName[0]}{Model.LastName[0]}".ToUpper()
+        : "U";
+
+    var activeTab = ViewBag.ActiveTab as string ?? "profile";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0 text-center p-4 h-100">
+                <div
+                    class="mx-auto mb-3 d-flex align-items-center justify-content-center bg-primary text-white shadow fw-bold"
+                    style="width: 120px; height: 120px; border-radius: 50%; font-size: 48px;">
+                    @initials
+                </div>
+                <h3 class="fw-bold">@Model.FirstName @Model.LastName</h3>
+                <p class="text-muted text-break">@Model.Email</p>
+
+                <hr class="my-4">
+
+                <div class="row text-center">
+                    <div class="col-6 border-end">
+                        <h4 class="fw-bold text-primary mb-0">@Model.OrganizedCount</h4>
+                        <small class="text-muted text-uppercase"
+                               style="font-size: 10px; letter-spacing: 1px;">Organized</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="fw-bold text-success mb-0">@Model.JoinedCount</h4>
+                        <small class="text-muted text-uppercase"
+                               style="font-size: 10px; letter-spacing: 1px;">Joined</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4">
+                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0">
+                    <ul class="nav nav-tabs card-header-tabs" id="profileTabs" role="tablist">
+                        <li class="nav-item">
+                            <button
+                                class="nav-link @(activeTab == "profile" ? "active fw-bold text-primary" : "text-muted")"
+                                id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+                                <i class="bi bi-person-gear me-2"></i> Edit Details
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button
+                                class="nav-link @(activeTab == "security" ? "active fw-bold text-primary" : "text-muted")"
+                                id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button"
+                                role="tab">
+                                <i class="bi bi-shield-lock me-2"></i> Security
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="tab-content" id="profileTabsContent">
+
+                        <div class="tab-pane fade @(activeTab == "profile" ? "show active" : "")" id="info"
+                             role="tabpanel">
+                            <form asp-action="UpdateInfo" method="post">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="FirstName" class="form-label fw-bold small text-uppercase">First
+                                            Name</label>
+                                        <input asp-for="FirstName" class="form-control"/>
+                                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="LastName" class="form-label fw-bold small text-uppercase">Last
+                                            Name</label>
+                                        <input asp-for="LastName" class="form-control"/>
+                                        <span asp-validation-for="LastName" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-12">
+                                        <label asp-for="PhoneNumber" class="form-label fw-bold small text-uppercase">Phone
+                                            Number</label>
+                                        <input asp-for="PhoneNumber" class="form-control" placeholder="+1..."/>
+                                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold small text-uppercase">Email</label>
+                                        <input asp-for="Email" class="form-control bg-light" readonly disabled/>
+                                        <div class="form-text">Email cannot be changed directly.</div>
+                                    </div>
+
+                                    <div class="col-12 mt-4 text-end">
+                                        <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="tab-pane fade @(activeTab == "security" ? "show active" : "")" id="security"
+                             role="tabpanel">
+                            <form asp-action="ChangePassword" method="post">
+
+                                @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("PasswordError"))
+                                {
+                                    <div class="alert alert-danger">
+                                        @Html.ValidationMessage("PasswordError")
+                                    </div>
+                                }
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small text-uppercase">Current Password</label>
+                                    <input name="CurrentPassword" type="password" class="form-control" required/>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small text-uppercase">New Password</label>
+                                    <input name="NewPassword" type="password" class="form-control" required/>
+                                    <div class="form-text">Must be at least 6 characters long.</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small text-uppercase">Confirm New Password</label>
+                                    <input name="ConfirmPassword" type="password" class="form-control" required/>
+                                </div>
+
+                                <div class="mt-4 text-end">
+                                    <button type="submit" class="btn btn-danger px-4">Update Password</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}

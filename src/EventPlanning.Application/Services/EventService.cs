@@ -165,4 +165,9 @@ public class EventService(
     {
         await eventRepository.RemoveGuestAsync(eventId, userId, cancellationToken);
     }
+    
+    public async Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    {
+        return await eventRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);
+    }
 }
