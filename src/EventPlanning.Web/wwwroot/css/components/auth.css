@@ -1,0 +1,106 @@
+﻿/* --- AUTHENTICATION PAGES --- */
+
+.auth-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+.auth-card {
+    background: #fff;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(1, 22, 30, 0.08);
+    overflow: hidden;
+    width: 100%;
+    max-width: 450px;
+}
+
+/* Header with Gradient */
+.auth-header {
+    background: linear-gradient(135deg, var(--color-ink-black), var(--color-dark-teal));
+    padding: 2.5rem 2rem;
+    text-align: center;
+    color: #fff;
+}
+
+.auth-title {
+    font-family: var(--font-heading), serif;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1.75rem;
+}
+
+.auth-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 0;
+}
+
+.auth-body {
+    padding: 2.5rem 2rem;
+}
+
+.auth-card.wide {
+    max-width: 600px;
+}
+
+/* Form Styles Override */
+.auth-form-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: var(--color-air-force-blue);
+    margin-bottom: 0.5rem;
+}
+
+.auth-icon-input .input-group-text {
+    background-color: var(--color-cool-mist);
+    border-color: var(--color-ash-grey);
+    color: var(--color-dark-teal);
+    border-right: none;
+}
+
+.auth-icon-input .form-control {
+    border-left: none;
+}
+
+.auth-icon-input .form-control:focus {
+    border-color: var(--color-ash-grey);
+    box-shadow: none;
+    border-left: none;
+}
+
+.auth-icon-input:focus-within .input-group-text,
+.auth-icon-input:focus-within .form-control {
+    border-color: var(--color-dark-teal);
+    box-shadow: 0 0 0 0.25rem rgba(18, 69, 89, 0.15);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: var(--color-air-force-blue);
+}
+
+.auth-footer a {
+    color: var(--color-dark-teal);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Access Denied Specific */
+.access-denied-icon {
+    font-size: 5rem;
+    color: #dc3545;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+}
