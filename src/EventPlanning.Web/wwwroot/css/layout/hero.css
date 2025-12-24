@@ -1,0 +1,105 @@
+﻿/* --- HERO SECTION --- */
+.hero-stanza-container {
+    background: radial-gradient(circle at top right, #1a5f7a 0%, var(--color-ink-black) 60%);
+    border-radius: 4px 4px 24px 24px;
+    position: relative;
+    overflow: hidden;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 20px 40px rgba(1, 22, 30, 0.15);
+}
+
+.hero-content-left {
+    position: relative;
+    z-index: 20;
+    padding: 5rem;
+    color: #fff;
+    max-width: 700px;
+}
+
+.hero-title-poetic {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 4rem;
+    line-height: 1.05;
+    margin-bottom: 2rem;
+    letter-spacing: -0.04em;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.hero-title-accent {
+    font-style: italic;
+    background: linear-gradient(90deg, #81f7e5, #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: 3rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid rgba(255,255,255,0.3);
+}
+
+.hero-visual-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60%;
+    height: 100%;
+    z-index: 10;
+}
+
+.stanza-giant-mark {
+    position: absolute;
+    top: 50%;
+    right: -15%;
+    transform: translateY(-50%);
+    width: 100%;
+    height: auto;
+    opacity: 0.08;
+    mix-blend-mode: hard-light;
+    pointer-events: none;
+}
+
+/* --- FILTER FLOATING CARD --- */
+.filter-floating-card {
+    background-color: #fff;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    margin-top: -60px;
+    position: relative;
+    z-index: 30;
+    padding: 1rem;
+    backdrop-filter: blur(5px);
+}
+
+/* Responsive adjustments for Hero */
+@media (max-width: 991px) {
+    .hero-stanza-container {
+        min-height: auto;
+        padding: 2rem 0;
+        text-align: center;
+        border-radius: 4px;
+    }
+    .hero-content-left {
+        padding: 2rem;
+        max-width: 100%;
+    }
+    .hero-title-poetic {
+        font-size: 2.8rem;
+    }
+    .hero-subtitle {
+        padding-left: 0;
+        border-left: none;
+    }
+    .filter-floating-card {
+        margin-top: -30px;
+    }
+}

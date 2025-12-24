@@ -1,0 +1,15 @@
+﻿/* --- FORMS --- */
+.form-control, .form-select, .input-group-text {
+    border-radius: 8px !important;
+    padding: 0.75rem 1rem;
+    border-color: var(--color-ash-grey);
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+    color: var(--color-air-force-blue);
+    text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+    text-align: start;
+}
