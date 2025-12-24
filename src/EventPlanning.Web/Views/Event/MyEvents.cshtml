@@ -24,17 +24,17 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="mb-0"><i class="bi bi-speedometer2"></i> My Dashboard</h1>
+            <h1 class="mb-0" style="font-family: var(--font-heading),serif;"><i class="bi bi-speedometer2"></i> My Dashboard</h1>
             <p class="text-muted">Manage your upcoming and past events</p>
         </div>
-        <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+        <a asp-controller="Event" asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
             <i class="bi bi-plus-lg"></i> Create Event
         </a>
     </div>
 
     <div class="card shadow-sm border-0 mb-4 bg-light">
         <div class="card-body">
-            <form method="get" asp-action="MyEvents" class="row g-3">
+            <form method="get" asp-controller="Event" asp-action="MyEvents" class="row g-3">
                 <input type="hidden" name="sortOrder" value="@ViewBag.CurrentSort" />
 
                 <div class="col-md-3">
@@ -54,7 +54,7 @@
                 </div>
                 <div class="col-md-2 d-grid gap-2">
                     <button type="submit" class="btn btn-outline-primary">Filter</button>
-                    <a asp-action="MyEvents" class="btn btn-link text-decoration-none btn-sm">Clear</a>
+                    <a asp-controller="Event" asp-action="MyEvents" class="btn btn-link text-decoration-none btn-sm">Clear</a>
                 </div>
             </form>
         </div>
@@ -70,7 +70,7 @@
             <p class="text-muted">Try adjusting your filters or create a new event.</p>
             @if (ViewBag.CurrentSearch == null && ViewBag.CurrentType == null)
             {
-                <a asp-action="Create" class="btn btn-primary mt-2">Get Started</a>
+                <a asp-controller="Event" asp-action="Create" class="btn btn-primary mt-2">Get Started</a>
             }
         </div>
     }
@@ -82,7 +82,7 @@
                     <thead class="bg-light">
                     <tr>
                         <th class="ps-4">
-                            <a asp-action="MyEvents"
+                            <a asp-controller="Event" asp-action="MyEvents"
                                asp-route-sortOrder="@ViewBag.DateSortParam"
                                asp-route-searchTerm="@ViewBag.CurrentSearch"
                                asp-route-type="@ViewBag.CurrentType"
@@ -94,7 +94,7 @@
                             </a>
                         </th>
                         <th>
-                            <a asp-action="MyEvents"
+                            <a asp-controller="Event" asp-action="MyEvents"
                                asp-route-sortOrder="@ViewBag.NameSortParam"
                                asp-route-searchTerm="@ViewBag.CurrentSearch"
                                asp-route-type="@ViewBag.CurrentType"
@@ -125,7 +125,7 @@
                             </td>
                             <td>
                                 <div class="@(isPast ? "opacity-75" : "")">
-                                    <a asp-action="Details" asp-route-id="@item.Id"
+                                    <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id"
                                        class="text-decoration-none fw-bold text-dark fs-5">
                                         @item.Name
                                     </a>
@@ -149,20 +149,20 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="btn-group shadow-sm">
-                                    <button onclick="copyLink('@Url.Action("Details", "Home", new { id = item.Id }, Context.Request.Scheme)')"
+                                    <button onclick="copyLink('@Url.Action("Details", "Event", new { id = item.Id }, Context.Request.Scheme)')"
                                             class="btn btn-sm btn-outline-info"
                                             title="Copy Link">
                                         <i class="bi bi-share"></i>
                                     </button>
 
-                                    <a asp-action="Details" asp-route-id="@item.Id"
+                                    <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id"
                                        class="btn btn-sm btn-outline-secondary" title="View">
                                         <i class="bi bi-eye"></i>
                                     </a>
 
                                     @if (!isPast)
                                     {
-                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                        <a asp-controller="Event" asp-action="Edit" asp-route-id="@item.Id"
                                            class="btn btn-sm btn-outline-primary" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
@@ -186,7 +186,7 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                <form asp-controller="Event" asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
                                                     <button type="submit" class="btn btn-danger">Delete</button>
                                                 </form>
                                             </div>
@@ -207,7 +207,7 @@
                 <nav>
                     <ul class="pagination justify-content-center">
                         <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                            <a class="page-link" asp-action="MyEvents"
+                            <a class="page-link" asp-controller="Event" asp-action="MyEvents"
                                asp-route-page="@(Model.PageNumber - 1)"
                                asp-route-sortOrder="@ViewBag.CurrentSort"
                                asp-route-searchTerm="@ViewBag.CurrentSearch"
@@ -219,7 +219,7 @@
                         @for (var i = 1; i <= Model.TotalPages; i++)
                         {
                             <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                                <a class="page-link" asp-action="MyEvents"
+                                <a class="page-link" asp-controller="Event" asp-action="MyEvents"
                                    asp-route-page="@i"
                                    asp-route-sortOrder="@ViewBag.CurrentSort"
                                    asp-route-searchTerm="@ViewBag.CurrentSearch"
@@ -230,7 +230,7 @@
                         }
 
                         <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" asp-action="MyEvents"
+                            <a class="page-link" asp-controller="Event" asp-action="MyEvents"
                                asp-route-page="@(Model.PageNumber + 1)"
                                asp-route-sortOrder="@ViewBag.CurrentSort"
                                asp-route-searchTerm="@ViewBag.CurrentSearch"
