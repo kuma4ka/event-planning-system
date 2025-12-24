@@ -1,0 +1,106 @@
+﻿/* --- NAVBAR --- */
+.navbar-meetup {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--color-ash-grey);
+}
+
+.brand-logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--color-dark-teal);
+    text-decoration: none;
+}
+
+.brand-logo:hover {
+    background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Search Pill */
+.search-pill-container {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid var(--color-ash-grey);
+    border-radius: 12px;
+    padding: 6px 6px 6px 20px;
+    max-width: 500px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.search-pill-container:focus-within {
+    border-color: var(--color-dark-teal);
+    box-shadow: 0 4px 15px rgba(89, 131, 146, 0.15);
+}
+
+.search-input-header {
+    border: none;
+    outline: none;
+    width: 100%;
+    color: var(--color-ink-black);
+    font-size: 1rem;
+    background: transparent;
+    font-family: var(--font-body), sans-serif;
+}
+
+.search-btn-header {
+    background-color: var(--color-dark-teal);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: all 0.2s;
+}
+
+.search-btn-header:hover {
+    background-color: var(--color-air-force-blue);
+}
+
+/* Auth Buttons */
+.nav-link-login {
+    color: var(--color-dark-teal) !important;
+    font-weight: 600;
+    margin-right: 1.5rem;
+    font-size: 1rem;
+    transition: color 0.2s;
+    font-family: var(--font-heading), serif;
+}
+
+.nav-link-login:hover {
+    color: var(--color-air-force-blue) !important;
+}
+
+.btn-signup-header {
+    background-color: var(--color-ink-black);
+    color: #fff !important;
+    font-weight: 600;
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px !important;
+    font-size: 0.95rem;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+    font-family: var(--font-heading), serif;
+}
+
+.btn-signup-header:hover {
+    background-color: var(--color-dark-teal);
+    color: #fff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(1, 22, 30, 0.2);
+}

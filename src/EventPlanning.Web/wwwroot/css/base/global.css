@@ -1,0 +1,30 @@
+﻿/* --- LAYOUT STRUCTURE --- */
+html {
+    position: relative;
+    min-height: 100%;
+    height: 100%;
+}
+
+body {
+    margin-bottom: 0;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    font-family: var(--font-body), sans-serif;
+
+    /* Flexbox for sticky footer */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- FOCUS RINGS --- */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem var(--color-cool-mist), 0 0 0 0.25rem var(--color-air-force-blue);
+    border-color: var(--color-air-force-blue);
+}

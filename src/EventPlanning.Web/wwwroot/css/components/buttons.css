@@ -1,0 +1,31 @@
+﻿/* --- BUTTONS --- */
+.btn {
+    border-radius: 8px !important;
+}
+
+.btn-primary {
+    background-color: var(--color-dark-teal);
+    border-color: var(--color-dark-teal);
+    color: #fff;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+    padding: 0.6rem 1.5rem;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+    background-color: var(--color-air-force-blue) !important;
+    border-color: var(--color-air-force-blue) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(18, 69, 89, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+    color: var(--color-dark-teal);
+    border-color: var(--color-dark-teal);
+}
+.btn-outline-primary:hover {
+    background-color: var(--color-dark-teal);
+    color: #fff;
+}
