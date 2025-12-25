@@ -1,6 +1,6 @@
 ﻿using EventPlanning.Application.DTOs.Auth;
+using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
-using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
