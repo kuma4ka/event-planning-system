@@ -5,15 +5,6 @@
 @using System.Reflection
 @model PagedResult<EventDto>
 
-@functions {
-    private string GetDisplayName(Enum enumValue)
-    {
-        var field = enumValue.GetType().GetField(enumValue.ToString());
-        var attribute = field?.GetCustomAttribute<DisplayAttribute>();
-        return attribute?.Name ?? enumValue.ToString();
-    }
-}
-
 @{
     ViewData["Title"] = "My Events";
 
@@ -31,7 +22,7 @@
 }
 
 <div class="container mt-5 mb-5">
-    
+
     <div class="d-flex justify-content-between align-items-end dashboard-header">
         <div>
             <h1 class="dashboard-title display-5 mb-1">My Dashboard</h1>
@@ -44,19 +35,20 @@
 
     <div class="dashboard-toolbar">
         <form method="get" asp-controller="Event" asp-action="MyEvents" class="row g-3 align-items-center">
-            <input type="hidden" name="sortOrder" value="@ViewBag.CurrentSort" />
+            <input type="hidden" name="sortOrder" value="@ViewBag.CurrentSort"/>
 
             <div class="col-xl-4 col-lg-4 col-md-12">
                 <div class="input-group dashboard-input-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" name="searchTerm" class="form-control" 
+                    <input type="text" name="searchTerm" class="form-control"
                            placeholder="Search events..." value="@ViewBag.CurrentSearch">
                 </div>
             </div>
 
             <div class="col-xl-2 col-lg-3 col-md-6">
                 <div class="input-group dashboard-input-group">
-                    <select name="type" class="form-select" asp-items="eventTypes" onchange="this.form.submit()" style="cursor: pointer;">
+                    <select name="type" class="form-select" asp-items="eventTypes" onchange="this.form.submit()"
+                            style="cursor: pointer;">
                         <option value="">All Categories</option>
                     </select>
                 </div>
@@ -65,21 +57,25 @@
             <div class="col-xl-4 col-lg-5 col-md-6">
                 <div class="d-flex gap-2">
                     <div class="input-group dashboard-input-group flex-grow-1">
-                        <input type="date" name="from" class="form-control" value="@ViewBag.CurrentFrom" placeholder="From" title="Start Date">
+                        <input type="date" name="from" class="form-control" value="@ViewBag.CurrentFrom"
+                               placeholder="From" title="Start Date">
                     </div>
                     <span class="date-separator">-</span>
                     <div class="input-group dashboard-input-group flex-grow-1">
-                        <input type="date" name="to" class="form-control" value="@ViewBag.CurrentTo" placeholder="To" title="End Date">
+                        <input type="date" name="to" class="form-control" value="@ViewBag.CurrentTo" placeholder="To"
+                               title="End Date">
                     </div>
                 </div>
             </div>
 
             <div class="col-xl-2 col-lg-12 text-end">
                 <div class="d-flex gap-2 justify-content-end">
-                    <button type="submit" class="btn btn-outline-primary flex-grow-1 flex-lg-grow-0 px-4">Filter</button>
+                    <button type="submit" class="btn btn-outline-primary flex-grow-1 flex-lg-grow-0 px-4">Filter
+                    </button>
                     @if (ViewBag.CurrentSearch != null || ViewBag.CurrentType != null || ViewBag.CurrentFrom != null)
                     {
-                        <a asp-controller="Event" asp-action="MyEvents" class="btn btn-link text-danger text-decoration-none" title="Clear Filters">
+                        <a asp-controller="Event" asp-action="MyEvents"
+                           class="btn btn-link text-danger text-decoration-none" title="Clear Filters">
                             <i class="bi bi-x-circle fs-5"></i>
                         </a>
                     }
@@ -92,7 +88,8 @@
     {
         <div class="text-center py-5 bg-white rounded-3 border border-light shadow-sm">
             <div class="mb-4">
-                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
+                     style="width: 80px; height: 80px;">
                     <i class="bi bi-calendar-x fs-1 text-muted opacity-50"></i>
                 </div>
             </div>
@@ -102,11 +99,12 @@
             </p>
             @if (ViewBag.CurrentSearch == null && ViewBag.CurrentType == null)
             {
-                <a asp-controller="Event" asp-action="Create" class="btn btn-primary mt-3 px-4">Create Your First Event</a>
+                <a asp-controller="Event" asp-action="Create" class="btn btn-primary mt-3 px-4">Create Your First
+                    Event</a>
             }
             else
             {
-                 <a asp-controller="Event" asp-action="MyEvents" class="btn btn-outline-secondary mt-3">Reset Filters</a>
+                <a asp-controller="Event" asp-action="MyEvents" class="btn btn-outline-secondary mt-3">Reset Filters</a>
             }
         </div>
     }
@@ -115,115 +113,105 @@
         <div class="table-responsive">
             <table class="table dashboard-table">
                 <thead>
-                    <tr>
-                        <th class="ps-4">
-                            <a asp-controller="Event" asp-action="MyEvents" asp-route-sortOrder="@ViewBag.DateSortParam" class="text-decoration-none text-secondary">
-                                Date @(ViewBag.CurrentSort == "date_asc" ? "▲" : "▼")
-                            </a>
-                        </th>
-                        <th>
-                            <a asp-controller="Event" asp-action="MyEvents" asp-route-sortOrder="@ViewBag.NameSortParam" class="text-decoration-none text-secondary">
-                                Event Details @(ViewBag.CurrentSort == "name_asc" ? "▲" : "▼")
-                            </a>
-                        </th>
-                        <th>Location</th>
-                        <th>Status</th>
-                        <th class="text-end pe-4">Actions</th>
-                    </tr>
+                <tr>
+                    <th class="ps-4">
+                        <a asp-controller="Event" asp-action="MyEvents" asp-route-sortOrder="@ViewBag.DateSortParam"
+                           class="text-decoration-none text-secondary">
+                            Date @(ViewBag.CurrentSort == "date_asc" ? "▲" : "▼")
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-controller="Event" asp-action="MyEvents" asp-route-sortOrder="@ViewBag.NameSortParam"
+                           class="text-decoration-none text-secondary">
+                            Event Details @(ViewBag.CurrentSort == "name_asc" ? "▲" : "▼")
+                        </a>
+                    </th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th class="text-end pe-4">Actions</th>
+                </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.Items)
-                    {
-                        var isPast = item.Date < DateTime.Now;
+                @foreach (var item in Model.Items)
+                {
+                    var isPast = item.Date < DateTime.Now;
 
-                        <tr class="dashboard-row">
-                            <td class="ps-4" style="width: 100px;">
-                                <div class="event-date-badge @(isPast ? "past" : "")">
-                                    <span class="event-day">@item.Date.Day</span>
-                                    <span class="event-month">@item.Date.ToString("MMM")</span>
+                    <tr class="dashboard-row">
+                        <td class="ps-4" style="width: 100px;">
+                            <div class="event-date-badge @(isPast ? "past" : "")">
+                                <span class="event-day">@item.Date.Day</span>
+                                <span class="event-month">@item.Date.ToString("MMM")</span>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="@(isPast ? "opacity-75" : "")">
+                                <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id"
+                                   class="event-title-link">
+                                    @item.Name
+                                </a>
+                                <div class="event-meta">
+                                    <span
+                                        class="badge bg-light text-dark border fw-normal">@item.Type.GetDisplayName()</span>
+                                    <span
+                                        class="text-muted border-start ps-2 ms-1">@item.Date.ToString("yyyy") • @item.Date.ToString("HH:mm")</span>
                                 </div>
-                            </td>
+                            </div>
+                        </td>
 
-                            <td>
-                                <div class="@(isPast ? "opacity-75" : "")">
-                                    <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id" class="event-title-link">
-                                        @item.Name
-                                    </a>
-                                    <div class="event-meta">
-                                        <span class="badge bg-light text-dark border fw-normal">@GetDisplayName(item.Type)</span>
-                                        <span class="text-muted border-start ps-2 ms-1">@item.Date.ToString("yyyy") • @item.Date.ToString("HH:mm")</span>
-                                    </div>
-                                </div>
-                            </td>
-
-                            <td>
-                                <div class="d-flex align-items-center text-muted">
-                                    <i class="bi bi-geo-alt-fill text-danger me-2 opacity-75"></i>
-                                    <span class="text-truncate" style="max-width: 150px;" title="@item.VenueName">
+                        <td>
+                            <div class="d-flex align-items-center text-muted">
+                                <i class="bi bi-geo-alt-fill text-danger me-2 opacity-75"></i>
+                                <span class="text-truncate" style="max-width: 150px;" title="@item.VenueName">
                                         @item.VenueName
                                     </span>
-                                </div>
-                            </td>
+                            </div>
+                        </td>
 
-                            <td>
-                                @if (isPast)
+                        <td>
+                            @if (isPast)
+                            {
+                                <span class="status-badge status-past">Completed</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-upcoming">Upcoming</span>
+                            }
+                        </td>
+
+                        <td class="text-end pe-4">
+                            <div class="action-btn-group">
+                                <button
+                                    onclick="copyLink('@Url.Action("Details", "Event", new { id = item.Id }, Context.Request.Scheme)')"
+                                    class="btn-icon-soft" title="Copy Link">
+                                    <i class="bi bi-link-45deg"></i>
+                                </button>
+
+                                <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id"
+                                   class="btn-icon-soft" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
+                                @if (!isPast)
                                 {
-                                    <span class="status-badge status-past">Completed</span>
-                                }
-                                else
-                                {
-                                    <span class="status-badge status-upcoming">Upcoming</span>
-                                }
-                            </td>
-
-                            <td class="text-end pe-4">
-                                <div class="action-btn-group">
-                                    <button onclick="copyLink('@Url.Action("Details", "Event", new { id = item.Id }, Context.Request.Scheme)')"
-                                            class="btn-icon-soft" title="Copy Link">
-                                        <i class="bi bi-link-45deg"></i>
-                                    </button>
-
-                                    <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id"
-                                       class="btn-icon-soft" title="View Details">
-                                        <i class="bi bi-eye"></i>
+                                    <a asp-controller="Event" asp-action="Edit" asp-route-id="@item.Id"
+                                       class="btn-icon-soft" title="Edit Event">
+                                        <i class="bi bi-pencil"></i>
                                     </a>
+                                }
 
-                                    @if (!isPast)
-                                    {
-                                        <a asp-controller="Event" asp-action="Edit" asp-route-id="@item.Id"
-                                           class="btn-icon-soft" title="Edit Event">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                    }
-
-                                    <button type="button" class="btn-icon-soft danger" data-bs-toggle="modal"
-                                            data-bs-target="#deleteModal-@item.Id" title="Delete Event">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-
-                                <div class="modal fade" id="deleteModal-@item.Id" tabindex="-1">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content border-0 shadow">
-                                            <div class="modal-header border-0 pb-0">
-                                                <h5 class="modal-title fw-bold text-danger">Delete Event?</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body text-start text-muted">
-                                                Are you sure you want to delete <strong>@item.Name</strong>?
-                                            </div>
-                                            <div class="modal-footer border-0 pt-0">
-                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                                                <form asp-controller="Event" asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
-                                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    }
+                                <button type="button" class="btn-icon-soft danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal"
+                                        data-event-id="@item.Id"
+                                        data-event-name="@item.Name"
+                                        title="Delete Event">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
                 </tbody>
             </table>
         </div>
@@ -272,14 +260,27 @@
     }
 </div>
 
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true"
+     data-url-template="@Url.Action("Delete", "Event", new { id = 0 })">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">Delete Event?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-start text-muted">
+                Are you sure you want to delete <strong id="modalEventName"></strong>? <br>
+                This action cannot be undone.
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
-    <script>
-        function copyLink(url) {
-            navigator.clipboard.writeText(url).then(function() {
-                alert('Link copied to clipboard!'); 
-            }, function(err) {
-                console.error('Could not copy text: ', err);
-            });
-        }
-    </script>
 }
