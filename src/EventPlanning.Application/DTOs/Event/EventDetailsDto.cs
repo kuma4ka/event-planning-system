@@ -1,8 +1,12 @@
-﻿using EventPlanning.Domain.Enums;
+﻿using EventPlanning.Application.DTOs.Guest;
+using EventPlanning.Domain.Enums;
 
 namespace EventPlanning.Application.DTOs.Event;
 
 public record EventDetailsDto(
+    int VenueCapacity,
+    bool IsPrivate,
+    List<GuestDto> Guests,
     int Id,
     string Name,
     string Description,
@@ -10,11 +14,9 @@ public record EventDetailsDto(
     EventType Type,
     string OrganizerId,
     string VenueName,
-    string? VenueImageUrl, 
-    int VenueCapacity,     
-    bool IsPrivate,
-    List<GuestDto> Guests
-)
+    int? VenueId,
+    string? VenueImageUrl
+) : EventDto(Id, Name, Description, Date, Type, OrganizerId, VenueName, VenueId, VenueImageUrl)
 {
     public bool IsOrganizer { get; set; }
     public bool IsJoined { get; set; }
@@ -27,7 +29,7 @@ public record EventDetailsDto(
 
     public bool IsFull => VenueCapacity > 0 && SpotsLeft <= 0;
 
-    public int FillPercent => VenueCapacity > 0 
-        ? (int)((double)GuestsCount / VenueCapacity * 100) 
+    public int FillPercent => VenueCapacity > 0
+        ? (int)((double)GuestsCount / VenueCapacity * 100)
         : 0;
 }

@@ -1,5 +1,6 @@
 ﻿using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Services;
+using EventPlanning.Application.Validators.Event;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +10,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddValidatorsFromAssemblyContaining<Validators.CreateEventDtoValidator>();
+        services.AddValidatorsFromAssemblyContaining<CreateEventDtoValidator>();
 
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IVenueService, VenueService>();

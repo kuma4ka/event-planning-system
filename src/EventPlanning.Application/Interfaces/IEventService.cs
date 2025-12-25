@@ -1,5 +1,4 @@
-﻿using EventPlanning.Application.DTOs;
-using EventPlanning.Application.DTOs.Event;
+﻿using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Models;
 
 namespace EventPlanning.Application.Interfaces;
@@ -22,7 +21,10 @@ public interface IEventService
     Task UpdateEventAsync(string userId, UpdateEventDto dto, CancellationToken cancellationToken = default);
 
     Task DeleteEventAsync(string userId, int eventId, CancellationToken cancellationToken = default);
+
     Task JoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default);
+
     Task LeaveEventAsync(int eventId, string userId, CancellationToken cancellationToken = default);
+
     Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default);
 }

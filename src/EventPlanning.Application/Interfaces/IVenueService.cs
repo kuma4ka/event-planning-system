@@ -1,4 +1,5 @@
 ﻿using EventPlanning.Application.DTOs;
+using EventPlanning.Application.DTOs.Venue;
 
 namespace EventPlanning.Application.Interfaces;
 

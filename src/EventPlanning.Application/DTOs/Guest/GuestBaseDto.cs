@@ -1,6 +1,6 @@
-﻿namespace EventPlanning.Application.DTOs;
+﻿namespace EventPlanning.Application.DTOs.Guest;
 
-public record AddGuestManuallyDto(
+public abstract record GuestBaseDto(
     int EventId,
     string FirstName,
     string LastName,

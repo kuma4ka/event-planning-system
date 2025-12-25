@@ -1,9 +1,8 @@
-﻿using EventPlanning.Application.DTOs;
-using EventPlanning.Application.DTOs.Event;
+﻿using EventPlanning.Application.DTOs.Event;
+using EventPlanning.Application.DTOs.Guest;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
-using EventPlanning.Domain.Enums;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 
@@ -12,7 +11,8 @@ namespace EventPlanning.Application.Services;
 public class EventService(
     IEventRepository eventRepository,
     IValidator<CreateEventDto> createValidator,
-    IValidator<UpdateEventDto> updateValidator) : IEventService
+    IValidator<UpdateEventDto> updateValidator,
+    IValidator<EventSearchDto> searchValidator) : IEventService
 {
     public async Task<PagedResult<EventDto>> GetEventsAsync(
         string userId,
@@ -21,6 +21,9 @@ public class EventService(
         string? sortOrder,
         CancellationToken cancellationToken = default)
     {
+        var validationResult = await searchValidator.ValidateAsync(searchDto, cancellationToken);
+        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
         var fromDate = searchDto.FromDate ?? DateTime.Now;
 
         var pagedEvents = await eventRepository.GetFilteredAsync(
@@ -44,7 +47,7 @@ public class EventService(
             e.Type, 
             e.OrganizerId, 
             e.Venue?.Name ?? "TBD",
-            e.VenueId ?? 0,
+            e.VenueId,
             e.Venue?.ImageUrl
         )).ToList();
 
@@ -66,7 +69,7 @@ public class EventService(
             e.Type,
             e.OrganizerId,
             e.Venue?.Name ?? "TBD",
-            e.VenueId ?? 0,
+            e.VenueId,
             e.Venue?.ImageUrl
         );
     }
@@ -76,7 +79,17 @@ public class EventService(
         var eventEntity = await eventRepository.GetByIdAsync(id, cancellationToken);
         if (eventEntity == null) return null;
 
+        var guestsDto = eventEntity.Guests.Select(g => new GuestDto(
+            g.Id,
+            $"{g.FirstName} {g.LastName}",
+            g.Email,
+            g.PhoneNumber
+        )).ToList();
+
         return new EventDetailsDto(
+            eventEntity.Venue?.Capacity ?? 0,
+            eventEntity.IsPrivate,
+            guestsDto,
             eventEntity.Id,
             eventEntity.Name,
             eventEntity.Description ?? string.Empty,
@@ -84,15 +97,8 @@ public class EventService(
             eventEntity.Type,
             eventEntity.OrganizerId,
             eventEntity.Venue?.Name ?? "Online / TBD",
-            eventEntity.Venue?.ImageUrl,
-            eventEntity.Venue?.Capacity ?? 0,
-            eventEntity.IsPrivate,
-            eventEntity.Guests.Select(g => new GuestDto(
-                g.Id,
-                $"{g.FirstName} {g.LastName}",
-                g.Email,
-                g.PhoneNumber
-            )).ToList()
+            eventEntity.VenueId,
+            eventEntity.Venue?.ImageUrl
         );
     }
 
@@ -107,10 +113,10 @@ public class EventService(
             Name = dto.Name,
             Description = dto.Description,
             Date = dto.Date,
-            Type = Enum.Parse<EventType>(dto.Type),
-            VenueId = dto.VenueId,
+            Type = dto.Type,
+            VenueId = dto.VenueId == 0 ? null : dto.VenueId,
             OrganizerId = userId,
-            IsPrivate = dto.IsPrivate,
+            IsPrivate = false,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -134,7 +140,7 @@ public class EventService(
         eventEntity.Description = dto.Description;
         eventEntity.Date = dto.Date;
         eventEntity.Type = dto.Type;
-        eventEntity.VenueId = dto.VenueId;
+        eventEntity.VenueId = dto.VenueId == 0 ? null : dto.VenueId;
 
         await eventRepository.UpdateAsync(eventEntity, cancellationToken);
     }
@@ -162,7 +168,7 @@ public class EventService(
         if (eventEntity.OrganizerId == userId)
             throw new InvalidOperationException("You cannot join your own event as a guest.");
 
-        if (eventEntity.Venue != null && eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
+        if (eventEntity.Venue != null && eventEntity.Venue.Capacity > 0 && eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
             throw new InvalidOperationException("Sorry, this event is fully booked.");
 
         var isAlreadyJoined = await eventRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);

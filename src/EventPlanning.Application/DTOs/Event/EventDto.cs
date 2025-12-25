@@ -1,6 +1,6 @@
 ﻿using EventPlanning.Domain.Enums;
 
-namespace EventPlanning.Application.DTOs;
+namespace EventPlanning.Application.DTOs.Event;
 
 public record EventDto(
     int Id,

@@ -1,6 +1,6 @@
 ﻿using EventPlanning.Domain.Enums;
 
-namespace EventPlanning.Application.DTOs;
+namespace EventPlanning.Application.DTOs.Event;
 
 public record EventSearchDto
 {
@@ -8,7 +8,6 @@ public record EventSearchDto
     public DateTime? FromDate { get; init; }
     public DateTime? ToDate { get; init; }
     public EventType? Type { get; init; }
-    
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 9;
 }

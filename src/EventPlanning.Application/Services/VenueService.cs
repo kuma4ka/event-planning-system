@@ -1,4 +1,4 @@
-﻿using EventPlanning.Application.DTOs;
+﻿using EventPlanning.Application.DTOs.Venue;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
@@ -9,7 +9,9 @@ namespace EventPlanning.Application.Services;
 public class VenueService(
     IVenueRepository venueRepository, 
     IImageService imageService,
-    IValidator<CreateVenueDto> validator) : IVenueService
+    IValidator<CreateVenueDto> createValidator,
+    IValidator<UpdateVenueDto> updateValidator
+    ) : IVenueService
 {
     public async Task<List<VenueDto>> GetVenuesAsync(CancellationToken cancellationToken = default)
     {
@@ -35,7 +37,7 @@ public class VenueService(
 
     public async Task CreateVenueAsync(string adminId, CreateVenueDto dto, CancellationToken cancellationToken = default)
     {
-        var validationResult = await validator.ValidateAsync(dto, cancellationToken);
+        var validationResult = await createValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
         string? imageUrl = null;
@@ -60,6 +62,9 @@ public class VenueService(
 
     public async Task UpdateVenueAsync(UpdateVenueDto dto, CancellationToken cancellationToken = default)
     {
+        var validationResult = await updateValidator.ValidateAsync(dto, cancellationToken);
+        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
         var venue = await venueRepository.GetByIdAsync(dto.Id, cancellationToken);
         if (venue == null) throw new KeyNotFoundException($"Venue {dto.Id} not found");
 
