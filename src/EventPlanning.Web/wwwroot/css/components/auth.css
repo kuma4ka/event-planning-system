@@ -47,7 +47,8 @@
     max-width: 600px;
 }
 
-/* Form Styles Override */
+/* --- Form Styles Override --- */
+
 .auth-form-label {
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -57,28 +58,45 @@
     margin-bottom: 0.5rem;
 }
 
-.auth-icon-input .input-group-text {
+.auth-icon-input {
+    display: flex;
+    align-items: center;
     background-color: var(--color-cool-mist);
-    border-color: var(--color-ash-grey);
-    color: var(--color-dark-teal);
-    border-right: none;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.auth-icon-input:focus-within {
+    background-color: #fff;
+    border-color: var(--color-dark-teal);
+    box-shadow: 0 0 0 4px rgba(18, 69, 89, 0.15);
+}
+
+.auth-icon-input .input-group-text {
+    background-color: transparent;
+    border: none;
+    color: var(--color-air-force-blue);
+    padding-right: 0.5rem;
+    padding-left: 1rem;
 }
 
 .auth-icon-input .form-control {
-    border-left: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--color-ink-black);
+    padding: 0.8rem 1rem 0.8rem 0.5rem;
+    font-weight: 500;
 }
 
 .auth-icon-input .form-control:focus {
-    border-color: var(--color-ash-grey);
     box-shadow: none;
-    border-left: none;
+    background-color: transparent;
 }
 
-.auth-icon-input:focus-within .input-group-text,
-.auth-icon-input:focus-within .form-control {
-    border-color: var(--color-dark-teal);
-    box-shadow: 0 0 0 0.25rem rgba(18, 69, 89, 0.15);
-}
+/* --- Footer & Misc --- */
 
 .auth-footer {
     text-align: center;
