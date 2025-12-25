@@ -1,5 +1,4 @@
-﻿using EventPlanning.Application.DTOs;
-using EventPlanning.Application.DTOs.Event;
+﻿using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Enums;
 using EventPlanning.Infrastructure.Identity;
@@ -87,7 +86,7 @@ public class EventController(
             eventDto.Description,
             eventDto.Date,
             eventDto.Type,
-            eventDto.VenueId
+            eventDto.VenueId ?? 0
         );
 
         return View(updateModel);

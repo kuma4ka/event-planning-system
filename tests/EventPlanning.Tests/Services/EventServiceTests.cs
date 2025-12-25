@@ -1,6 +1,7 @@
-﻿using EventPlanning.Application.DTOs;
+﻿using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Services;
 using EventPlanning.Domain.Entities;
+using EventPlanning.Domain.Enums;
 using EventPlanning.Domain.Interfaces;
 using FluentAssertions;
 using FluentValidation;
@@ -13,6 +14,8 @@ public class EventServiceTests
 {
     private readonly Mock<IEventRepository> _eventRepoMock;
     private readonly Mock<IValidator<CreateEventDto>> _createValidatorMock;
+    private readonly Mock<IValidator<UpdateEventDto>> _updateValidatorMock;
+    private readonly Mock<IValidator<EventSearchDto>> _searchValidatorMock;
 
     private readonly EventService _service;
 
@@ -20,12 +23,14 @@ public class EventServiceTests
     {
         _eventRepoMock = new Mock<IEventRepository>();
         _createValidatorMock = new Mock<IValidator<CreateEventDto>>();
-        var updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
+        _updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
+        _searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
 
         _service = new EventService(
             _eventRepoMock.Object,
             _createValidatorMock.Object,
-            updateValidatorMock.Object
+            _updateValidatorMock.Object,
+            _searchValidatorMock.Object
         );
     }
 
@@ -40,9 +45,8 @@ public class EventServiceTests
             "Test Event",
             "Description",
             DateTime.Now.AddDays(1),
-            "Conference", // Type is string now
-            1, // VenueId
-            true // IsPrivate
+            EventType.Conference, 
+            1
         );
 
         _createValidatorMock
@@ -62,7 +66,8 @@ public class EventServiceTests
         _eventRepoMock.Verify(x => x.AddAsync(It.Is<Event>(e =>
             e.Name == dto.Name &&
             e.OrganizerId == userId &&
-            e.IsPrivate == dto.IsPrivate &&
+            e.IsPrivate == false &&
+            e.Type == dto.Type &&
             e.VenueId == dto.VenueId
         ), It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -72,7 +77,7 @@ public class EventServiceTests
     {
         // Arrange
         var userId = "user-1";
-        var dto = new CreateEventDto("", "", DateTime.Now, "Conference", null, false);
+        var dto = new CreateEventDto("", "", DateTime.Now, EventType.Conference, 0);
 
         var validationFailure = new ValidationResult(new[] { new ValidationFailure("Name", "Required") });
 

@@ -1,22 +1,13 @@
 ﻿@using EventPlanning.Domain.Enums
-@using System.ComponentModel.DataAnnotations
-@using System.Reflection
-@model EventPlanning.Application.DTOs.CreateEventDto
+@model CreateEventDto
 
 @{
     ViewData["Title"] = "Create Event";
 
-    var eventTypes = Enum.GetValues<EventType>().Select(e =>
+    var eventTypes = Enum.GetValues<EventType>().Select(e => new SelectListItem
     {
-        var field = e.GetType().GetField(e.ToString());
-        var attribute = field?.GetCustomAttribute<DisplayAttribute>();
-
-        return new SelectListItem
-        {
-            Value = e.ToString(),
-
-            Text = attribute?.Name ?? e.ToString()
-        };
+        Value = e.ToString(),
+        Text = e.GetDisplayName()
     });
 }
 
@@ -59,21 +50,14 @@
                     <div class="mb-3">
                         <label asp-for="VenueId" class="form-label">Venue (Optional)</label>
                         <select asp-for="VenueId" class="form-select" asp-items="@ViewBag.Venues">
-                            <option value="">-- Select a Venue (TBD) --</option>
+                            <option value="0">-- Select a Venue (TBD) --</option>
                         </select>
                         <span asp-validation-for="VenueId" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3 form-check">
-                        <input asp-for="IsPrivate" class="form-check-input" id="IsPrivate"/>
-                        <label asp-for="IsPrivate" class="form-check-label" for="IsPrivate">
-                            Private Event (Hidden from public feed)
-                        </label>
-                    </div>
-
-                    <div class="d-grid gap-2">
+                    <div class="d-grid gap-2 mt-4">
                         <button type="submit" class="btn btn-primary btn-lg">Create Event</button>
-                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary">Cancel</a>
                     </div>
                 </form>
             </div>

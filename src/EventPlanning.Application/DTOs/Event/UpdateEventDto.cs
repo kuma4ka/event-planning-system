@@ -1,6 +1,6 @@
 ﻿using EventPlanning.Domain.Enums;
 
-namespace EventPlanning.Application.DTOs;
+namespace EventPlanning.Application.DTOs.Event;
 
 public record UpdateEventDto(
     int Id,
@@ -8,5 +8,5 @@ public record UpdateEventDto(
     string Description,
     DateTime Date,
     EventType Type,
-    int? VenueId
-);
+    int VenueId
+) : EventBaseDto(Name, Description, Date, Type, VenueId);
