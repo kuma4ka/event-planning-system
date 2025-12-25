@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace EventPlanning.Application.DTOs;
+namespace EventPlanning.Application.DTOs.Venue;
 
 public record UpdateVenueDto(
     int Id,
@@ -10,4 +10,4 @@ public record UpdateVenueDto(
     string? Description,
     string? CurrentImageUrl,
     IFormFile? ImageFile
-);
+) : VenueBaseDto(Name, Address, Capacity, Description, ImageFile);
