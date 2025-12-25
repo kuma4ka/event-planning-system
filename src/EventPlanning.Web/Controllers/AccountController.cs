@@ -17,6 +17,7 @@ public class AccountController(
     [HttpGet]
     public IActionResult Register()
     {
+        if (User.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
         return View();
     }
 
@@ -48,7 +49,8 @@ public class AccountController(
             return RedirectToAction("Index", "Home");
         }
 
-        foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description);
+        foreach (var error in result.Errors) 
+            ModelState.AddModelError(string.Empty, error.Description);
 
         return View(model);
     }
@@ -56,6 +58,7 @@ public class AccountController(
     [HttpGet]
     public IActionResult Login()
     {
+        if (User.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
         return View();
     }
 
@@ -76,7 +79,15 @@ public class AccountController(
 
         if (result.Succeeded) return LocalRedirect(returnUrl);
 
-        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+        if (result.IsLockedOut)
+        {
+            ModelState.AddModelError(string.Empty, "Account is locked out.");
+        }
+        else
+        {
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+        }
+        
         return View(model);
     }
 
