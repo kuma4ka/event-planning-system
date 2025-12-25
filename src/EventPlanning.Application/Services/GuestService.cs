@@ -1,4 +1,4 @@
-﻿using EventPlanning.Application.DTOs;
+﻿using EventPlanning.Application.DTOs.Guest;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
@@ -22,28 +22,9 @@ public class GuestService(
         if (eventEntity == null) throw new KeyNotFoundException("Event not found");
         if (eventEntity.OrganizerId != userId) throw new UnauthorizedAccessException("Not your event");
 
-        var guest = new Guest
-        {
-            Id = Guid.NewGuid().ToString(),
-            EventId = dto.EventId,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            Email = dto.Email,
-            PhoneNumber = dto.PhoneNumber
-        };
+        var guest = CreateGuestEntity(dto);
 
         await guestRepository.AddAsync(guest, cancellationToken);
-    }
-
-    public async Task RemoveGuestAsync(string userId, string guestId, CancellationToken cancellationToken = default)
-    {
-        var guest = await guestRepository.GetByIdAsync(guestId, cancellationToken);
-        if (guest == null) return;
-
-        if (guest.Event?.OrganizerId != userId)
-            throw new UnauthorizedAccessException("Not your event");
-
-        await guestRepository.DeleteAsync(guest, cancellationToken);
     }
 
     public async Task AddGuestManuallyAsync(string currentUserId, AddGuestManuallyDto dto,
@@ -62,10 +43,28 @@ public class GuestService(
         if (eventEntity.Date < DateTime.Now)
             throw new InvalidOperationException("Cannot add guests to an event that has already ended.");
 
-        if (eventEntity.Venue != null && eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
+        if (eventEntity.Venue != null && eventEntity.Venue.Capacity > 0 && eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
             throw new InvalidOperationException("Venue is fully booked.");
 
-        var guest = new Guest
+        var guest = CreateGuestEntity(dto);
+
+        await guestRepository.AddAsync(guest, cancellationToken);
+    }
+
+    public async Task RemoveGuestAsync(string userId, string guestId, CancellationToken cancellationToken = default)
+    {
+        var guest = await guestRepository.GetByIdAsync(guestId, cancellationToken);
+        if (guest == null) return;
+
+        if (guest.Event?.OrganizerId != userId)
+            throw new UnauthorizedAccessException("Not your event");
+
+        await guestRepository.DeleteAsync(guest, cancellationToken);
+    }
+
+    private static Guest CreateGuestEntity(GuestBaseDto dto)
+    {
+        return new Guest
         {
             Id = Guid.NewGuid().ToString(),
             EventId = dto.EventId,
@@ -74,7 +73,5 @@ public class GuestService(
             Email = dto.Email,
             PhoneNumber = dto.PhoneNumber
         };
-
-        await guestRepository.AddAsync(guest, cancellationToken);
     }
 }

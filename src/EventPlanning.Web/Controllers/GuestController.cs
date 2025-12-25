@@ -1,4 +1,4 @@
-﻿using EventPlanning.Application.DTOs;
+﻿using EventPlanning.Application.DTOs.Guest;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
@@ -9,17 +9,18 @@ using Microsoft.AspNetCore.Mvc;
 namespace EventPlanning.Web.Controllers;
 
 [Authorize]
+[Route("guests")]
 public class GuestController(
     IGuestService guestService,
     UserManager<User> userManager) : Controller
 {
-    [HttpGet]
+    [HttpGet("create/{eventId:int}")]
     public IActionResult Create(int eventId)
     {
         return View(new CreateGuestDto(eventId));
     }
 
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> Create(CreateGuestDto model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid) return View(model);
@@ -43,7 +44,7 @@ public class GuestController(
         }
     }
 
-    [HttpPost]
+    [HttpPost("add-manually")]
     public async Task<IActionResult> AddManually(AddGuestManuallyDto model, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
@@ -69,7 +70,7 @@ public class GuestController(
         return RedirectToAction("Details", "Event", new { id = model.EventId });
     }
 
-    [HttpPost]
+    [HttpPost("delete")]
     public async Task<IActionResult> Delete(string guestId, int eventId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
