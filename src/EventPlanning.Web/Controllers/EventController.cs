@@ -1,4 +1,5 @@
 ﻿using EventPlanning.Application.DTOs;
+using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Enums;
 using EventPlanning.Infrastructure.Identity;
@@ -24,19 +25,14 @@ public class EventController(
         var eventDetails = await eventService.GetEventDetailsAsync(id, cancellationToken);
         if (eventDetails == null) return NotFound();
 
+        var userId = userManager.GetUserId(User);
+
+        eventDetails.IsOrganizer = userId != null && eventDetails.OrganizerId == userId;
+        eventDetails.IsJoined = userId != null && await eventService.IsUserJoinedAsync(id, userId, cancellationToken);
+
         var organizer = await userManager.FindByIdAsync(eventDetails.OrganizerId);
         ViewBag.OrganizerName = organizer != null ? $"{organizer.FirstName} {organizer.LastName}" : "Unknown Organizer";
         ViewBag.OrganizerEmail = organizer?.Email ?? "";
-
-        var userId = userManager.GetUserId(User);
-        var isJoined = false;
-
-        if (userId != null)
-        {
-            isJoined = await eventService.IsUserJoinedAsync(id, userId, cancellationToken);
-        }
-
-        ViewBag.IsJoined = isJoined;
 
         return View(eventDetails);
     }

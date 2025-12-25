@@ -29,7 +29,7 @@ public class GuestController(
         try
         {
             await guestService.AddGuestAsync(userId!, model, cancellationToken);
-            return RedirectToAction("Details", "Home", new { id = model.EventId });
+            return RedirectToAction("Details", "Event", new { id = model.EventId });
         }
         catch (ValidationException ex)
         {
@@ -66,7 +66,7 @@ public class GuestController(
             TempData["ErrorMessage"] = ex.Message;
         }
 
-        return RedirectToAction("Details", "Home", new { id = model.EventId });
+        return RedirectToAction("Details", "Event", new { id = model.EventId });
     }
 
     [HttpPost]
@@ -76,7 +76,7 @@ public class GuestController(
         try
         {
             await guestService.RemoveGuestAsync(userId!, guestId, cancellationToken);
-            return RedirectToAction("Details", "Home", new { id = eventId });
+            return RedirectToAction("Details", "Event", new { id = eventId });
         }
         catch (UnauthorizedAccessException)
         {
