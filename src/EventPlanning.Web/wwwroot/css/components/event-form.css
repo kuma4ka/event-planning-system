@@ -1,0 +1,87 @@
+﻿/* --- EVENT FORM COMPONENT --- */
+
+.event-card {
+    background: #fff;
+    border: 1px solid rgba(174, 195, 176, 0.3);
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(1, 22, 30, 0.05);
+}
+
+.event-form-title {
+    font-family: var(--font-heading), serif;
+    color: var(--color-ink-black);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.event-form-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: var(--color-air-force-blue);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* --- UNIFIED INPUT GROUP --- */
+.event-input-group {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-cool-mist);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.event-input-group.align-top {
+    align-items: flex-start;
+}
+
+.event-input-group:focus-within {
+    background-color: #fff;
+    border-color: var(--color-dark-teal);
+    box-shadow: 0 0 0 4px rgba(18, 69, 89, 0.15);
+}
+
+.event-input-group .input-group-text {
+    background-color: transparent;
+    border: none;
+    color: var(--color-air-force-blue);
+    padding-left: 1rem;
+    padding-right: 0.5rem;
+    padding-top: 0.8rem;
+}
+
+.event-input-group .form-control,
+.event-input-group .form-select {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--color-ink-black);
+    padding: 0.8rem 1rem 0.8rem 0.5rem;
+    font-weight: 500;
+}
+
+.event-input-group .form-control:focus,
+.event-input-group .form-select:focus {
+    box-shadow: none;
+    background-color: transparent;
+}
+
+.event-input-group textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Footer buttons */
+.form-actions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(174, 195, 176, 0.3);
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
