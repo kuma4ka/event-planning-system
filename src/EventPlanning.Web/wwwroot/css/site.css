@@ -10,6 +10,7 @@
 @import url('components/auth.css');
 @import url('components/dashboard.css');
 @import url('components/event-form.css');
+@import url('components/event-details.css');
 
 @import url('layout/navbar.css');
 @import url('layout/hero.css');
