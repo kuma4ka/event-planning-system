@@ -1,0 +1,226 @@
+﻿/* --- DASHBOARD COMPONENT --- */
+
+.dashboard-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(174, 195, 176, 0.3);
+    padding-bottom: 1.5rem;
+}
+
+.dashboard-title {
+    font-family: var(--font-heading), serif;
+    font-weight: 700;
+    color: var(--color-ink-black);
+    letter-spacing: -0.5px;
+}
+
+/* --- TOOLBAR / FILTER SECTION --- */
+.dashboard-toolbar {
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid rgba(174, 195, 176, 0.3);
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    margin-bottom: 2rem;
+}
+
+.dashboard-input-group {
+    background-color: var(--color-cool-mist);
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.dashboard-input-group:focus-within {
+    background-color: #fff;
+    border-color: var(--color-dark-teal);
+    box-shadow: 0 0 0 3px rgba(18, 69, 89, 0.1);
+}
+
+.dashboard-input-group .input-group-text {
+    background-color: transparent;
+    border: none;
+    color: var(--color-air-force-blue);
+    padding-right: 0;
+    padding-left: 1rem;
+}
+
+.dashboard-input-group .form-control,
+.dashboard-input-group .form-select {
+    background-color: transparent;
+    border: none;
+    color: var(--color-ink-black);
+    padding: 0.7rem 1rem;
+    font-weight: 500;
+}
+
+.dashboard-input-group .form-control:focus,
+.dashboard-input-group .form-select:focus {
+    box-shadow: none;
+    background-color: transparent;
+}
+
+.date-separator {
+    color: var(--color-ash-grey);
+    font-weight: bold;
+    align-self: center;
+    padding: 0 0.5rem;
+}
+
+/* --- EVENTS TABLE/LIST --- */
+.dashboard-table {
+    border-collapse: separate;
+    border-spacing: 0 12px;
+}
+
+.dashboard-table thead th {
+    border: none;
+    background: transparent;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: var(--color-air-force-blue);
+    font-weight: 700;
+    padding-bottom: 0.5rem;
+}
+
+.dashboard-row {
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-row td {
+    border: none;
+    padding: 1.25rem 1rem;
+    vertical-align: middle;
+    border-top: 1px solid rgba(174, 195, 176, 0.2);
+    border-bottom: 1px solid rgba(174, 195, 176, 0.2);
+}
+
+.dashboard-row td:first-child {
+    border-left: 1px solid rgba(174, 195, 176, 0.2);
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.dashboard-row td:last-child {
+    border-right: 1px solid rgba(174, 195, 176, 0.2);
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.dashboard-row:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(18, 69, 89, 0.1);
+    z-index: 1;
+    position: relative;
+}
+
+/* --- DATE BADGE --- */
+.event-date-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background-color: var(--color-cool-mist);
+    border-radius: 10px;
+    border: 1px solid rgba(174, 195, 176, 0.5);
+    color: var(--color-dark-teal);
+}
+
+.event-date-badge.past {
+    opacity: 0.6;
+    background-color: #f8f9fa;
+    color: var(--color-ash-grey);
+}
+
+.event-day {
+    font-size: 1.4rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.event-month {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+/* --- TYPOGRAPHY IN ROW --- */
+.event-title-link {
+    font-family: var(--font-heading), serif;
+    font-weight: 700;
+    color: var(--color-ink-black);
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+
+.event-title-link:hover {
+    color: var(--color-dark-teal);
+}
+
+.event-meta {
+    font-size: 0.85rem;
+    color: var(--color-air-force-blue);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+/* --- STATUS BADGES --- */
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-upcoming {
+    background-color: rgba(18, 69, 89, 0.1);
+    color: var(--color-dark-teal);
+}
+
+.status-past {
+    background-color: #f0f2f5;
+    color: var(--color-ash-grey);
+}
+
+/* --- ACTIONS --- */
+.action-btn-group {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.btn-icon-soft {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    color: var(--color-air-force-blue);
+    background-color: transparent;
+    transition: all 0.2s;
+}
+
+.btn-icon-soft:hover {
+    background-color: var(--color-cool-mist);
+    color: var(--color-dark-teal);
+}
+
+.btn-icon-soft.danger:hover {
+    background-color: #fff5f5;
+    color: #dc3545;
+}
