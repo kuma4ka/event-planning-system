@@ -1,4 +1,7 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿import { initDashboard } from './components/dashboard.js';
 
-// Write your JavaScript code.
+document.addEventListener('DOMContentLoaded', () => {
+
+    initDashboard();
+    console.log('Stanza JS loaded modules successfully.');
+});
