@@ -1,5 +1,5 @@
 ﻿using EventPlanning.Application.Interfaces;
-using EventPlanning.Infrastructure.Identity;
+using EventPlanning.Domain.Entities;
 using EventPlanning.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

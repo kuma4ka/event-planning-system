@@ -1,8 +1,7 @@
 ﻿using EventPlanning.Application.DTOs.Profile;
-using EventPlanning.Domain.Interfaces;
-using EventPlanning.Infrastructure.Identity;
+using EventPlanning.Application.Interfaces;
+using EventPlanning.Domain.Entities;
 using FluentValidation;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace EventPlanning.Web.Controllers;
 
 [Authorize]
+[Route("profile")]
 public class ProfileController(
+    IProfileService profileService,
     UserManager<User> userManager,
-    IEventRepository eventRepository,
-    ILogger<ProfileController> logger,
-    IValidator<EditProfileDto> profileValidator,
-    IValidator<ChangePasswordDto> passwordValidator
-    ) : Controller
+    ILogger<ProfileController> logger) : Controller
 {
     private const string TabProfile = "profile";
     private const string TabSecurity = "security";
@@ -24,10 +21,10 @@ public class ProfileController(
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var user = await userManager.GetUserAsync(User);
-        if (user == null) return RedirectToAction("Login", "Account");
+        var userId = userManager.GetUserId(User);
+        if (userId == null) return RedirectToAction("Login", "Account");
 
-        var model = await BuildProfileModelAsync(user, cancellationToken);
+        var model = await profileService.GetProfileAsync(userId, cancellationToken);
 
         ViewBag.PasswordModel = new ChangePasswordDto();
         ViewBag.ActiveTab = TabProfile;
@@ -35,134 +32,71 @@ public class ProfileController(
         return View(model);
     }
 
-    [HttpPost]
+    [HttpPost("update-info")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateInfo(EditProfileDto model, CancellationToken cancellationToken)
     {
-        var user = await userManager.GetUserAsync(User);
-        if (user == null) return RedirectToAction("Login", "Account");
+        var userId = userManager.GetUserId(User);
+        if (userId == null) return RedirectToAction("Login", "Account");
 
-        var validationResult = await profileValidator.ValidateAsync(model, cancellationToken);
-        
-        if (!validationResult.IsValid)
+        try
         {
-            AddToModelState(validationResult);
+            await profileService.UpdateProfileAsync(userId, model, cancellationToken);
 
-            await EnrichModelWithStatsAsync(model, user.Id, cancellationToken);
-            model.Email = user.Email;
-
-            ViewBag.ActiveTab = TabProfile;
-            ViewBag.PasswordModel = new ChangePasswordDto();
-            return View("Index", model);
-        }
-
-        user.FirstName = model.FirstName;
-        user.LastName = model.LastName;
-        user.PhoneNumber = model.PhoneNumber;
-
-        var result = await userManager.UpdateAsync(user);
-
-        if (result.Succeeded)
-        {
-            logger.LogInformation("User {UserId} updated their profile information.", user.Id);
+            logger.LogInformation("User {UserId} updated their profile information.", userId);
             TempData["SuccessMessage"] = "Profile details updated successfully!";
+            
             return RedirectToAction(nameof(Index));
         }
+        catch (ValidationException ex)
+        {
+            foreach (var error in ex.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+        }
 
-        AddIdentityErrorsToModelState(result);
-
-        await EnrichModelWithStatsAsync(model, user.Id, cancellationToken);
-        model.Email = user.Email;
+        var freshProfileData = await profileService.GetProfileAsync(userId, cancellationToken);
+        
+        model.Email = freshProfileData.Email;
+        model.OrganizedCount = freshProfileData.OrganizedCount;
+        model.JoinedCount = freshProfileData.JoinedCount;
 
         ViewBag.ActiveTab = TabProfile;
         ViewBag.PasswordModel = new ChangePasswordDto();
+        
         return View("Index", model);
     }
 
-    [HttpPost]
+    [HttpPost("change-password")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ChangePassword(ChangePasswordDto passwordModel,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> ChangePassword(ChangePasswordDto passwordModel, CancellationToken cancellationToken)
     {
-        var user = await userManager.GetUserAsync(User);
-        if (user == null) return RedirectToAction("Login", "Account");
+        var userId = userManager.GetUserId(User);
+        if (userId == null) return RedirectToAction("Login", "Account");
 
-        var validationResult = await passwordValidator.ValidateAsync(passwordModel, cancellationToken);
-
-        if (!validationResult.IsValid)
+        try
         {
-            foreach (var error in validationResult.Errors)
+            await profileService.ChangePasswordAsync(userId, passwordModel, cancellationToken);
+
+            logger.LogInformation("User {UserId} changed their password.", userId);
+            TempData["SuccessMessage"] = "Password changed successfully!";
+            
+            return RedirectToAction(nameof(Index));
+        }
+        catch (ValidationException ex)
+        {
+            foreach (var error in ex.Errors)
             {
                 ModelState.AddModelError("PasswordError", error.ErrorMessage);
             }
-
-            var profileModel = await BuildProfileModelAsync(user, cancellationToken);
-            ViewBag.ActiveTab = TabSecurity;
-            ViewBag.PasswordModel = passwordModel;
-            return View("Index", profileModel);
         }
 
-        var result =
-            await userManager.ChangePasswordAsync(user, passwordModel.CurrentPassword, passwordModel.NewPassword);
-
-        if (result.Succeeded)
-        {
-            logger.LogInformation("User {UserId} changed their password.", user.Id);
-            await userManager.UpdateSecurityStampAsync(user);
-            TempData["SuccessMessage"] = "Password changed successfully!";
-            return RedirectToAction(nameof(Index));
-        }
-
-        AddIdentityErrorsToModelState(result, "PasswordError");
-
-        var model = await BuildProfileModelAsync(user, cancellationToken);
+        var profileModel = await profileService.GetProfileAsync(userId, cancellationToken);
 
         ViewBag.ActiveTab = TabSecurity;
         ViewBag.PasswordModel = passwordModel;
-        return View("Index", model);
+        
+        return View("Index", profileModel);
     }
-
-    #region Private Helpers
-
-    private async Task<EditProfileDto> BuildProfileModelAsync(User user, CancellationToken token)
-    {
-        var model = new EditProfileDto
-        {
-            FirstName = user.FirstName ?? string.Empty,
-            LastName = user.LastName ?? string.Empty,
-            PhoneNumber = user.PhoneNumber,
-            Email = user.Email
-        };
-
-        await EnrichModelWithStatsAsync(model, user.Id, token);
-        return model;
-    }
-
-    private async Task EnrichModelWithStatsAsync(EditProfileDto model, string userId, CancellationToken token)
-    {
-        var organizedEvents = await eventRepository.GetFilteredAsync(
-            userId, null, null, null, null, null, null, 1, 1, token);
-
-        model.OrganizedCount = organizedEvents.TotalCount;
-        model.JoinedCount = await eventRepository.CountJoinedEventsAsync(userId, token);
-    }
-
-    private void AddToModelState(ValidationResult result)
-    {
-        foreach (var error in result.Errors)
-        {
-            ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-        }
-    }
-
-    private void AddIdentityErrorsToModelState(IdentityResult result, string? keyPrefix = null)
-    {
-        foreach (var error in result.Errors)
-        {
-            var key = string.IsNullOrEmpty(keyPrefix) ? string.Empty : keyPrefix;
-            ModelState.AddModelError(key, error.Description);
-        }
-    }
-
-    #endregion
 }

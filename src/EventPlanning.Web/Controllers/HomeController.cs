@@ -1,8 +1,8 @@
 using EventPlanning.Application.DTOs;
 using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Interfaces;
+using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
-using EventPlanning.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

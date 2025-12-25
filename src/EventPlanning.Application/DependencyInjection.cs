@@ -15,6 +15,7 @@ public static class DependencyInjection
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IVenueService, VenueService>();
         services.AddScoped<IGuestService, GuestService>();
+        services.AddScoped<IProfileService, ProfileService>();
 
         return services;
     }

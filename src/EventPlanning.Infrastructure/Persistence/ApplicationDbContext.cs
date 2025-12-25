@@ -1,5 +1,4 @@
 ﻿using EventPlanning.Domain.Entities;
-using EventPlanning.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
