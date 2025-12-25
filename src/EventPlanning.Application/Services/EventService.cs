@@ -1,4 +1,5 @@
 ﻿using EventPlanning.Application.DTOs;
+using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
@@ -80,7 +81,7 @@ public class EventService(
             eventEntity.Name,
             eventEntity.Description ?? string.Empty,
             eventEntity.Date,
-            eventEntity.Type.ToString(),
+            eventEntity.Type,
             eventEntity.OrganizerId,
             eventEntity.Venue?.Name ?? "Online / TBD",
             eventEntity.Venue?.ImageUrl,

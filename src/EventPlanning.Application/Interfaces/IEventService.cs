@@ -1,4 +1,5 @@
 ﻿using EventPlanning.Application.DTOs;
+using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Models;
 
 namespace EventPlanning.Application.Interfaces;
