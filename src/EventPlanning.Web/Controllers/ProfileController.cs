@@ -1,6 +1,8 @@
-﻿using EventPlanning.Application.DTOs;
+﻿using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Domain.Interfaces;
 using EventPlanning.Infrastructure.Identity;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +13,10 @@ namespace EventPlanning.Web.Controllers;
 public class ProfileController(
     UserManager<User> userManager,
     IEventRepository eventRepository,
-    ILogger<ProfileController> logger) : Controller
+    ILogger<ProfileController> logger,
+    IValidator<EditProfileDto> profileValidator,
+    IValidator<ChangePasswordDto> passwordValidator
+    ) : Controller
 {
     private const string TabProfile = "profile";
     private const string TabSecurity = "security";
@@ -37,8 +42,12 @@ public class ProfileController(
         var user = await userManager.GetUserAsync(User);
         if (user == null) return RedirectToAction("Login", "Account");
 
-        if (!ModelState.IsValid)
+        var validationResult = await profileValidator.ValidateAsync(model, cancellationToken);
+        
+        if (!validationResult.IsValid)
         {
+            AddToModelState(validationResult);
+
             await EnrichModelWithStatsAsync(model, user.Id, cancellationToken);
             model.Email = user.Email;
 
@@ -60,7 +69,7 @@ public class ProfileController(
             return RedirectToAction(nameof(Index));
         }
 
-        AddErrorsToModelState(result);
+        AddIdentityErrorsToModelState(result);
 
         await EnrichModelWithStatsAsync(model, user.Id, cancellationToken);
         model.Email = user.Email;
@@ -78,10 +87,16 @@ public class ProfileController(
         var user = await userManager.GetUserAsync(User);
         if (user == null) return RedirectToAction("Login", "Account");
 
-        if (!ModelState.IsValid)
-        {
-            var profileModel = await BuildProfileModelAsync(user, cancellationToken);
+        var validationResult = await passwordValidator.ValidateAsync(passwordModel, cancellationToken);
 
+        if (!validationResult.IsValid)
+        {
+            foreach (var error in validationResult.Errors)
+            {
+                ModelState.AddModelError("PasswordError", error.ErrorMessage);
+            }
+
+            var profileModel = await BuildProfileModelAsync(user, cancellationToken);
             ViewBag.ActiveTab = TabSecurity;
             ViewBag.PasswordModel = passwordModel;
             return View("Index", profileModel);
@@ -93,14 +108,12 @@ public class ProfileController(
         if (result.Succeeded)
         {
             logger.LogInformation("User {UserId} changed their password.", user.Id);
-
             await userManager.UpdateSecurityStampAsync(user);
-
             TempData["SuccessMessage"] = "Password changed successfully!";
             return RedirectToAction(nameof(Index));
         }
 
-        AddErrorsToModelState(result, "PasswordError");
+        AddIdentityErrorsToModelState(result, "PasswordError");
 
         var model = await BuildProfileModelAsync(user, cancellationToken);
 
@@ -131,11 +144,18 @@ public class ProfileController(
             userId, null, null, null, null, null, null, 1, 1, token);
 
         model.OrganizedCount = organizedEvents.TotalCount;
-
         model.JoinedCount = await eventRepository.CountJoinedEventsAsync(userId, token);
     }
 
-    private void AddErrorsToModelState(IdentityResult result, string? keyPrefix = null)
+    private void AddToModelState(ValidationResult result)
+    {
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+        }
+    }
+
+    private void AddIdentityErrorsToModelState(IdentityResult result, string? keyPrefix = null)
     {
         foreach (var error in result.Errors)
         {
