@@ -97,9 +97,14 @@ public class EventController(
         return View(updateModel);
     }
 
-    [HttpPost("edit")]
-    public async Task<IActionResult> Edit(UpdateEventDto model, CancellationToken cancellationToken)
+    [HttpPost("edit/{id:int}")]
+    public async Task<IActionResult> Edit(int id, UpdateEventDto model, CancellationToken cancellationToken)
     {
+        if (id != model.Id) 
+        {
+            return BadRequest("ID mismatch");
+        }
+
         if (!ModelState.IsValid)
         {
             await LoadVenuesToViewBag(cancellationToken);
@@ -111,7 +116,7 @@ public class EventController(
         try
         {
             await eventService.UpdateEventAsync(userId!, model, cancellationToken);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("MyEvents", "Event"); 
         }
         catch (ValidationException ex)
         {
