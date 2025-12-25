@@ -142,6 +142,45 @@
     margin-bottom: 0.5rem;
 }
 
+/* --- NEW INPUT STYLES --- */
+.profile-input-group {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-cool-mist);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.profile-input-group:focus-within {
+    background-color: #fff;
+    border-color: var(--color-dark-teal);
+    box-shadow: 0 0 0 4px rgba(18, 69, 89, 0.15);
+}
+
+.profile-input-group .input-group-text {
+    background-color: transparent;
+    border: none;
+    color: var(--color-air-force-blue);
+    padding-right: 0.5rem;
+    padding-left: 1rem;
+}
+
+.profile-input-group .form-control {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--color-ink-black);
+    padding: 0.8rem 1rem 0.8rem 0.5rem;
+    font-weight: 500;
+}
+
+.profile-input-group .form-control:focus {
+    box-shadow: none;
+    background-color: transparent;
+}
+
 .profile-footer {
     margin-top: 2rem;
     padding-top: 1.5rem;
