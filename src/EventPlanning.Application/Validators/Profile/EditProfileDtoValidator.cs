@@ -17,9 +17,13 @@ public class EditProfileDtoValidator : AbstractValidator<EditProfileDto>
             .MaximumLength(50).WithMessage("Last name cannot exceed 50 characters.")
             .Matches(@"^\p{Lu}\p{Ll}*$").WithMessage("Last name must start with a capital letter and contain only letters.");
 
+        RuleFor(x => x.CountryCode)
+            .NotEmpty().WithMessage("Country code is required.")
+            .Matches(@"^\+\d+$").WithMessage("Invalid country code format.");
+
         RuleFor(x => x.PhoneNumber)
-            .MaximumLength(20).WithMessage("Phone number is too long.")
-            .Matches(@"^\+?[\d\s-]*$").When(x => !string.IsNullOrEmpty(x.PhoneNumber))
-            .WithMessage("Phone number contains invalid characters.");
+            .MaximumLength(15).WithMessage("Phone number is too long.")
+            .Matches(@"^\d{7,15}$").WithMessage("Phone number must contain between 7 and 15 digits (without country code).")
+            .When(x => !string.IsNullOrEmpty(x.PhoneNumber));
     }
 }
