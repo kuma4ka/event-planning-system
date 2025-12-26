@@ -9,6 +9,15 @@
         : "ME";
 
     var activeTab = ViewBag.ActiveTab as string ?? "profile";
+    
+    var countryCodes = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "+380", Text = "🇺🇦 UA (+380)" },
+        new SelectListItem { Value = "+1", Text = "🇺🇸 US (+1)" },
+        new SelectListItem { Value = "+44", Text = "🇬🇧 UK (+44)" },
+        new SelectListItem { Value = "+48", Text = "🇵🇱 PL (+48)" },
+        new SelectListItem { Value = "+49", Text = "🇩🇪 DE (+49)" }
+    };
 }
 
 <div class="container py-5">
@@ -99,9 +108,14 @@
 
                                 <div class="col-12">
                                     <label asp-for="PhoneNumber" class="form-label-profile">Phone Number</label>
-                                    <div class="profile-input-group">
-                                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                                        <input asp-for="PhoneNumber" class="form-control" placeholder="+1 (555) 000-0000" />
+
+                                    <div class="input-group">
+
+                                        <select asp-for="CountryCode" asp-items="countryCodes" class="form-select" style="max-width: 150px; background-color: #f8f9fa;">
+                                        </select>
+
+                                        <input asp-for="PhoneNumber" class="form-control" placeholder="99 123 45 67" />
+
                                     </div>
                                     <span asp-validation-for="PhoneNumber" class="text-danger small mt-1 d-block"></span>
                                 </div>
