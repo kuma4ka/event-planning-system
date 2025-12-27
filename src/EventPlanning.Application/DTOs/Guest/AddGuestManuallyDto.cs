@@ -5,5 +5,6 @@ public record AddGuestManuallyDto(
     string FirstName,
     string LastName,
     string Email,
-    string? PhoneNumber
-) : GuestBaseDto(EventId, FirstName, LastName, Email, PhoneNumber);
+    string CountryCode,
+    string PhoneNumber
+) : GuestBaseDto(EventId, FirstName, LastName, Email, CountryCode, PhoneNumber);

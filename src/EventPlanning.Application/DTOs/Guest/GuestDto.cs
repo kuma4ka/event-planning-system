@@ -5,7 +5,8 @@ public record GuestDto(
     string FirstName,
     string LastName,
     string Email,
-    string? PhoneNumber
+    string CountryCode,
+    string PhoneNumber
 )
 {
     public string FullName => $"{FirstName} {LastName}".Trim();
