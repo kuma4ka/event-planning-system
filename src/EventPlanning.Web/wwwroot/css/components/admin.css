@@ -1,0 +1,99 @@
+﻿/* --- ADMIN LINKS --- */
+
+.c-admin-link {
+    background-color: rgba(17, 75, 95, 0.1);
+    color: var(--color-dark-teal);
+    font-weight: 700;
+    transition: all 0.2s ease-in-out;
+    padding: 10px 16px;
+    border: 1px solid rgba(17, 75, 95, 0.1);
+}
+
+.c-admin-link:hover,
+.c-admin-link:focus {
+    background-color: var(--color-dark-teal);
+    color: #fff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.c-admin-link:hover .badge {
+    background-color: #fff !important;
+    color: var(--color-dark-teal) !important;
+}
+
+/* --- ADMIN PANEL --- */
+
+.c-admin-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.c-admin-header {
+    background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Table Styles */
+.c-admin-table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: collapse;
+}
+
+.c-admin-table thead th {
+    background-color: #f8f9fa;
+    color: var(--color-air-force-blue);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #e9ecef;
+    padding: 1rem;
+}
+
+.c-admin-table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    color: var(--color-ink-black);
+    border-bottom: 1px solid #f0f2f5;
+}
+
+.c-admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.c-admin-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Action Buttons */
+.c-action-btn {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+    color: var(--color-air-force-blue);
+    background-color: #f0f2f5;
+    text-decoration: none;
+}
+
+.c-action-btn:hover {
+    background-color: var(--color-dark-teal);
+    color: white;
+}
+
+.c-action-btn.text-danger:hover {
+    background-color: #dc3545;
+    color: white !important;
+}
