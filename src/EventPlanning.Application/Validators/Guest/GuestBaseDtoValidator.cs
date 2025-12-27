@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace EventPlanning.Application.Validators.Guest;
 
-public class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : GuestBaseDto
+public abstract class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : GuestBaseDto
 {
     protected GuestBaseDtoValidator()
     {
@@ -11,7 +11,8 @@ public class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : GuestBase
             .GreaterThan(0).WithMessage("Event ID is required.");
 
         var nameRegex = @"^\p{Lu}\p{Ll}*(?:[\s-']\p{Lu}\p{Ll}*)*$";
-        var nameErrorMessage = "Must start with a capital letter. Parts must be separated by space, hyphen, or apostrophe and also start with a capital (e.g., 'Anna-Maria', 'Mc Donald').";
+        var nameErrorMessage =
+            "Must start with a capital letter. Parts must be separated by space, hyphen, or apostrophe and also start with a capital (e.g., 'Anna-Maria', 'Mc Donald').";
 
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("First name is required.")
@@ -32,6 +33,6 @@ public class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : GuestBase
         RuleFor(x => x.PhoneNumber)
             .MaximumLength(20).WithMessage("Phone number is too long.")
             .Matches(@"^\+?[\d\s-]*$").When(x => !string.IsNullOrEmpty(x.PhoneNumber))
-            .WithMessage("Phone number contains invalid characters.");
+            .WithMessage("Phone number contains invalid characters (allowed: digits, spaces, -, +).");
     }
 }

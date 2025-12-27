@@ -1,12 +1,10 @@
 ﻿namespace EventPlanning.Application.DTOs.Guest;
 
-public record GuestDto(
+public record UpdateGuestDto(
     string Id,
+    int EventId,
     string FirstName,
     string LastName,
     string Email,
     string? PhoneNumber
-)
-{
-    public string FullName => $"{FirstName} {LastName}".Trim();
-}
+) : GuestBaseDto(EventId, FirstName, LastName, Email, PhoneNumber);
