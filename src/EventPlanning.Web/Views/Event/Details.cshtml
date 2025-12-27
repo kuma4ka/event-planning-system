@@ -1,16 +1,11 @@
-﻿@model EventDetailsDto
+﻿@model EventPlanning.Application.DTOs.Event.EventDetailsDto
 
 @{
     ViewData["Title"] = Model.Name;
-
-    var organizerName = ViewBag.OrganizerName as string;
-    var organizerInitial = !string.IsNullOrEmpty(organizerName) 
-        ? organizerName.Substring(0, 1).ToUpper() 
-        : "O";
 }
 
 <div class="container py-4 animate-fade-in">
-    
+
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4">
@@ -33,7 +28,8 @@
         }
         else
         {
-            <div class="event-hero-img" style="background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));"></div>
+            <div class="event-hero-img"
+                 style="background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));"></div>
         }
 
         <div class="event-hero-overlay">
@@ -47,11 +43,11 @@
                     {
                         <span class="badge bg-success me-2"><i class="bi bi-globe"></i> Public</span>
                     }
-                    <span class="badge bg-light text-dark bg-opacity-75">@Model.Type.GetDisplayName()</span>
+                    <span class="badge bg-light text-dark bg-opacity-75">@Model.Type.ToString()</span>
                 </div>
-                
+
                 <h1 class="event-title">@Model.Name</h1>
-                
+
                 <div class="event-hero-meta">
                     <span><i class="bi bi-calendar-event me-2"></i> @Model.Date.ToString("dd MMMM yyyy")</span>
                     <span><i class="bi bi-clock me-2"></i> @Model.Date.ToString("HH:mm")</span>
@@ -62,7 +58,6 @@
 
     <div class="row g-5">
         <div class="col-lg-8">
-            
             <div class="mb-5">
                 <h5 class="event-section-title">About this event</h5>
                 <div class="event-description">
@@ -85,7 +80,7 @@
         </div>
 
         <div class="col-lg-4">
-            
+
             <div class="event-sidebar-card">
                 @if (Model.VenueCapacity > 0)
                 {
@@ -94,7 +89,7 @@
                         <span class="fw-bold text-dark">@Model.GuestsCount / @Model.VenueCapacity</span>
                     </div>
                     <div class="progress progress-thin mb-4">
-                        <div class="progress-bar progress-bar-custom @(Model.IsFull ? "full" : "")" 
+                        <div class="progress-bar progress-bar-custom @(Model.IsFull ? "full" : "")"
                              role="progressbar" style="width: @Model.FillPercent%"></div>
                     </div>
                 }
@@ -114,12 +109,12 @@
                     {
                         <div class="d-grid gap-2">
                             <button class="btn btn-secondary w-100" disabled>You are the Organizer</button>
-                            
-                            <button type="button" class="btn btn-outline-primary w-100" 
+
+                            <button type="button" class="btn btn-outline-primary w-100"
                                     data-bs-toggle="modal" data-bs-target="#addGuestModal">
                                 <i class="bi bi-person-plus"></i> Add Guest
                             </button>
-                            
+
                             <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning w-100">
                                 <i class="bi bi-pencil-square"></i> Edit Event
                             </a>
@@ -150,11 +145,12 @@
                 <h6 class="event-section-title mb-3">Organizer</h6>
                 <div class="organizer-info">
                     <div class="organizer-avatar">
-                        @organizerInitial
+                        @GetInitials(ViewBag.OrganizerName as string)
                     </div>
                     <div class="overflow-hidden">
                         <h6 class="fw-bold mb-0 text-truncate">@ViewBag.OrganizerName</h6>
-                        <a href="mailto:@ViewBag.OrganizerEmail" class="text-decoration-none text-muted small text-truncate d-block">
+                        <a href="mailto:@ViewBag.OrganizerEmail"
+                           class="text-decoration-none text-muted small text-truncate d-block">
                             @ViewBag.OrganizerEmail
                         </a>
                     </div>
@@ -166,26 +162,51 @@
                     <h6 class="event-section-title mb-0">Guest List</h6>
                     <span class="badge bg-light text-dark border">@Model.GuestsCount</span>
                 </div>
-                
-                @if (Model.Guests != null && Model.Guests.Any())
+
+                @if (Model.Guests is { Count: > 0 })
                 {
                     <div class="mb-2">
-                        @foreach (var guest in Model.Guests.Take(5))
+                        @foreach (var guest in Model.Guests)
                         {
-                            var gInitial = !string.IsNullOrEmpty(guest.FullName) ? guest.FullName.Substring(0, 1).ToUpper() : "G";
-                            <div class="guest-list-item">
-                                <div class="guest-avatar">@gInitial</div>
-                                <span class="small fw-bold text-dark">@guest.FullName</span>
+                            <div
+                                class="guest-list-item d-flex justify-content-between align-items-center mb-2 p-2 hover-bg-light rounded">
+                                <div class="d-flex align-items-center">
+                                    <div class="guest-avatar me-2">@GetInitials(guest.FullName)</div>
+                                    <div>
+                                        <span class="small fw-bold text-dark d-block">@guest.FullName</span>
+                                        @if (Model.IsOrganizer)
+                                        {
+                                            <small class="text-muted" style="font-size: 0.75rem;">@guest.Email</small>
+                                        }
+                                    </div>
+                                </div>
+
+                                @if (Model is { IsOrganizer: true, IsPast: false })
+                                {
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-link text-muted p-0" type="button"
+                                                data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                            <li>
+                                                <button class="dropdown-item small"
+                                                        onclick="openEditGuestModal('@guest.Id', '@guest.FirstName', '@guest.LastName', '@guest.Email', '@guest.PhoneNumber')">
+                                                    <i class="bi bi-pencil me-2 text-warning"></i> Edit
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item small text-danger"
+                                                        onclick="openDeleteGuestModal('@guest.Id')">
+                                                    <i class="bi bi-trash me-2"></i> Remove
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                }
                             </div>
                         }
                     </div>
-                    
-                    @if (Model.GuestsCount > 5)
-                    {
-                        <div class="text-center border-top pt-2">
-                            <span class="small text-muted">+ @(Model.GuestsCount - 5) more guests</span>
-                        </div>
-                    }
                 }
                 else
                 {
@@ -197,7 +218,7 @@
     </div>
 </div>
 
-@if (Model.IsOrganizer && !Model.IsPast)
+@if (Model is { IsOrganizer: true, IsPast: false })
 {
     <div class="modal fade" id="addGuestModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -224,7 +245,8 @@
 
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold">Email</label>
-                            <input name="Email" type="email" class="form-control" required placeholder="guest@example.com"/>
+                            <input name="Email" type="email" class="form-control" required
+                                   placeholder="guest@example.com"/>
                         </div>
 
                         <div class="mb-3">
@@ -240,4 +262,82 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="editGuestModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Edit Guest</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form asp-controller="Guest" asp-action="Edit" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="EventId" value="@Model.Id"/>
+                        <input type="hidden" name="Id" id="editGuestId"/>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted fw-bold">First Name</label>
+                                <input name="FirstName" id="editGuestFirstName" class="form-control" required/>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted fw-bold">Last Name</label>
+                                <input name="LastName" id="editGuestLastName" class="form-control" required/>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small text-muted fw-bold">Email</label>
+                            <input name="Email" id="editGuestEmail" type="email" class="form-control" required/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small text-muted fw-bold">Phone</label>
+                            <input name="PhoneNumber" id="editGuestPhone" type="tel" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteGuestModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-danger">Remove Guest</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to remove this guest from the list? This action cannot be
+                        undone.</p>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+
+                    <form asp-controller="Guest" asp-action="Remove" method="post">
+                        <input type="hidden" name="EventId" value="@Model.Id"/>
+                        <input type="hidden" name="GuestId" id="deleteGuestId"/>
+                        <button type="submit" class="btn btn-danger px-4">Remove</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@functions {
+
+    private string GetInitials(string? name)
+    {
+        return !string.IsNullOrEmpty(name) ? name.Substring(0, 1).ToUpper() : "U";
+    }
+
 }
