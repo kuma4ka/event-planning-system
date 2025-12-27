@@ -1,50 +1,82 @@
-﻿@model List<EventPlanning.Application.DTOs.Venue.VenueDto>
+﻿@model IEnumerable<EventPlanning.Application.DTOs.Venue.VenueDto>
 
 @{
     ViewData["Title"] = "Manage Venues";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Manage Venues</h1>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Create New Venue
-        </a>
-    </div>
+<div class="container py-5">
 
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col" class="ps-4">Name</th>
-                        <th scope="col" class="text-end pe-4">Actions</th>
-                    </tr>
+    <div class="card c-admin-card">
+
+        <div class="c-admin-header">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-building-gear fs-3 me-3"></i>
+                <div>
+                    <h4 class="mb-0 fw-bold">Manage Venues</h4>
+                    <small class="opacity-75">Overview of all platform locations</small>
+                </div>
+            </div>
+            <a asp-action="Create" class="btn btn-light text-dark fw-bold shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i> Create New Venue
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table c-admin-table mb-0">
+                <thead>
+                <tr>
+                    <th class="ps-4">Name</th>
+                    <th>Address</th>
+                    <th>Capacity</th>
+                    <th class="text-center pe-4">Actions</th>
+                </tr>
                 </thead>
                 <tbody>
-                    @foreach (var venue in Model)
-                    {
-                        <tr>
-                            <td class="ps-4 align-middle">
-                                <strong>@venue.Name</strong>
-                            </td>
-                            <td class="text-end pe-4">
-                                <div class="btn-group" role="group">
-                                    <a asp-action="Edit" asp-route-id="@venue.Id" class="btn btn-sm btn-outline-primary">
-                                        Edit
-                                    </a>
-                                    
-                                    <form asp-action="Delete" asp-route-id="@venue.Id" method="post" 
-                                          onsubmit="return confirm('Are you sure you want to delete this venue? This might affect existing events.');" 
-                                          style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    }
+                @foreach (var venue in Model)
+                {
+                    <tr>
+                        <td class="ps-4 fw-bold align-middle">
+                            @venue.Name
+                        </td>
+                        <td class="align-middle">
+                            @* Перевірка на null, якщо Address може бути пустим *@
+                            <i class="bi bi-geo-alt text-muted me-1"></i> @(venue.Address ?? "N/A")
+                        </td>
+                        <td class="align-middle">
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi bi-people me-1"></i> @venue.Capacity
+                            </span>
+                        </td>
+                        <td class="text-center pe-4 align-middle">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a asp-action="Edit" asp-route-id="@venue.Id" class="c-action-btn" title="Edit">
+                                    <i class="bi bi-pencil-fill" style="font-size: 0.9rem;"></i>
+                                </a>
+
+                                <form asp-action="Delete" asp-route-id="@venue.Id" method="post"
+                                      onsubmit="return confirm('Are you sure you want to delete this venue?');"
+                                      style="display:inline;">
+                                    <button type="submit" class="c-action-btn text-danger border-0" title="Delete">
+                                        <i class="bi bi-trash-fill" style="font-size: 0.9rem;"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
                 </tbody>
             </table>
         </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="text-muted">No venues found</h5>
+                <p class="text-muted small">Get started by creating a new venue.</p>
+            </div>
+        }
     </div>
 </div>
