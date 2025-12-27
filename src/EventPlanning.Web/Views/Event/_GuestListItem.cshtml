@@ -1,0 +1,43 @@
+﻿@model EventPlanning.Application.DTOs.Guest.GuestDto
+
+@{
+    var isOrganizer = ViewData["IsOrganizer"] as bool? ?? false;
+    var isPast = ViewData["IsPast"] as bool? ?? false;
+}
+
+<div class="guest-list-item d-flex justify-content-between align-items-center mb-2 p-2 hover-bg-light rounded">
+    <div class="d-flex align-items-center">
+        <div class="guest-avatar me-2">@Model.Initials</div>
+        <div class="overflow-hidden">
+            <span class="small fw-bold text-dark d-block text-truncate" style="max-width: 150px;">@Model.FullName</span>
+            @if (isOrganizer)
+            {
+                <small class="text-muted text-truncate d-block"
+                       style="font-size: 0.75rem; max-width: 150px;">@Model.Email</small>
+            }
+        </div>
+    </div>
+
+    @if (isOrganizer && !isPast)
+    {
+        <div class="dropdown">
+            <button class="btn btn-sm btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                <li>
+                    <button class="dropdown-item small"
+                            onclick="openEditGuestModal('@Model.Id', '@Model.FirstName', '@Model.LastName', '@Model.Email', '@Model.CountryCode', '@Model.PhoneNumber')">
+                        <i class="bi bi-pencil me-2 text-warning"></i> Edit
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item small text-danger"
+                            onclick="openDeleteGuestModal('@Model.Id')">
+                        <i class="bi bi-trash me-2"></i> Remove
+                    </button>
+                </li>
+            </ul>
+        </div>
+    }
+</div>
