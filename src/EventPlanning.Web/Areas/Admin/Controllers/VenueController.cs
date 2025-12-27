@@ -9,25 +9,26 @@ using Microsoft.AspNetCore.Mvc;
 namespace EventPlanning.Web.Areas.Admin.Controllers;
 
 [Area("Admin")]
+[Route("[area]/[controller]")]
 [Authorize(Roles = "Admin")]
 public class VenueController(
     IVenueService venueService,
     UserManager<User> userManager) : Controller
 {
-    [HttpGet]
+    [HttpGet("")]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
         var venues = await venueService.GetVenuesAsync(cancellationToken);
         return View(venues);
     }
 
-    [HttpGet]
+    [HttpGet("create")]
     public IActionResult Create()
     {
         return View();
     }
 
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> Create(CreateVenueDto model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid) return View(model);
@@ -47,19 +48,35 @@ public class VenueController(
         }
     }
 
-    [HttpGet]
+    [HttpGet("edit/{id:int}")]
     public async Task<IActionResult> Edit(int id, CancellationToken cancellationToken)
     {
         var venueDto = await venueService.GetVenueByIdAsync(id, cancellationToken);
-        
+    
         if (venueDto == null) return NotFound();
 
-        return View(venueDto);
+        var updateModel = new UpdateVenueDto(
+            venueDto.Id,
+            venueDto.Name,
+            venueDto.Address,
+            venueDto.Capacity,
+            venueDto.Description,
+            venueDto.ImageUrl,
+            null
+        );
+
+        return View(updateModel);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Edit(UpdateVenueDto model, CancellationToken cancellationToken)
+    [HttpPost("edit/{id:int}")] 
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, UpdateVenueDto model, CancellationToken cancellationToken)
     {
+        if (id != model.Id) 
+        {
+            return BadRequest("ID mismatch");
+        }
+
         if (!ModelState.IsValid) return View(model);
 
         try
@@ -79,10 +96,12 @@ public class VenueController(
         }
     }
 
-    [HttpPost]
+    [HttpPost("delete/{id:int}")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         await venueService.DeleteVenueAsync(id, cancellationToken);
+        
         return RedirectToAction(nameof(Index));
     }
 }
