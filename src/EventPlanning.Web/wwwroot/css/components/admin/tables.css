@@ -1,47 +1,4 @@
-﻿/* --- ADMIN LINKS --- */
-
-.c-admin-link {
-    background-color: rgba(17, 75, 95, 0.1);
-    color: var(--color-dark-teal);
-    font-weight: 700;
-    transition: all 0.2s ease-in-out;
-    padding: 10px 16px;
-    border: 1px solid rgba(17, 75, 95, 0.1);
-}
-
-.c-admin-link:hover,
-.c-admin-link:focus {
-    background-color: var(--color-dark-teal);
-    color: #fff !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.c-admin-link:hover .badge {
-    background-color: #fff !important;
-    color: var(--color-dark-teal) !important;
-}
-
-/* --- ADMIN PANEL --- */
-
-.c-admin-card {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
-    overflow: hidden;
-    background-color: #fff;
-}
-
-.c-admin-header {
-    background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));
-    color: white;
-    padding: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Table Styles */
+﻿/* Admin Table */
 .c-admin-table {
     width: 100%;
     margin-bottom: 0;
@@ -74,7 +31,7 @@
     background-color: #f8f9fa;
 }
 
-/* Action Buttons */
+/* Action Buttons (Edit/Delete icons) */
 .c-action-btn {
     width: 32px;
     height: 32px;
@@ -86,6 +43,7 @@
     color: var(--color-air-force-blue);
     background-color: #f0f2f5;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .c-action-btn:hover {

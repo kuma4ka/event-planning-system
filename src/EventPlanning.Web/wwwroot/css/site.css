@@ -11,7 +11,11 @@
 @import url('components/dashboard.css');
 @import url('components/event-form.css');
 @import url('components/event-details.css');
-@import url('components/admin.css');
+
+@import url('components/admin/layout.css');
+@import url('components/admin/navigation.css');
+@import url('components/admin/tables.css');
+@import url('components/admin/forms.css');
 
 @import url('layout/navbar.css');
 @import url('layout/hero.css');

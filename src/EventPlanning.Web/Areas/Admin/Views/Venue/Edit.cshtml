@@ -4,73 +4,98 @@
     ViewData["Title"] = "Edit Venue";
 }
 
-<div class="container mt-4">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="card-title mb-0">Edit Venue</h3>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
-                        <input type="hidden" asp-for="Id" />
-                        <input type="hidden" asp-for="CurrentImageUrl" />
-                        
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="col-lg-8">
+            
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CurrentImageUrl" />
+                
+                <div class="card c-admin-card">
+                    
+                    <div class="c-admin-header">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-pencil-square fs-4 me-3"></i>
+                            <div>
+                                <h5 class="mb-0 fw-bold">Edit Venue</h5>
+                                <small class="opacity-75">@Model.Name</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="Name" class="c-admin-form-label">Venue Name</label>
+                            <div class="c-admin-input-group">
+                                <i class="bi bi-building c-admin-input-icon"></i>
+                                <input asp-for="Name" class="form-control c-admin-input" />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small mt-1"></span>
+                        </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Name" class="form-label">Name</label>
-                                <input asp-for="Name" class="form-control" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
+                            <div class="col-md-8 mb-4">
+                                <label asp-for="Address" class="c-admin-form-label">Address</label>
+                                <div class="c-admin-input-group">
+                                    <i class="bi bi-geo-alt c-admin-input-icon"></i>
+                                    <input asp-for="Address" class="form-control c-admin-input" />
+                                </div>
+                                <span asp-validation-for="Address" class="text-danger small mt-1"></span>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Capacity" class="form-label">Capacity</label>
-                                <input asp-for="Capacity" type="number" class="form-control" />
-                                <span asp-validation-for="Capacity" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Address" class="form-label">Address</label>
-                            <input asp-for="Address" class="form-control" />
-                            <span asp-validation-for="Address" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-4 p-3 bg-light rounded border">
-                            <label class="form-label fw-bold">Venue Image</label>
                             
+                            <div class="col-md-4 mb-4">
+                                <label asp-for="Capacity" class="c-admin-form-label">Capacity</label>
+                                <div class="c-admin-input-group">
+                                    <i class="bi bi-people c-admin-input-icon"></i>
+                                    <input asp-for="Capacity" class="form-control c-admin-input" type="number" />
+                                </div>
+                                <span asp-validation-for="Capacity" class="text-danger small mt-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ImageFile" class="c-admin-form-label">Update Image</label>
+
                             @if (!string.IsNullOrEmpty(Model.CurrentImageUrl))
                             {
-                                <div class="mb-3">
-                                    <p class="text-muted small">Current image:</p>
-                                    <img src="@Model.CurrentImageUrl" alt="Current Venue Image" 
-                                         class="img-thumbnail" style="max-height: 200px;" />
+                                <div class="mb-2">
+                                    <img src="@Model.CurrentImageUrl" alt="Current Venue Image"
+                                         class="img-thumbnail" style="max-height: 150px; border-radius: 8px;" />
+                                    <div class="small text-muted mt-1">Current Image</div>
                                 </div>
                             }
-                            else
-                            {
-                                <div class="alert alert-warning py-1 px-2 mb-2 d-inline-block">No image uploaded</div>
-                            }
 
-                            <label asp-for="ImageFile" class="form-label">Upload new image (leave empty to keep current)</label>
-                            <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
-                            <span asp-validation-for="ImageFile" class="text-danger"></span>
+                            <div class="c-admin-input-group">
+                                <i class="bi bi-image c-admin-input-icon"></i>
+                                <input asp-for="ImageFile" type="file" class="form-control c-admin-input" accept="image/*" />
+                            </div>
+                            <span asp-validation-for="ImageFile" class="text-danger small mt-1"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Description" class="form-label">Description</label>
-                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
+                        <div class="mb-4">
+                            <label asp-for="Description" class="c-admin-form-label">Description</label>
+                            <div class="c-admin-input-group">
+                                <i class="bi bi-text-paragraph c-admin-input-icon" style="top: 1.5rem;"></i>
+                                <textarea asp-for="Description" class="form-control c-admin-input" rows="4"></textarea>
+                            </div>
+                            <span asp-validation-for="Description" class="text-danger small mt-1"></span>
                         </div>
 
-                        <div class="d-flex justify-content-between mt-4">
-                            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-link text-decoration-none text-muted ps-0">
+                                <i class="bi bi-arrow-left me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">
+                                Save Changes
+                            </button>
                         </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
+            </form>
+            
         </div>
     </div>
 </div>
