@@ -1,5 +1,4 @@
-﻿using EventPlanning.Application.DTOs;
-using EventPlanning.Application.DTOs.Venue;
+﻿using EventPlanning.Application.DTOs.Venue;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
 using FluentValidation;
