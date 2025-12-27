@@ -1,4 +1,3 @@
-using EventPlanning.Application.DTOs;
 using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
