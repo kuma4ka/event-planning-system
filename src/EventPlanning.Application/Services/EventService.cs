@@ -25,7 +25,7 @@ public class EventService(
         var validationResult = await searchValidator.ValidateAsync(searchDto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-        var fromDate = searchDto.FromDate ?? DateTime.Now;
+        var fromDate = searchDto.FromDate; 
 
         var pagedEvents = await eventRepository.GetFilteredAsync(
             organizerIdFilter,
