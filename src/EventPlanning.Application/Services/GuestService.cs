@@ -77,7 +77,8 @@ public class GuestService(
         guest.FirstName = dto.FirstName;
         guest.LastName = dto.LastName;
         guest.Email = dto.Email;
-        guest.PhoneNumber = dto.PhoneNumber;
+
+        guest.PhoneNumber = dto.CountryCode + dto.PhoneNumber;
 
         await guestRepository.UpdateAsync(guest, cancellationToken);
     }
@@ -110,7 +111,7 @@ public class GuestService(
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             Email = dto.Email,
-            PhoneNumber = dto.PhoneNumber
+            PhoneNumber = dto.CountryCode + dto.PhoneNumber
         };
     }
 }

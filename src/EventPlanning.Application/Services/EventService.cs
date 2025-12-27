@@ -1,5 +1,6 @@
 ﻿using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.DTOs.Guest;
+using EventPlanning.Application.Constants;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
@@ -40,12 +41,12 @@ public class EventService(
         );
 
         var eventDtos = pagedEvents.Items.Select(e => new EventDto(
-            e.Id, 
-            e.Name, 
-            e.Description ?? string.Empty, 
-            e.Date, 
-            e.Type, 
-            e.OrganizerId, 
+            e.Id,
+            e.Name,
+            e.Description ?? string.Empty,
+            e.Date,
+            e.Type,
+            e.OrganizerId,
             e.Venue?.Name ?? "TBD",
             e.VenueId,
             e.Venue?.ImageUrl
@@ -79,15 +80,21 @@ public class EventService(
         var eventEntity = await eventRepository.GetByIdAsync(id, cancellationToken);
         if (eventEntity == null) return null;
 
-        var guestsDto = eventEntity.Guests.Select(g => new GuestDto(
-            g.Id,
-            g.FirstName,
-            g.LastName,
-            g.Email,
-            g.PhoneNumber
-        )).ToList();
+        var guestsDto = eventEntity.Guests.Select(g =>
+        {
+            var (countryCode, localNumber) = ParsePhoneNumber(g.PhoneNumber);
 
-        return new EventDetailsDto(
+            return new GuestDto(
+                g.Id,
+                g.FirstName,
+                g.LastName,
+                g.Email,
+                countryCode,
+                localNumber
+            );
+        }).ToList();
+
+        var eventDetails = new EventDetailsDto(
             eventEntity.Venue?.Capacity ?? 0,
             eventEntity.IsPrivate,
             guestsDto,
@@ -97,10 +104,16 @@ public class EventService(
             eventEntity.Date,
             eventEntity.Type,
             eventEntity.OrganizerId,
-            eventEntity.Venue?.Name ?? "Online / TBD",
+            eventEntity.Venue?.Name ?? "TBD",
             eventEntity.VenueId,
             eventEntity.Venue?.ImageUrl
-        );
+        )
+        {
+            IsOrganizer = false,
+            IsJoined = false
+        };
+
+        return eventDetails;
     }
 
     public async Task<int> CreateEventAsync(string userId, CreateEventDto dto,
@@ -169,7 +182,8 @@ public class EventService(
         if (eventEntity.OrganizerId == userId)
             throw new InvalidOperationException("You cannot join your own event as a guest.");
 
-        if (eventEntity.Venue != null && eventEntity.Venue.Capacity > 0 && eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
+        if (eventEntity.Venue != null && eventEntity.Venue.Capacity > 0 &&
+            eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
             throw new InvalidOperationException("Sorry, this event is fully booked.");
 
         var isAlreadyJoined = await eventRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);
@@ -187,5 +201,22 @@ public class EventService(
     public async Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
         return await eventRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);
+    }
+
+    private static (string CountryCode, string PhoneNumber) ParsePhoneNumber(string? fullPhoneNumber)
+    {
+        if (string.IsNullOrEmpty(fullPhoneNumber)) return (CountryConstants.DefaultCode, string.Empty);
+
+        var country = CountryConstants.SupportedCountries
+            .OrderByDescending(c => c.Code.Length)
+            .FirstOrDefault(c => fullPhoneNumber.StartsWith(c.Code));
+
+        if (country != null)
+        {
+            var localNumber = fullPhoneNumber.Substring(country.Code.Length);
+            return (country.Code, localNumber);
+        }
+
+        return (CountryConstants.DefaultCode, fullPhoneNumber);
     }
 }
