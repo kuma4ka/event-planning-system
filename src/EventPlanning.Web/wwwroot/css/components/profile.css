@@ -1,6 +1,18 @@
-﻿/* --- PROFILE COMPONENT --- */
+﻿/* =========================================
+   PROFILE PAGE STYLES
+   ========================================= */
 
-/* Sidebar Card */
+/* --- COLORS & FONTS VARIABLES (FALLBACKS) --- */
+:root {
+    --color-air-force-blue: #5D737E;
+    --color-dark-teal: #114B5F;
+    --color-ink-black: #212529;
+    --color-ash-grey: #B2B2B2;
+    --color-cool-mist: #F0F2F5;
+    --font-heading: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* --- SIDEBAR CARD --- */
 .profile-card {
     background-color: #fff;
     border: 1px solid rgba(174, 195, 176, 0.3);
@@ -11,7 +23,7 @@
     top: 100px;
 }
 
-/* Avatar Styling */
+/* --- AVATAR --- */
 .profile-avatar-container {
     position: relative;
     width: 120px;
@@ -35,7 +47,7 @@
     border: 4px solid #fff;
 }
 
-/* User Info */
+/* --- USER INFO --- */
 .profile-name {
     font-size: 1.5rem;
     font-weight: 700;
@@ -49,7 +61,7 @@
     margin-bottom: 1.5rem;
 }
 
-/* Stats Section */
+/* --- STATS SECTION --- */
 .profile-stats {
     display: flex;
     justify-content: center;
@@ -83,7 +95,7 @@
     background-color: rgba(0,0,0,0.05);
 }
 
-/* --- TABS & CONTENT --- */
+/* --- MAIN CONTENT CARD --- */
 .profile-content-card {
     background-color: #fff;
     border: 1px solid rgba(174, 195, 176, 0.3);
@@ -92,7 +104,7 @@
     min-height: 100%;
 }
 
-/* Custom Tabs */
+/* --- TABS --- */
 .nav-tabs-stanza {
     border-bottom: 2px solid #f0f2f5;
     margin-bottom: 2rem;
@@ -117,7 +129,6 @@
     background: transparent;
 }
 
-/* Active Indicator */
 .nav-tabs-stanza .nav-link.active::after {
     content: '';
     position: absolute;
@@ -133,6 +144,7 @@
     margin-right: 8px;
 }
 
+/* --- FORM LABELS --- */
 .form-label-profile {
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -142,13 +154,28 @@
     margin-bottom: 0.5rem;
 }
 
-/* --- NEW INPUT STYLES --- */
+/* --- FOOTER --- */
+.profile-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f0f2f5;
+    text-align: right;
+}
+
+/* =========================================================
+   UNIFIED INPUT GROUP STYLES (Fixed & Consolidated)
+   ========================================================= */
+
 .profile-input-group {
     display: flex;
-    align-items: center;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    width: 100%;
+
     background-color: var(--color-cool-mist);
     border: 1px solid transparent;
     border-radius: 8px;
+
     overflow: hidden;
     transition: all 0.3s ease;
 }
@@ -157,14 +184,36 @@
     background-color: #fff;
     border-color: var(--color-dark-teal);
     box-shadow: 0 0 0 4px rgba(18, 69, 89, 0.15);
+    z-index: 2;
 }
 
 .profile-input-group .input-group-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: transparent;
     border: none;
     color: var(--color-air-force-blue);
-    padding-right: 0.5rem;
     padding-left: 1rem;
+    padding-right: 0.5rem;
+    flex-shrink: 0;
+}
+
+.profile-input-group .form-select {
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--color-ink-black);
+    font-weight: 600;
+    padding: 0.8rem 2.25rem 0.8rem 1rem;
+    cursor: pointer;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 150px;
+    background-position: right 0.75rem center;
 }
 
 .profile-input-group .form-control {
@@ -172,18 +221,21 @@
     border: none;
     box-shadow: none;
     color: var(--color-ink-black);
-    padding: 0.8rem 1rem 0.8rem 0.5rem;
+    padding: 0.8rem 1rem;
     font-weight: 500;
+
+    flex: 1 1 auto;
+    width: 1%;
 }
 
-.profile-input-group .form-control:focus {
+.profile-input-group .form-control:focus,
+.profile-input-group .form-select:focus {
     box-shadow: none;
+    outline: none;
     background-color: transparent;
 }
 
-.profile-footer {
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #f0f2f5;
-    text-align: right;
+.profile-input-group .form-select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 var(--color-ink-black);
 }

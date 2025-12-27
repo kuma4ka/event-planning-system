@@ -1,10 +1,12 @@
-﻿using EventPlanning.Application.DTOs.Profile;
+﻿using EventPlanning.Application.Constants;
+using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace EventPlanning.Web.Controllers;
 
@@ -26,6 +28,8 @@ public class ProfileController(
 
         var model = await profileService.GetProfileAsync(userId, cancellationToken);
 
+        LoadSharedViewData();
+        
         ViewBag.PasswordModel = new ChangePasswordDto();
         ViewBag.ActiveTab = TabProfile;
 
@@ -62,6 +66,8 @@ public class ProfileController(
         model.OrganizedCount = freshProfileData.OrganizedCount;
         model.JoinedCount = freshProfileData.JoinedCount;
 
+        LoadSharedViewData();
+
         ViewBag.ActiveTab = TabProfile;
         ViewBag.PasswordModel = new ChangePasswordDto();
         
@@ -94,9 +100,24 @@ public class ProfileController(
 
         var profileModel = await profileService.GetProfileAsync(userId, cancellationToken);
 
+        LoadSharedViewData();
+
         ViewBag.ActiveTab = TabSecurity;
         ViewBag.PasswordModel = passwordModel;
         
         return View("Index", profileModel);
     }
+
+    #region Private Helpers
+
+    private void LoadSharedViewData()
+    {
+        ViewBag.Countries = new SelectList(
+            CountryConstants.SupportedCountries, 
+            nameof(CountryInfo.Code),
+            nameof(CountryInfo.DisplayValue)
+        );
+    }
+
+    #endregion
 }

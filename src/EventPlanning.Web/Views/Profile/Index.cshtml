@@ -1,30 +1,17 @@
-﻿@using EventPlanning.Application.DTOs
-@model EventPlanning.Application.DTOs.Profile.EditProfileDto
+﻿@using EventPlanning.Application.DTOs.Profile
+@model EditProfileDto
 
 @{
     ViewData["Title"] = "My Profile";
-
-    var initials = (!string.IsNullOrEmpty(Model.FirstName) && !string.IsNullOrEmpty(Model.LastName))
-        ? $"{Model.FirstName[0]}{Model.LastName[0]}".ToUpper()
-        : "ME";
-
     var activeTab = ViewBag.ActiveTab as string ?? "profile";
-    
-    var countryCodes = new List<SelectListItem>
-    {
-        new SelectListItem { Value = "+380", Text = "🇺🇦 UA (+380)" },
-        new SelectListItem { Value = "+1", Text = "🇺🇸 US (+1)" },
-        new SelectListItem { Value = "+44", Text = "🇬🇧 UK (+44)" },
-        new SelectListItem { Value = "+48", Text = "🇵🇱 PL (+48)" },
-        new SelectListItem { Value = "+49", Text = "🇩🇪 DE (+49)" }
-    };
 }
 
 <div class="container py-5">
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4 border-0" style="background-color: #d1e7dd; color: #0f5132;">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4 border-0"
+             style="background-color: #d1e7dd; color: #0f5132;">
             <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -36,7 +23,7 @@
             <div class="profile-card shadow-sm">
                 <div class="profile-avatar-container">
                     <div class="profile-avatar">
-                        @initials
+                        @Model.Initials
                     </div>
                 </div>
 
@@ -63,21 +50,13 @@
                 <ul class="nav nav-tabs-stanza" id="profileTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link @(activeTab == "profile" ? "active" : "")"
-                                id="info-tab"
-                                data-bs-toggle="tab"
-                                data-bs-target="#info"
-                                type="button"
-                                role="tab">
+                                id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
                             <i class="bi bi-person-gear me-2"></i> Edit Details
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link @(activeTab == "security" ? "active" : "")"
-                                id="security-tab"
-                                data-bs-toggle="tab"
-                                data-bs-target="#security"
-                                type="button"
-                                role="tab">
+                                id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
                             <i class="bi bi-shield-lock me-2"></i> Security
                         </button>
                     </li>
@@ -92,7 +71,7 @@
                                     <label asp-for="FirstName" class="form-label-profile">First Name</label>
                                     <div class="profile-input-group">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <input asp-for="FirstName" class="form-control" placeholder="Enter first name" />
+                                        <input asp-for="FirstName" class="form-control" placeholder="Enter first name"/>
                                     </div>
                                     <span asp-validation-for="FirstName" class="text-danger small mt-1 d-block"></span>
                                 </div>
@@ -101,7 +80,7 @@
                                     <label asp-for="LastName" class="form-label-profile">Last Name</label>
                                     <div class="profile-input-group">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <input asp-for="LastName" class="form-control" placeholder="Enter last name" />
+                                        <input asp-for="LastName" class="form-control" placeholder="Enter last name"/>
                                     </div>
                                     <span asp-validation-for="LastName" class="text-danger small mt-1 d-block"></span>
                                 </div>
@@ -109,14 +88,17 @@
                                 <div class="col-12">
                                     <label asp-for="PhoneNumber" class="form-label-profile">Phone Number</label>
 
-                                    <div class="input-group">
+                                    <div class="profile-input-group">
 
-                                        <select asp-for="CountryCode" asp-items="countryCodes" class="form-select" style="max-width: 150px; background-color: #f8f9fa;">
+                                        <select asp-for="CountryCode"
+                                                asp-items="ViewBag.Countries"
+                                                class="form-select">
                                         </select>
 
-                                        <input asp-for="PhoneNumber" class="form-control" placeholder="99 123 45 67" />
-
+                                        <input asp-for="PhoneNumber" class="form-control" placeholder="XX XXX XX XX"/>
                                     </div>
+
+                                    <span asp-validation-for="CountryCode" class="text-danger small mt-1 d-block"></span>
                                     <span asp-validation-for="PhoneNumber" class="text-danger small mt-1 d-block"></span>
                                 </div>
 
@@ -124,7 +106,7 @@
                                     <label class="form-label-profile">Email Address</label>
                                     <div class="profile-input-group">
                                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                        <input asp-for="Email" class="form-control bg-transparent text-muted" readonly disabled />
+                                        <input asp-for="Email" class="form-control bg-transparent text-muted" readonly disabled/>
                                     </div>
                                     <div class="form-text small mt-2">
                                         <i class="bi bi-info-circle me-1"></i> Email cannot be changed directly for security reasons.
@@ -154,7 +136,7 @@
                                 <label class="form-label-profile">Current Password</label>
                                 <div class="profile-input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                    <input name="CurrentPassword" type="password" class="form-control" required />
+                                    <input name="CurrentPassword" type="password" class="form-control" required/>
                                 </div>
                             </div>
 
@@ -163,7 +145,7 @@
                                     <label class="form-label-profile">New Password</label>
                                     <div class="profile-input-group">
                                         <span class="input-group-text"><i class="bi bi-key"></i></span>
-                                        <input name="NewPassword" type="password" class="form-control" required />
+                                        <input name="NewPassword" type="password" class="form-control" required/>
                                     </div>
                                     <div class="form-text small mt-1">Must be at least 6 characters long.</div>
                                 </div>
@@ -171,7 +153,7 @@
                                     <label class="form-label-profile">Confirm New Password</label>
                                     <div class="profile-input-group">
                                         <span class="input-group-text"><i class="bi bi-check-lg"></i></span>
-                                        <input name="ConfirmPassword" type="password" class="form-control" required />
+                                        <input name="ConfirmPassword" type="password" class="form-control" required/>
                                     </div>
                                 </div>
                             </div>
