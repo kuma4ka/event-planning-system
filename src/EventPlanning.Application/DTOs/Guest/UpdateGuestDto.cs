@@ -1,6 +1,7 @@
 ﻿namespace EventPlanning.Application.DTOs.Guest;
 
-public record AddGuestManuallyDto(
+public record UpdateGuestDto(
+    string Id,
     int EventId,
     string FirstName,
     string LastName,

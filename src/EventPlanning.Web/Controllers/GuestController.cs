@@ -70,18 +70,56 @@ public class GuestController(
         return RedirectToAction("Details", "Event", new { id = model.EventId });
     }
 
-    [HttpPost("delete")]
-    public async Task<IActionResult> Delete(string guestId, int eventId, CancellationToken cancellationToken)
+    [HttpPost("edit")]
+    public async Task<IActionResult> Edit(UpdateGuestDto model, CancellationToken cancellationToken)
     {
+        if (!ModelState.IsValid)
+        {
+            TempData["ErrorMessage"] = "Invalid data provided for guest update.";
+            return RedirectToAction("Details", "Event", new { id = model.EventId });
+        }
+
         var userId = userManager.GetUserId(User);
+
         try
         {
-            await guestService.RemoveGuestAsync(userId!, guestId, cancellationToken);
-            return RedirectToAction("Details", "Event", new { id = eventId });
+            await guestService.UpdateGuestAsync(userId!, model, cancellationToken);
+            TempData["SuccessMessage"] = "Guest information updated successfully.";
+        }
+        catch (ValidationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Errors.FirstOrDefault()?.ErrorMessage ?? "Validation failed.";
         }
         catch (UnauthorizedAccessException)
         {
             return Forbid();
         }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
+
+        return RedirectToAction("Details", "Event", new { id = model.EventId });
+    }
+
+    [HttpPost("remove")]
+    public async Task<IActionResult> Remove(int eventId, string guestId, CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User);
+        try
+        {
+            await guestService.RemoveGuestAsync(userId!, guestId, cancellationToken);
+            TempData["SuccessMessage"] = "Guest removed from the list.";
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
+
+        return RedirectToAction("Details", "Event", new { id = eventId });
     }
 }

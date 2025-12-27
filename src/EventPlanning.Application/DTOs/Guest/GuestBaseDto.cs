@@ -5,5 +5,6 @@ public abstract record GuestBaseDto(
     string FirstName,
     string LastName,
     string Email,
-    string? PhoneNumber
+    string CountryCode,
+    string PhoneNumber
 );

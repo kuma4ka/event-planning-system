@@ -1,9 +1,10 @@
-﻿using EventPlanning.Application.DTOs.Guest;
+﻿using EventPlanning.Application.Constants;
+using EventPlanning.Application.DTOs.Guest;
 using FluentValidation;
 
 namespace EventPlanning.Application.Validators.Guest;
 
-public class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : GuestBaseDto
+public abstract class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : GuestBaseDto
 {
     protected GuestBaseDtoValidator()
     {
@@ -11,7 +12,8 @@ public class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : GuestBase
             .GreaterThan(0).WithMessage("Event ID is required.");
 
         var nameRegex = @"^\p{Lu}\p{Ll}*(?:[\s-']\p{Lu}\p{Ll}*)*$";
-        var nameErrorMessage = "Must start with a capital letter. Parts must be separated by space, hyphen, or apostrophe and also start with a capital (e.g., 'Anna-Maria', 'Mc Donald').";
+        var nameErrorMessage =
+            "Must start with a capital letter. Parts must be separated by space, hyphen, or apostrophe and also start with a capital (e.g., 'Anna-Maria', 'Mc Donald').";
 
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("First name is required.")
@@ -29,9 +31,14 @@ public class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : GuestBase
             .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
             .WithMessage("Email must be a valid address with a domain (e.g., user@example.com).");
 
+        RuleFor(x => x.CountryCode)
+            .NotEmpty()
+            .Must(code => CountryConstants.SupportedCountries.Any(c => c.Code == code))
+            .WithMessage("Invalid or unsupported country code.");
+
         RuleFor(x => x.PhoneNumber)
-            .MaximumLength(20).WithMessage("Phone number is too long.")
-            .Matches(@"^\+?[\d\s-]*$").When(x => !string.IsNullOrEmpty(x.PhoneNumber))
-            .WithMessage("Phone number contains invalid characters.");
+            .NotEmpty().WithMessage("Phone number is required.")
+            .MaximumLength(15)
+            .Matches(@"^\d{7,15}$").WithMessage("Phone number must contain between 7 and 15 digits (no spaces or symbols).");
     }
 }
