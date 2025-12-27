@@ -81,7 +81,8 @@ public class EventService(
 
         var guestsDto = eventEntity.Guests.Select(g => new GuestDto(
             g.Id,
-            $"{g.FirstName} {g.LastName}",
+            g.FirstName,
+            g.LastName,
             g.Email,
             g.PhoneNumber
         )).ToList();

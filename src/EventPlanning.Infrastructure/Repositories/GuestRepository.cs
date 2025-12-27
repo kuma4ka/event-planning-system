@@ -22,7 +22,6 @@ public class GuestRepository(ApplicationDbContext context) : IGuestRepository
 
     public async Task UpdateAsync(Guest guest, CancellationToken cancellationToken = default)
     {
-        context.Guests.Update(guest);
         await context.SaveChangesAsync(cancellationToken);
     }
 

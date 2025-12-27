@@ -1,5 +1,4 @@
-﻿using EventPlanning.Application.DTOs;
-using EventPlanning.Application.DTOs.Guest;
+﻿using EventPlanning.Application.DTOs.Guest;
 
 namespace EventPlanning.Application.Interfaces;
 
@@ -10,5 +9,6 @@ public interface IGuestService
     Task AddGuestManuallyAsync(string currentUserId, AddGuestManuallyDto dto,
         CancellationToken cancellationToken = default);
 
+    Task UpdateGuestAsync(string currentUserId, UpdateGuestDto dto, CancellationToken cancellationToken = default);
     Task RemoveGuestAsync(string userId, string guestId, CancellationToken cancellationToken = default);
 }
