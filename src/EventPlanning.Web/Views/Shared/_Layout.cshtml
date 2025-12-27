@@ -54,10 +54,12 @@
 
                         @if (User.IsInRole("Admin"))
                         {
-                            <li>
-                                <a class="dropdown-item text-primary fw-bold" asp-area="Admin" asp-controller="Venue"
+                            <li class="px-2 mb-2">
+                                <a class="dropdown-item c-admin-link rounded-3" asp-area="Admin" asp-controller="Venue"
                                    asp-action="Index">
-                                    <i class="bi bi-speedometer2 me-2"></i> Admin Panel
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-shield-lock-fill me-2"></i> Admin Portal
+                                    </div>
                                 </a>
                             </li>
                             <li>
