@@ -1,7 +1,5 @@
 ﻿@using EventPlanning.Application.Models
-@using EventPlanning.Application.DTOs
 @using EventPlanning.Domain.Enums
-@using EventPlanning.Web.Extensions
 @model PagedResult<EventDto>
 
 @{
@@ -9,7 +7,6 @@
 
     var currentViewType = ViewBag.CurrentViewType as string ?? "upcoming";
     var currentTypeEnum = ViewBag.CurrentType as EventType?;
-    // Використовуємо Extension метод для генерації списку
     var typeSelectList = currentTypeEnum.ToSelectList("All Categories");
 }
 
