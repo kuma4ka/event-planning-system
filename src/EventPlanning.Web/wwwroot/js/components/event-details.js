@@ -1,5 +1,6 @@
 ﻿export function initEventDetails() {
-    window.openEditGuestModal = (id, firstName, lastName, email, phone) => {
+
+    window.openEditGuestModal = (id, firstName, lastName, email, countryCode, phone) => {
         const modalElement = document.getElementById('editGuestModal');
         if (!modalElement) return;
 
@@ -15,10 +16,13 @@
         const emailInput = document.getElementById('editGuestEmail');
         if (emailInput) emailInput.value = email;
 
+        const countryInput = document.getElementById('editGuestCountryCode');
+        if (countryInput) countryInput.value = countryCode;
+
         const phoneInput = document.getElementById('editGuestPhone');
         if (phoneInput) phoneInput.value = phone || '';
 
-        const modal = new bootstrap.Modal(modalElement);
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
         modal.show();
     };
 
@@ -27,10 +31,9 @@
         if (!modalElement) return;
 
         const guestIdInput = document.getElementById('deleteGuestId');
-
         if (guestIdInput) guestIdInput.value = guestId;
 
-        const modal = new bootstrap.Modal(modalElement);
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
         modal.show();
     };
 }

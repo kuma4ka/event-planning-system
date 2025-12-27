@@ -28,8 +28,7 @@
         }
         else
         {
-            <div class="event-hero-img"
-                 style="background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));"></div>
+            <div class="event-hero-img" style="background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));"></div>
         }
 
         <div class="event-hero-overlay">
@@ -149,8 +148,7 @@
                     </div>
                     <div class="overflow-hidden">
                         <h6 class="fw-bold mb-0 text-truncate">@ViewBag.OrganizerName</h6>
-                        <a href="mailto:@ViewBag.OrganizerEmail"
-                           class="text-decoration-none text-muted small text-truncate d-block">
+                        <a href="mailto:@ViewBag.OrganizerEmail" class="text-decoration-none text-muted small text-truncate d-block">
                             @ViewBag.OrganizerEmail
                         </a>
                     </div>
@@ -168,13 +166,12 @@
                     <div class="mb-2">
                         @foreach (var guest in Model.Guests)
                         {
-                            <div
-                                class="guest-list-item d-flex justify-content-between align-items-center mb-2 p-2 hover-bg-light rounded">
+                            <div class="guest-list-item d-flex justify-content-between align-items-center mb-2 p-2 hover-bg-light rounded">
                                 <div class="d-flex align-items-center">
                                     <div class="guest-avatar me-2">@GetInitials(guest.FullName)</div>
                                     <div>
                                         <span class="small fw-bold text-dark d-block">@guest.FullName</span>
-                                        @if (Model.IsOrganizer)
+                                        @if(Model.IsOrganizer)
                                         {
                                             <small class="text-muted" style="font-size: 0.75rem;">@guest.Email</small>
                                         }
@@ -184,14 +181,13 @@
                                 @if (Model is { IsOrganizer: true, IsPast: false })
                                 {
                                     <div class="dropdown">
-                                        <button class="btn btn-sm btn-link text-muted p-0" type="button"
-                                                data-bs-toggle="dropdown">
+                                        <button class="btn btn-sm btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
                                             <li>
                                                 <button class="dropdown-item small"
-                                                        onclick="openEditGuestModal('@guest.Id', '@guest.FirstName', '@guest.LastName', '@guest.Email', '@guest.PhoneNumber')">
+                                                        onclick="openEditGuestModal('@guest.Id', '@guest.FirstName', '@guest.LastName', '@guest.Email', '@guest.CountryCode', '@guest.PhoneNumber')">
                                                     <i class="bi bi-pencil me-2 text-warning"></i> Edit
                                                 </button>
                                             </li>
@@ -245,13 +241,25 @@
 
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold">Email</label>
-                            <input name="Email" type="email" class="form-control" required
-                                   placeholder="guest@example.com"/>
+                            <input name="Email" type="email" class="form-control" required placeholder="guest@example.com"/>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label small text-muted fw-bold">Phone (Optional)</label>
-                            <input name="PhoneNumber" type="tel" class="form-control" placeholder="+1..."/>
+                        <div class="row g-3 mb-3">
+                            <div class="col-4">
+                                <label class="form-label small text-muted fw-bold">Code</label>
+                                <select name="CountryCode" class="form-select">
+                                    @foreach (var country in EventPlanning.Application.Constants.CountryConstants.SupportedCountries)
+                                    {
+                                        <option value="@country.Code" selected="@(country.Code == EventPlanning.Application.Constants.CountryConstants.DefaultCode)">
+                                            @country.DisplayValue
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-8">
+                                <label class="form-label small text-muted fw-bold">Phone (digits only)</label>
+                                <input name="PhoneNumber" class="form-control" placeholder="991234567" pattern="\d{7,15}"/>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer border-0 pt-0">
@@ -292,9 +300,22 @@
                             <input name="Email" id="editGuestEmail" type="email" class="form-control" required/>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label small text-muted fw-bold">Phone</label>
-                            <input name="PhoneNumber" id="editGuestPhone" type="tel" class="form-control"/>
+                        <div class="row g-3 mb-3">
+                            <div class="col-4">
+                                <label class="form-label small text-muted fw-bold">Code</label>
+                                <select name="CountryCode" id="editGuestCountryCode" class="form-select">
+                                    @foreach (var country in EventPlanning.Application.Constants.CountryConstants.SupportedCountries)
+                                    {
+                                        <option value="@country.Code">
+                                            @country.DisplayValue
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-8">
+                                <label class="form-label small text-muted fw-bold">Phone</label>
+                                <input name="PhoneNumber" id="editGuestPhone" class="form-control" pattern="\d{7,15}"/>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer border-0 pt-0">
@@ -315,16 +336,15 @@
                 </div>
 
                 <div class="modal-body">
-                    <p class="mb-0">Are you sure you want to remove this guest from the list? This action cannot be
-                        undone.</p>
+                    <p class="mb-0">Are you sure you want to remove this guest from the list? This action cannot be undone.</p>
                 </div>
 
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
 
                     <form asp-controller="Guest" asp-action="Remove" method="post">
-                        <input type="hidden" name="EventId" value="@Model.Id"/>
-                        <input type="hidden" name="GuestId" id="deleteGuestId"/>
+                        <input type="hidden" name="EventId" value="@Model.Id" />
+                        <input type="hidden" name="GuestId" id="deleteGuestId" />
                         <button type="submit" class="btn btn-danger px-4">Remove</button>
                     </form>
                 </div>
@@ -334,10 +354,8 @@
 }
 
 @functions {
-
     private string GetInitials(string? name)
     {
         return !string.IsNullOrEmpty(name) ? name.Substring(0, 1).ToUpper() : "U";
     }
-
 }
