@@ -5,5 +5,6 @@ public record VenueDto(
     string Name,
     string Address,
     int Capacity,
-    string? Description = null
+    string? Description = null,
+    string? ImageUrl = null
 );

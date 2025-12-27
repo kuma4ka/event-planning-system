@@ -29,7 +29,6 @@ public class VenueRepository(ApplicationDbContext context) : IVenueRepository
 
     public async Task UpdateAsync(Venue venue, CancellationToken cancellationToken = default)
     {
-        context.Venues.Update(venue);
         await context.SaveChangesAsync(cancellationToken);
     }
 
