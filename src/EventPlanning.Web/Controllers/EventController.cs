@@ -95,10 +95,7 @@ public class EventController(
     [HttpPost("edit/{id:int}")]
     public async Task<IActionResult> Edit(int id, UpdateEventDto model, CancellationToken cancellationToken)
     {
-        if (id != model.Id) 
-        {
-            return BadRequest("ID mismatch");
-        }
+        if (id != model.Id) return BadRequest("ID mismatch");
 
         if (!ModelState.IsValid)
         {
@@ -111,7 +108,7 @@ public class EventController(
         try
         {
             await eventService.UpdateEventAsync(userId!, model, cancellationToken);
-            return RedirectToAction("MyEvents", "Event"); 
+            return RedirectToAction("MyEvents", "Event");
         }
         catch (ValidationException ex)
         {
@@ -176,10 +173,25 @@ public class EventController(
         DateTime? from,
         DateTime? to,
         string? sortOrder,
+        string viewType = "upcoming",
         int page = 1,
         CancellationToken cancellationToken = default)
     {
         var userId = userManager.GetUserId(User);
+        var now = DateTime.UtcNow;
+
+        if (viewType == "past")
+        {
+            to ??= now;
+
+            if (string.IsNullOrEmpty(sortOrder)) sortOrder = "date_desc";
+        }
+        else
+        {
+            from ??= now;
+
+            if (string.IsNullOrEmpty(sortOrder)) sortOrder = "date_asc";
+        }
 
         var searchDto = new EventSearchDto
         {
@@ -191,13 +203,15 @@ public class EventController(
             PageSize = 10
         };
 
+        ViewBag.CurrentViewType = viewType;
         ViewBag.CurrentSearch = searchTerm;
         ViewBag.CurrentType = type;
-        ViewBag.CurrentFrom = from?.ToString("yyyy-MM-dd");
-        ViewBag.CurrentTo = to?.ToString("yyyy-MM-dd");
+
+        ViewBag.CurrentFrom = from == now && viewType == "upcoming" ? null : from?.ToString("yyyy-MM-dd");
+        ViewBag.CurrentTo = to == now && viewType == "past" ? null : to?.ToString("yyyy-MM-dd");
 
         ViewBag.CurrentSort = sortOrder;
-        ViewBag.DateSortParam = string.IsNullOrEmpty(sortOrder) || sortOrder == "date_desc" ? "date_asc" : "date_desc";
+        ViewBag.DateSortParam = sortOrder == "date_desc" ? "date_asc" : "date_desc";
         ViewBag.NameSortParam = sortOrder == "name_asc" ? "name_desc" : "name_asc";
 
         var result = await eventService.GetEventsAsync(userId!, userId, searchDto, sortOrder, cancellationToken);
