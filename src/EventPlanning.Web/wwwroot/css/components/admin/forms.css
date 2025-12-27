@@ -1,0 +1,39 @@
+﻿/* Form Labels */
+.c-admin-form-label {
+    font-weight: 600;
+    color: var(--color-dark-teal);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Input Group with Icon */
+.c-admin-input-group {
+    position: relative;
+}
+
+.c-admin-input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-air-force-blue);
+    z-index: 5;
+}
+
+/* Input Fields */
+.c-admin-input {
+    padding-left: 2.5rem !important;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+    transition: all 0.2s;
+}
+
+.c-admin-input:focus {
+    border-color: var(--color-dark-teal);
+    box-shadow: 0 0 0 4px rgba(17, 75, 95, 0.1);
+    outline: none;
+}

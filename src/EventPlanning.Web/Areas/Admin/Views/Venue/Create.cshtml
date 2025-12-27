@@ -4,43 +4,82 @@
     ViewData["Title"] = "Create Venue";
 }
 
-<div class="container mt-4">
-    <h2>Create New Venue</h2>
-    <div class="row">
-        <div class="col-md-6">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
             <form asp-action="Create" method="post" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label">Name</label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-                <div class="mb-3">
-                    <label asp-for="Address" class="form-label">Address</label>
-                    <input asp-for="Address" class="form-control" />
-                    <span asp-validation-for="Address" class="text-danger"></span>
-                </div>
-                <div class="mb-3">
-                    <label asp-for="Capacity" class="form-label">Capacity</label>
-                    <input asp-for="Capacity" type="number" class="form-control" />
-                    <span asp-validation-for="Capacity" class="text-danger"></span>
-                </div>
-                <div class="mb-3">
-                    <label asp-for="Description" class="form-label">Description</label>
-                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
+                <div class="card c-admin-card">
 
-                <div class="mb-3">
-                    <label asp-for="ImageFile" class="form-label">Venue Image</label>
-                    <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
-                    <span asp-validation-for="ImageFile" class="text-danger"></span>
-                </div>
+                    <div class="c-admin-header">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-plus-square fs-4 me-3"></i>
+                            <h5 class="mb-0 fw-bold">Create New Venue</h5>
+                        </div>
+                    </div>
 
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-success">Save</button>
-                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                    <div class="card-body p-4">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="Name" class="c-admin-form-label">Venue Name</label>
+                            <div class="c-admin-input-group">
+                                <i class="bi bi-building c-admin-input-icon"></i>
+                                <input asp-for="Name" class="form-control c-admin-input" placeholder="E.g. Grand Hall" />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small mt-1"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-4">
+                                <label asp-for="Address" class="c-admin-form-label">Address</label>
+                                <div class="c-admin-input-group">
+                                    <i class="bi bi-geo-alt c-admin-input-icon"></i>
+                                    <input asp-for="Address" class="form-control c-admin-input" placeholder="Full street address" />
+                                </div>
+                                <span asp-validation-for="Address" class="text-danger small mt-1"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-4">
+                                <label asp-for="Capacity" class="c-admin-form-label">Capacity</label>
+                                <div class="c-admin-input-group">
+                                    <i class="bi bi-people c-admin-input-icon"></i>
+                                    <input asp-for="Capacity" class="form-control c-admin-input" type="number" min="1" />
+                                </div>
+                                <span asp-validation-for="Capacity" class="text-danger small mt-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ImageFile" class="c-admin-form-label">Venue Image</label>
+                            <div class="c-admin-input-group">
+                                <i class="bi bi-image c-admin-input-icon"></i>
+                                <input asp-for="ImageFile" type="file" class="form-control c-admin-input" accept="image/*" />
+                            </div>
+                            <span asp-validation-for="ImageFile" class="text-danger small mt-1"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Description" class="c-admin-form-label">Description (Optional)</label>
+                            <div class="c-admin-input-group">
+                                <i class="bi bi-text-paragraph c-admin-input-icon" style="top: 1.5rem;"></i>
+                                <textarea asp-for="Description" class="form-control c-admin-input" rows="4" placeholder="Describe the venue features..."></textarea>
+                            </div>
+                            <span asp-validation-for="Description" class="text-danger small mt-1"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-link text-decoration-none text-muted ps-0">
+                                <i class="bi bi-arrow-left me-1"></i> Back to List
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">
+                                Create Venue
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
+
         </div>
     </div>
 </div>

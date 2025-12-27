@@ -1,0 +1,40 @@
+﻿/* Admin Card Container */
+.c-admin-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+    background-color: #fff;
+}
+
+/* Admin Header (Gradient strip) */
+.c-admin-header {
+    background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Danger Zone (Delete Page) */
+.c-danger-card {
+    border: 1px solid #fee2e2;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.c-danger-header {
+    background-color: #fef2f2;
+    color: #991b1b;
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid #fee2e2;
+}
+
+.c-danger-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}
