@@ -1,4 +1,5 @@
-﻿using EventPlanning.Application.DTOs.Guest;
+﻿using EventPlanning.Application.Constants;
+using EventPlanning.Application.DTOs.Guest;
 using FluentValidation;
 
 namespace EventPlanning.Application.Validators.Guest;
@@ -30,9 +31,14 @@ public abstract class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : 
             .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
             .WithMessage("Email must be a valid address with a domain (e.g., user@example.com).");
 
+        RuleFor(x => x.CountryCode)
+            .NotEmpty()
+            .Must(code => CountryConstants.SupportedCountries.Any(c => c.Code == code))
+            .WithMessage("Invalid or unsupported country code.");
+
         RuleFor(x => x.PhoneNumber)
-            .MaximumLength(20).WithMessage("Phone number is too long.")
-            .Matches(@"^\+?[\d\s-]*$").When(x => !string.IsNullOrEmpty(x.PhoneNumber))
-            .WithMessage("Phone number contains invalid characters (allowed: digits, spaces, -, +).");
+            .NotEmpty().WithMessage("Phone number is required.")
+            .MaximumLength(15)
+            .Matches(@"^\d{7,15}$").WithMessage("Phone number must contain between 7 and 15 digits (no spaces or symbols).");
     }
 }
