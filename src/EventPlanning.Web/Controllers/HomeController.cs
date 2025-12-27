@@ -28,17 +28,24 @@ public class HomeController(
     {
         var userId = userManager.GetUserId(User) ?? string.Empty;
 
+        var effectiveFromDate = (from.HasValue && from.Value > DateTime.UtcNow) ? from.Value : DateTime.UtcNow;
+
         var searchDto = new EventSearchDto
         {
             SearchTerm = searchTerm,
             Type = type,
-            FromDate = from,
+            FromDate = effectiveFromDate,
             ToDate = to,
             PageNumber = page,
             PageSize = 9
         };
 
         var result = await eventService.GetEventsAsync(userId, null, searchDto, null, cancellationToken);
+
+        ViewBag.CurrentSearch = searchTerm;
+        ViewBag.CurrentType = type;
+        ViewBag.CurrentFrom = from?.ToString("yyyy-MM-dd"); 
+        ViewBag.CurrentTo = to?.ToString("yyyy-MM-dd");
 
         return View(result);
     }
