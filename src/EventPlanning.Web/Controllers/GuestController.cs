@@ -62,9 +62,13 @@ public class GuestController(
         {
             return Forbid();
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex) 
         {
-            TempData["ErrorMessage"] = ex.Message;
+            TempData["ErrorMessage"] = ex.Message; 
+        }
+        catch (Exception)
+        {
+            TempData["ErrorMessage"] = "An unexpected error occurred.";
         }
 
         return RedirectToAction("Details", "Event", new { id = model.EventId });
