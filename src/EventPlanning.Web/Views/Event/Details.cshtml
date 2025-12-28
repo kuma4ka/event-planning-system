@@ -91,18 +91,13 @@
                 @if (!string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string) && !string.IsNullOrEmpty(Model.VenueAddress))
                 {
                     var addressQuery = $"{Model.VenueName}, {Model.VenueAddress}";
-
                     var encodedQuery = System.Net.WebUtility.UrlEncode(addressQuery);
-
                     var apiKey = ViewBag.GoogleMapsApiKey;
-
                     var mapUrl = $"https://www.google.com/maps/embed/v1/place?key={apiKey}&q={encodedQuery}";
 
-                    <div class="ratio ratio-21x9 rounded overflow-hidden shadow-sm border">
+                    <div class="ratio ratio-21x9 event-map-container">
                         <iframe
-                            width="100%"
-                            height="450"
-                            style="border:0"
+                            class="event-map-frame"
                             loading="lazy"
                             allowfullscreen
                             referrerpolicy="no-referrer-when-downgrade"
@@ -112,7 +107,7 @@
                 }
                 else
                 {
-                    <div class="alert alert-secondary border-0 d-flex align-items-center" role="alert">
+                    <div class="alert alert-secondary border-0 d-flex align-items-center rounded-3 shadow-sm" role="alert" style="background-color: var(--color-cool-mist); color: var(--color-ink-black);">
                         <i class="bi bi-map-fill me-2 fs-5"></i>
                         <div>
                             Map is currently unavailable.

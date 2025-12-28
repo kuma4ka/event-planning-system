@@ -148,3 +148,31 @@
     display: grid;
     gap: 0.75rem;
 }
+
+/* Map Container Styling */
+.event-map-container {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(174, 195, 176, 0.3);
+    background-color: #fff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.event-map-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(1, 22, 30, 0.1);
+}
+
+.event-map-frame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    filter: saturate(80%);
+    transition: filter 0.3s ease;
+}
+
+.event-map-container:hover .event-map-frame {
+    filter: saturate(100%);
+}
