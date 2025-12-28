@@ -6,13 +6,13 @@ using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace EventPlanning.Application.Services;
 
 public class ProfileService(
     UserManager<User> userManager,
     IEventRepository eventRepository,
+    IUserRepository userRepository,
     IValidator<EditProfileDto> profileValidator,
     IValidator<ChangePasswordDto> passwordValidator) : IProfileService
 {
@@ -56,8 +56,7 @@ public class ProfileService(
 
         if (newFullPhoneNumber != user.PhoneNumber && !string.IsNullOrEmpty(newFullPhoneNumber))
         {
-            var isPhoneTaken = await userManager.Users
-                .AnyAsync(u => u.PhoneNumber == newFullPhoneNumber && u.Id != userId, cancellationToken);
+            var isPhoneTaken = await userRepository.IsPhoneNumberTakenAsync(newFullPhoneNumber, userId, cancellationToken);
 
             if (isPhoneTaken)
             {
@@ -69,7 +68,6 @@ public class ProfileService(
 
         user.FirstName = dto.FirstName;
         user.LastName = dto.LastName;
-        
         user.PhoneNumber = newFullPhoneNumber;
 
         var result = await userManager.UpdateAsync(user);
