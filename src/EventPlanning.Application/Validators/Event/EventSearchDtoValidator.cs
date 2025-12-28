@@ -21,17 +21,17 @@ public class EventSearchDtoValidator : AbstractValidator<EventSearchDto>
             .When(x => !string.IsNullOrEmpty(x.SearchTerm));
 
         RuleFor(x => x.FromDate)
-            .GreaterThan(new DateTime(2025, 1, 1))
+            .GreaterThanOrEqualTo(new DateTime(2025, 1, 1))
             .WithMessage("Date is too far in the past.")
             .When(x => x.FromDate.HasValue);
 
         RuleFor(x => x.ToDate)
-            .GreaterThan(new DateTime(2025, 1, 1))
+            .GreaterThanOrEqualTo(new DateTime(2025, 1, 1))
             .WithMessage("Date is too far in the past.")
             .When(x => x.ToDate.HasValue);
 
         RuleFor(x => x.ToDate)
-            .GreaterThanOrEqualTo(x => x.FromDate!.Value)
+            .Must((model, toDate) => toDate!.Value.Date >= model.FromDate!.Value.Date)
             .WithMessage("End date must be greater than or equal to start date.")
             .When(x => x.FromDate.HasValue && x.ToDate.HasValue);
     }
