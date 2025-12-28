@@ -136,31 +136,41 @@
     else
     {
         <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
-            <h4 class="mb-0 fw-bold display-6" style="color: var(--color-ink-black); font-size: 1.75rem;">Upcoming
-                Events</h4>
-            <span class="badge bg-white text-dark border shadow-sm px-3 py-2"
-                  style="border-radius: 8px !important; color: var(--color-dark-teal) !important;">
-                    @Model.Events.TotalCount results
-            </span>
+            <div>
+                <h4 class="mb-0 fw-bold display-6" style="color: var(--color-ink-black); font-size: 1.75rem;">Upcoming Events</h4>
+                <span class="badge bg-white text-dark border shadow-sm px-3 py-2 mt-2 d-inline-block"
+                      style="border-radius: 8px !important; color: var(--color-dark-teal) !important;">
+                        @Model.Events.TotalCount results
+                </span>
+            </div>
+
+            <div class="d-flex ms-3">
+                <button id="btnGridView" class="view-toggle-btn active" title="Grid View">
+                    <i class="bi bi-grid-fill"></i>
+                </button>
+                <button id="btnListView" class="view-toggle-btn" title="List View">
+                    <i class="bi bi-list-ul"></i>
+                </button>
+            </div>
         </div>
 
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+        <div id="itemsContainer" class="row g-4 mb-5">
             @foreach (var item in Model.Events.Items)
             {
                 var currentItem = item;
-                <div class="col">
-                    <div class="card h-100 shadow-sm hover-effect transition-transform border-0 bg-white">
+                <div class="col-md-6 col-lg-4 col-xl-4 d-flex">
+                    <div class="card h-100 w-100 shadow-sm hover-effect transition-transform border-0 bg-white">
                         <div class="position-relative"
-                             style="height: 220px; overflow: hidden; background-color: #f0f2f5;">
+                             style="overflow: hidden; background-color: #f0f2f5;">
                             @if (!string.IsNullOrEmpty(currentItem.VenueImageUrl))
                             {
-                                <img src="@currentItem.VenueImageUrl" class="card-img-top w-100 h-100"
-                                     style="object-fit: cover;" alt="@currentItem.Name">
+                                <img src="@currentItem.VenueImageUrl" class="card-img-top"
+                                     style="height: 220px; object-fit: cover;" alt="@currentItem.Name">
                             }
                             else
                             {
-                                <div class="w-100 h-100 d-flex align-items-center justify-content-center text-white"
-                                     style="background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));">
+                                <div class="card-img-top w-100 d-flex align-items-center justify-content-center text-white"
+                                     style="height: 220px; background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));">
                                     <i class="bi bi-calendar-event fs-1 opacity-50"></i>
                                 </div>
                             }
@@ -217,7 +227,6 @@
 
                     @for (var i = 1; i <= Model.Events.TotalPages; i++)
                     {
-                        // Fix 199/203: Локальна копія змінної циклу
                         var pageNumber = i;
                         <li class="page-item @(pageNumber == Model.Events.PageNumber ? "active" : "")">
                             <a class="page-link" asp-action="Index"
