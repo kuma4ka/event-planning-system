@@ -139,7 +139,7 @@
                 <tbody>
                 @foreach (var item in Model.Items)
                 {
-                    var isPast = item.Date < DateTime.UtcNow;
+                    var isPast = item.Date < DateTime.Now;
 
                     <tr class="dashboard-row @(isPast ? "bg-light" : "")">
                         <td class="ps-4" style="width: 100px;">
@@ -255,19 +255,21 @@
 
                         @for (var i = 1; i <= Model.TotalPages; i++)
                         {
-                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                                @if (i == Model.PageNumber)
+                            var pageIndex = i;
+
+                            <li class="page-item @(pageIndex == Model.PageNumber ? "active" : "")">
+                                @if (pageIndex == Model.PageNumber)
                                 {
-                                    <span class="page-link">@i</span>
+                                    <span class="page-link">@pageIndex</span>
                                 }
                                 else
                                 {
                                     <a class="page-link" asp-controller="Event" asp-action="MyEvents"
-                                       asp-route-page="@i"
+                                       asp-route-page="@pageIndex"
                                        asp-route-viewType="@currentViewType"
                                        asp-route-sortOrder="@ViewBag.CurrentSort"
                                        asp-route-searchTerm="@ViewBag.CurrentSearch"
-                                       asp-route-type="@ViewBag.CurrentType">@i</a>
+                                       asp-route-type="@ViewBag.CurrentType">@pageIndex</a>
                                 }
                             </li>
                         }

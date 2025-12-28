@@ -178,7 +178,8 @@ public class EventController(
         CancellationToken cancellationToken = default)
     {
         var userId = userManager.GetUserId(User);
-        var now = DateTime.UtcNow;
+
+        var now = DateTime.Now;
 
         if (viewType == "past")
         {
@@ -207,8 +208,13 @@ public class EventController(
         ViewBag.CurrentSearch = searchTerm;
         ViewBag.CurrentType = type;
 
-        ViewBag.CurrentFrom = from == now && viewType == "upcoming" ? null : from?.ToString("yyyy-MM-dd");
-        ViewBag.CurrentTo = to == now && viewType == "past" ? null : to?.ToString("yyyy-MM-dd");
+        ViewBag.CurrentFrom = from.HasValue && Math.Abs((from.Value - now).TotalMinutes) < 1 && viewType == "upcoming"
+            ? null
+            : from?.ToString("yyyy-MM-dd");
+
+        ViewBag.CurrentTo = to.HasValue && Math.Abs((to.Value - now).TotalMinutes) < 1 && viewType == "past"
+            ? null
+            : to?.ToString("yyyy-MM-dd");
 
         ViewBag.CurrentSort = sortOrder;
         ViewBag.DateSortParam = sortOrder == "date_desc" ? "date_asc" : "date_desc";
