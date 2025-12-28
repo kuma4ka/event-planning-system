@@ -7,6 +7,7 @@ using EventPlanning.Domain.Interfaces;
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 
 namespace EventPlanning.Tests.Services;
@@ -26,13 +27,15 @@ public class EventServiceTests
         Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
         Mock<IValidator<EventSearchDto>> searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
         _identityServiceMock = new Mock<IIdentityService>();
+        Mock<IMemoryCache> cacheMock = new Mock<IMemoryCache>();
 
         _service = new EventService(
             _eventRepoMock.Object,
             _createValidatorMock.Object,
             updateValidatorMock.Object,
             searchValidatorMock.Object,
-            _identityServiceMock.Object
+            _identityServiceMock.Object,
+            cacheMock.Object
         );
     }
 
@@ -123,8 +126,8 @@ public class EventServiceTests
         { 
             Id = userId, 
             Email = userEmail,
-            FirstName = "Test", // Додано
-            LastName = "User"   // Додано
+            FirstName = "Test",
+            LastName = "User"
         };
 
         _eventRepoMock

@@ -3,6 +3,7 @@ using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace EventPlanning.Application.Services;
 
@@ -11,9 +12,11 @@ public class GuestService(
     IEventRepository eventRepository,
     IValidator<CreateGuestDto> createValidator,
     IValidator<AddGuestManuallyDto> manualAddValidator,
-    IValidator<UpdateGuestDto> updateValidator
-) : IGuestService
+    IValidator<UpdateGuestDto> updateValidator,
+    IMemoryCache cache) : IGuestService
 {
+    private const string EventCacheKeyPrefix = "event_details_";
+
     public async Task AddGuestAsync(string userId, CreateGuestDto dto, CancellationToken cancellationToken = default)
     {
         var validationResult = await createValidator.ValidateAsync(dto, cancellationToken);
@@ -25,11 +28,14 @@ public class GuestService(
         if (eventEntity.OrganizerId != userId) throw new UnauthorizedAccessException("Not your event");
 
         if (eventEntity.Guests.Any(g => g.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase)))
-            throw new InvalidOperationException(
-                $"Guest with email '{dto.Email}' is already registered for this event.");
+        {
+            throw new InvalidOperationException($"Guest with email '{dto.Email}' is already registered for this event.");
+        }
 
         var guest = CreateGuestEntity(dto);
         await guestRepository.AddAsync(guest, cancellationToken);
+
+        InvalidateEventCache(dto.EventId);
     }
 
     public async Task AddGuestManuallyAsync(string currentUserId, AddGuestManuallyDto dto,
@@ -53,23 +59,26 @@ public class GuestService(
             throw new InvalidOperationException("Venue is fully booked.");
 
         if (eventEntity.Guests.Any(g => g.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase)))
+        {
             throw new InvalidOperationException($"Guest with email '{dto.Email}' is already added to this event.");
+        }
 
         var fullPhoneNumber = dto.CountryCode + dto.PhoneNumber;
         if (!string.IsNullOrEmpty(dto.PhoneNumber))
         {
-            var phoneExists = eventEntity.Guests.Any(g => g.PhoneNumber == fullPhoneNumber);
+            bool phoneExists = eventEntity.Guests.Any(g => g.PhoneNumber == fullPhoneNumber);
             if (phoneExists)
             {
                 var displayPhone = fullPhoneNumber.StartsWith("+") ? fullPhoneNumber : $"+{fullPhoneNumber}";
-                throw new InvalidOperationException(
-                    $"Guest with phone number {displayPhone} is already added to this event.");
+                throw new InvalidOperationException($"Guest with phone number {displayPhone} is already added to this event.");
             }
         }
 
         var guest = CreateGuestEntity(dto);
 
         await guestRepository.AddAsync(guest, cancellationToken);
+
+        InvalidateEventCache(dto.EventId);
     }
 
     public async Task UpdateGuestAsync(string currentUserId, UpdateGuestDto dto,
@@ -83,26 +92,25 @@ public class GuestService(
 
         var eventEntity = guest.Event ?? await eventRepository.GetByIdAsync(guest.EventId, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException("Event not found.");
-
+        
         if (eventEntity.OrganizerId != currentUserId)
             throw new UnauthorizedAccessException("Not your event. Only the organizer can update guests.");
 
         if (!guest.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase))
         {
-            var emailTaken = eventEntity.Guests.Any(g =>
-                g.Id != guest.Id &&
+            bool emailTaken = eventEntity.Guests.Any(g => 
+                g.Id != guest.Id && 
                 g.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase));
 
             if (emailTaken)
-                throw new InvalidOperationException(
-                    $"Another guest with email '{dto.Email}' already exists in this event.");
+                throw new InvalidOperationException($"Another guest with email '{dto.Email}' already exists in this event.");
         }
 
         var newFullPhone = dto.CountryCode + dto.PhoneNumber;
         if (guest.PhoneNumber != newFullPhone && !string.IsNullOrEmpty(dto.PhoneNumber))
         {
-            var phoneTaken = eventEntity.Guests.Any(g =>
-                g.Id != guest.Id &&
+            bool phoneTaken = eventEntity.Guests.Any(g => 
+                g.Id != guest.Id && 
                 g.PhoneNumber == newFullPhone);
 
             if (phoneTaken)
@@ -118,12 +126,16 @@ public class GuestService(
         guest.PhoneNumber = newFullPhone;
 
         await guestRepository.UpdateAsync(guest, cancellationToken);
+
+        InvalidateEventCache(guest.EventId);
     }
 
     public async Task RemoveGuestAsync(string userId, string guestId, CancellationToken cancellationToken = default)
     {
         var guest = await guestRepository.GetByIdAsync(guestId, cancellationToken);
         if (guest == null) return;
+
+        int eventId = guest.EventId;
 
         if (guest.Event == null)
         {
@@ -137,6 +149,13 @@ public class GuestService(
         }
 
         await guestRepository.DeleteAsync(guest, cancellationToken);
+
+        InvalidateEventCache(eventId);
+    }
+
+    private void InvalidateEventCache(int eventId)
+    {
+        cache.Remove($"{EventCacheKeyPrefix}{eventId}");
     }
 
     private static Guest CreateGuestEntity(GuestBaseDto dto)

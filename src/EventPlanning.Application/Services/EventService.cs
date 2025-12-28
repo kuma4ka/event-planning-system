@@ -6,6 +6,7 @@ using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace EventPlanning.Application.Services;
 
@@ -14,8 +15,11 @@ public class EventService(
     IValidator<CreateEventDto> createValidator,
     IValidator<UpdateEventDto> updateValidator,
     IValidator<EventSearchDto> searchValidator,
-    IIdentityService identityService) : IEventService
+    IIdentityService identityService,
+    IMemoryCache cache) : IEventService
 {
+    private const string EventCacheKeyPrefix = "event_details_";
+
     public async Task<PagedResult<EventDto>> GetEventsAsync(
         string userId,
         string? organizerIdFilter,
@@ -26,7 +30,7 @@ public class EventService(
         var validationResult = await searchValidator.ValidateAsync(searchDto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-        var fromDate = searchDto.FromDate;
+        var fromDate = searchDto.FromDate; 
 
         var pagedEvents = await eventRepository.GetFilteredAsync(
             organizerIdFilter,
@@ -78,6 +82,13 @@ public class EventService(
 
     public async Task<EventDetailsDto?> GetEventDetailsAsync(int id, CancellationToken cancellationToken = default)
     {
+        var cacheKey = $"{EventCacheKeyPrefix}{id}";
+
+        if (cache.TryGetValue(cacheKey, out EventDetailsDto? cachedEvent))
+        {
+            return cachedEvent;
+        }
+
         var eventEntity = await eventRepository.GetByIdAsync(id, cancellationToken);
         if (eventEntity == null) return null;
 
@@ -113,6 +124,13 @@ public class EventService(
             IsOrganizer = false,
             IsJoined = false
         };
+
+        var cacheOptions = new MemoryCacheEntryOptions()
+            .SetAbsoluteExpiration(TimeSpan.FromMinutes(10))
+            .SetSlidingExpiration(TimeSpan.FromMinutes(2))
+            .SetSize(1);
+
+        cache.Set(cacheKey, eventDetails, cacheOptions);
 
         return eventDetails;
     }
@@ -158,6 +176,8 @@ public class EventService(
         eventEntity.VenueId = dto.VenueId == 0 ? null : dto.VenueId;
 
         await eventRepository.UpdateAsync(eventEntity, cancellationToken);
+        
+        InvalidateEventCache(dto.Id);
     }
 
     public async Task DeleteEventAsync(string userId, int eventId, CancellationToken cancellationToken = default)
@@ -169,14 +189,14 @@ public class EventService(
             throw new UnauthorizedAccessException("Not your event");
 
         await eventRepository.DeleteAsync(eventEntity, cancellationToken);
+        
+        InvalidateEventCache(eventId);
     }
 
     public async Task JoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
-
-        if (eventEntity == null)
-            throw new KeyNotFoundException($"Event {eventId} not found");
+        if (eventEntity == null) throw new KeyNotFoundException($"Event {eventId} not found");
 
         if (eventEntity.Date < DateTime.Now)
             throw new InvalidOperationException("Cannot join an event that has already ended.");
@@ -186,36 +206,51 @@ public class EventService(
 
         if (eventEntity.Venue is { Capacity: > 0 } &&
             eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
+        {
             throw new InvalidOperationException("Sorry, this event is fully booked.");
+        }
 
         var user = await identityService.GetUserByIdAsync(userId);
         if (user == null) throw new KeyNotFoundException("User not found.");
 
         if (eventEntity.Guests.Any(g => g.Email.Equals(user.Email, StringComparison.OrdinalIgnoreCase)))
+        {
             throw new InvalidOperationException("You are already registered for this event.");
+        }
 
         if (!string.IsNullOrEmpty(user.PhoneNumber))
         {
-            var isPhoneTaken = eventEntity.Guests.Any(g =>
-                !string.IsNullOrEmpty(g.PhoneNumber) &&
+            var isPhoneTaken = eventEntity.Guests.Any(g => 
+                !string.IsNullOrEmpty(g.PhoneNumber) && 
                 g.PhoneNumber == user.PhoneNumber);
 
             if (isPhoneTaken)
-                throw new InvalidOperationException(
-                    "A participant with this phone number is already joined to this event.");
+            {
+                var displayPhone = user.PhoneNumber.StartsWith("+") ? user.PhoneNumber : $"+{user.PhoneNumber}";
+                throw new InvalidOperationException($"A participant with this phone number {displayPhone} is already joined to this event.");
+            }
         }
-
+        
         await eventRepository.AddGuestAsync(eventId, userId, cancellationToken);
+        
+        InvalidateEventCache(eventId);
     }
 
     public async Task LeaveEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
         await eventRepository.RemoveGuestAsync(eventId, userId, cancellationToken);
+        
+        InvalidateEventCache(eventId);
     }
 
     public async Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
         return await eventRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);
+    }
+
+    private void InvalidateEventCache(int eventId)
+    {
+        cache.Remove($"{EventCacheKeyPrefix}{eventId}");
     }
 
     private static (string CountryCode, string PhoneNumber) ParsePhoneNumber(string? fullPhoneNumber)
