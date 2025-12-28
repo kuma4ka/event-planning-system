@@ -118,7 +118,8 @@ public class EventService(
             eventEntity.OrganizerId,
             eventEntity.Venue?.Name ?? "TBD",
             eventEntity.VenueId,
-            eventEntity.Venue?.ImageUrl
+            eventEntity.Venue?.ImageUrl,
+            eventEntity.Venue?.Address
         )
         {
             IsOrganizer = false,
