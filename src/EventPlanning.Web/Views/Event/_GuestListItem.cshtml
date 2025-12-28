@@ -3,17 +3,30 @@
 @{
     var isOrganizer = ViewData["IsOrganizer"] as bool? ?? false;
     var isPast = ViewData["IsPast"] as bool? ?? false;
+
+    var fullName = $"{Model.FirstName} {Model.LastName}";
+    var initials = !string.IsNullOrEmpty(Model.FirstName) ? Model.FirstName.Substring(0, 1).ToUpper() : "G";
 }
 
-<div class="guest-list-item d-flex justify-content-between align-items-center mb-2 p-2 hover-bg-light rounded">
+<div class="guest-list-item d-flex justify-content-between align-items-center mb-2 p-2 rounded border-bottom bg-white">
     <div class="d-flex align-items-center">
-        <div class="guest-avatar me-2">@Model.Initials</div>
+        <div
+            class="guest-avatar me-3 bg-light text-primary fw-bold d-flex align-items-center justify-content-center rounded-circle border"
+            style="width: 36px; height: 36px; min-width: 36px; font-size: 0.9rem;">
+            @initials
+        </div>
+
         <div class="overflow-hidden">
-            <span class="small fw-bold text-dark d-block text-truncate" style="max-width: 150px;">@Model.FullName</span>
+            <span class="small fw-bold text-dark d-block text-truncate" style="max-width: 160px;" title="@fullName">
+                @fullName
+            </span>
             @if (isOrganizer)
             {
-                <small class="text-muted text-truncate d-block"
-                       style="font-size: 0.75rem; max-width: 150px;">@Model.Email</small>
+                <small class="text-muted text-truncate d-block" style="font-size: 0.75rem; max-width: 160px;"
+                       title="@Model.Email">
+                    @Model.Email
+                </small>
+                @* Телефон прибрано з відображення, як ви просили *@
             }
         </div>
     </div>
@@ -21,19 +34,24 @@
     @if (isOrganizer && !isPast)
     {
         <div class="dropdown">
-            <button class="btn btn-sm btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+            <button class="btn btn-sm btn-link text-secondary p-0 px-2" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
                 <i class="bi bi-three-dots-vertical"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 animate-fade-in">
                 <li>
+                    @* Дані про телефон передаються тут, щоб заповнити форму редагування *@
                     <button class="dropdown-item small"
-                            onclick="openEditGuestModal('@Model.Id', '@Model.FirstName', '@Model.LastName', '@Model.Email', '@Model.CountryCode', '@Model.PhoneNumber')">
+                            onclick="window.openEditGuestModal('@Model.Id', '@Model.FirstName', '@Model.LastName', '@Model.Email', '@Model.CountryCode', '@Model.PhoneNumber')">
                         <i class="bi bi-pencil me-2 text-warning"></i> Edit
                     </button>
                 </li>
                 <li>
+                    <hr class="dropdown-divider my-1">
+                </li>
+                <li>
                     <button class="dropdown-item small text-danger"
-                            onclick="openDeleteGuestModal('@Model.Id')">
+                            onclick="window.openDeleteGuestModal('@Model.Id')">
                         <i class="bi bi-trash me-2"></i> Remove
                     </button>
                 </li>
