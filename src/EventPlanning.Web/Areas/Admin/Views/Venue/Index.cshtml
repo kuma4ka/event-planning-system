@@ -6,84 +6,107 @@
 
 <div class="container py-5">
 
-    <div class="card c-admin-card">
-
-        <div class="c-admin-header">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-building-gear fs-3 me-3"></i>
-                <div>
-                    <h4 class="mb-0 fw-bold">Manage Venues</h4>
-                    <small class="opacity-75">Overview of all platform locations</small>
-                </div>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div class="d-flex align-items-center">
+            <div class="bg-white p-3 rounded-circle shadow-sm me-3 text-primary">
+                <i class="bi bi-building-gear fs-3"></i>
             </div>
-            <a asp-action="Create" class="btn btn-light text-dark fw-bold shadow-sm">
-                <i class="bi bi-plus-lg me-1"></i> Create New Venue
-            </a>
+            <div>
+                <h4 class="mb-0 fw-bold">Manage Venues</h4>
+                <small class="text-muted">Overview of all platform locations</small>
+            </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table c-admin-table mb-0">
-                <thead>
-                <tr>
-                    <th class="ps-4">Name</th>
-                    <th>Address</th>
-                    <th>Capacity</th>
-                    <th class="text-center pe-4">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var venue in Model)
-                {
-                    <tr>
-                        <td class="ps-4 fw-bold align-middle">
-                            @venue.Name
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-flex bg-white rounded shadow-sm">
+                <button id="btnGridView" class="view-toggle-btn active" title="Grid View">
+                    <i class="bi bi-grid-fill"></i>
+                </button>
+                <button id="btnListView" class="view-toggle-btn" title="List View">
+                    <i class="bi bi-list-ul"></i>
+                </button>
+            </div>
+
+            <a asp-action="Create" class="btn btn-primary fw-bold shadow-sm px-4">
+                <i class="bi bi-plus-lg me-1"></i> Create Venue
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm py-5 text-center">
+            <div class="mb-3">
+                <i class="bi bi-inbox text-muted opacity-25" style="font-size: 4rem;"></i>
+            </div>
+            <h5 class="text-muted">No venues found</h5>
+            <p class="text-muted small mb-4">Get started by adding the first location to the platform.</p>
+            <div>
+                <a asp-action="Create" class="btn btn-primary">Create New Venue</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div id="itemsContainer" class="row g-4">
+            @foreach (var venue in Model)
+            {
+                <div class="col-md-6 col-lg-4 d-flex">
+                    <div class="card h-100 w-100 shadow-sm border-0 hover-lift bg-white overflow-hidden">
+
+                        <div class="position-relative">
                             @if (!string.IsNullOrEmpty(venue.ImageUrl))
                             {
-                                <i class="bi bi-image text-muted ms-2" title="Has image"></i>
+                                <img src="@venue.ImageUrl" class="card-img-top"
+                                     style="height: 200px; object-fit: cover;" alt="@venue.Name">
                             }
-                        </td>
-                        <td class="align-middle">
-                            <i class="bi bi-geo-alt text-muted me-1"></i> @(venue.Address ?? "N/A")
-                        </td>
-                        <td class="align-middle">
-                            <span class="badge bg-light text-dark border">
-                                <i class="bi bi-people me-1"></i> @venue.Capacity
-                            </span>
-                        </td>
-                        <td class="text-center pe-4 align-middle">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a asp-action="Edit" asp-route-id="@venue.Id" class="c-action-btn" title="Edit">
-                                    <i class="bi bi-pencil-fill" style="font-size: 0.9rem;"></i>
+                            else
+                            {
+                                <div class="card-img-top w-100 d-flex align-items-center justify-content-center text-white"
+                                     style="height: 200px; background: linear-gradient(135deg, #6c757d, #adb5bd);">
+                                    <i class="bi bi-building fs-1 opacity-50"></i>
+                                </div>
+                            }
+
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-white text-dark shadow-sm border">
+                                    <i class="bi bi-people me-1"></i> @venue.Capacity
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body d-flex flex-column p-4">
+                            <h5 class="card-title fw-bold mb-2 text-dark">
+                                @venue.Name
+                            </h5>
+
+                            <p class="card-text text-muted small mb-3 flex-grow-1">
+                                <i class="bi bi-geo-alt me-1 text-danger opacity-75"></i>
+                                @(venue.Address)
+                            </p>
+
+                            <div class="pt-3 border-top d-flex justify-content-end gap-2 mt-auto">
+                                <a asp-action="Edit" asp-route-id="@venue.Id"
+                                   class="btn btn-sm btn-light border text-primary fw-bold" title="Edit">
+                                    <i class="bi bi-pencil-fill me-1"></i> Edit
                                 </a>
 
                                 <button type="button"
-                                        class="c-action-btn text-danger border-0"
+                                        class="btn btn-sm btn-light border text-danger fw-bold"
                                         data-bs-toggle="modal"
                                         data-bs-target="#deleteModal"
                                         data-venue-id="@venue.Id"
                                         data-venue-name="@venue.Name"
                                         title="Delete">
-                                    <i class="bi bi-trash-fill" style="font-size: 0.9rem;"></i>
+                                    <i class="bi bi-trash-fill me-1"></i> Delete
                                 </button>
                             </div>
-                        </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        </div>
-
-        @if (!Model.Any())
-        {
-            <div class="text-center py-5">
-                <div class="mb-3">
-                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                    </div>
                 </div>
-                <h5 class="text-muted">No venues found</h5>
-                <p class="text-muted small">Get started by creating a new venue.</p>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
 </div>
 
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true"
@@ -92,10 +115,10 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 overflow-hidden rounded-4">
 
-            <div class="c-danger-header py-4">
-                <i class="bi bi-exclamation-triangle c-danger-icon mb-2"></i>
-                <h5 class="fw-bold mb-0">Delete Venue?</h5>
-                <p class="mb-0 opacity-75 small">This action cannot be undone.</p>
+            <div class="c-danger-header py-4" style="background-color: #fdf2f2; text-align: center; border-bottom: 1px solid #f8d7da;">
+                <i class="bi bi-exclamation-triangle text-danger fs-1 mb-2 d-block"></i>
+                <h5 class="fw-bold mb-0 text-danger">Delete Venue?</h5>
+                <p class="mb-0 opacity-75 small text-danger">This action cannot be undone.</p>
             </div>
 
             <div class="modal-body p-4 text-center">
@@ -119,6 +142,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-}

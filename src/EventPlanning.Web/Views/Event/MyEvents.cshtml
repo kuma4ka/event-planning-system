@@ -43,7 +43,7 @@
         </li>
     </ul>
 
-    <div class="dashboard-toolbar">
+    <div class="dashboard-toolbar mb-4">
         <form method="get" asp-controller="Event" asp-action="MyEvents" class="row g-3 align-items-center">
             <input type="hidden" name="viewType" value="@currentViewType"/>
             <input type="hidden" name="sortOrder" value="@ViewBag.CurrentSort"/>
@@ -125,107 +125,116 @@
     }
     else
     {
-        <div class="table-responsive">
-            <table class="table dashboard-table">
-                <thead>
-                <tr>
-                    <th class="ps-4">Date</th>
-                    <th>Event Details</th>
-                    <th>Location</th>
-                    <th>Status</th>
-                    <th class="text-end pe-4">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var item in Model.Items)
-                {
-                    var isPast = item.Date < DateTime.Now;
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-0 fw-bold text-dark">
+                    @(currentViewType == "upcoming" ? "Your Upcoming Events" : "Event History")
+                </h4>
+                <span class="badge bg-white text-muted border shadow-sm px-2 py-1 mt-1 fw-normal">
+                    @Model.TotalCount items
+                </span>
+            </div>
+            
+            <div class="d-flex">
+                <button id="btnGridView" class="view-toggle-btn active" title="Grid View">
+                    <i class="bi bi-grid-fill"></i>
+                </button>
+                <button id="btnListView" class="view-toggle-btn" title="List View">
+                    <i class="bi bi-list-ul"></i>
+                </button>
+            </div>
+        </div>
 
-                    <tr class="dashboard-row @(isPast ? "bg-light" : "")">
-                        <td class="ps-4" style="width: 100px;">
-                            <div class="event-date-badge @(isPast ? "past" : "")">
-                                <span class="event-day">@item.Date.Day</span>
-                                <span class="event-month">@item.Date.ToString("MMM")</span>
-                            </div>
-                        </td>
-
-                        <td>
-                            <div class="@(isPast ? "opacity-75" : "")">
-                                <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id"
-                                   class="event-title-link text-decoration-none @(isPast ? "text-muted" : "text-dark fw-bold")">
-                                    @item.Name
-                                </a>
-                                <div class="event-meta mt-1">
-                                    <span
-                                        class="badge bg-light text-dark border fw-normal">@item.Type.GetDisplayName()</span>
-                                    <span class="text-muted border-start ps-2 ms-1 small">
-                                        @item.Date.ToString("yyyy") • @item.Date.ToString("HH:mm")
-                                    </span>
-                                </div>
-                            </div>
-                        </td>
-
-                        <td>
-                            <div class="d-flex align-items-center text-muted">
-                                <i class="bi bi-geo-alt-fill me-2 @(isPast ? "text-secondary" : "text-danger") opacity-75"></i>
-                                <span class="text-truncate" style="max-width: 150px;" title="@item.VenueName">
-                                        @(item.VenueName)
-                                </span>
-                            </div>
-                        </td>
-
-                        <td>
-                            @if (isPast)
+        <div id="itemsContainer" class="row g-4">
+            @foreach (var item in Model.Items)
+            {
+                var isPast = item.Date < DateTime.Now;
+                
+                <div class="col-md-6 col-lg-4 d-flex">
+                    <div class="card h-100 w-100 shadow-sm border-0 hover-lift bg-white">
+                        
+                        <div class="position-relative" style="background-color: #f0f2f5;">
+                            @if (!string.IsNullOrEmpty(item.VenueImageUrl))
                             {
-                                <span
-                                    class="badge bg-secondary text-white fw-normal px-3 py-2 rounded-pill">Completed</span>
+                                <img src="@item.VenueImageUrl" class="card-img-top" 
+                                     style="height: 200px; object-fit: cover;" alt="@item.Name">
                             }
                             else
                             {
-                                <span
-                                    class="badge bg-success bg-opacity-10 text-success fw-normal px-3 py-2 rounded-pill">Upcoming</span>
+                                <div class="card-img-top w-100 d-flex align-items-center justify-content-center text-white"
+                                     style="height: 200px; background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));">
+                                    <i class="bi bi-calendar-event fs-1 opacity-50"></i>
+                                </div>
                             }
-                        </td>
+                            
+                            <div class="position-absolute top-0 end-0 m-3">
+                                @if (isPast)
+                                {
+                                    <span class="badge bg-secondary shadow-sm">Completed</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success shadow-sm">Upcoming</span>
+                                }
+                            </div>
+                        </div>
 
-                        <td class="text-end pe-4">
-                            <div class="action-btn-group">
-                                <button type="button"
-                                        class="btn-icon-soft js-copy-link"
+                        <div class="card-body d-flex flex-column p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-light text-dark border fw-normal">@item.Type.GetDisplayName()</span>
+                                <small class="text-muted fw-bold">
+                                    <i class="bi bi-calendar3 me-1"></i> @item.Date.ToString("MMM dd")
+                                </small>
+                            </div>
+
+                            <h5 class="card-title fw-bold mb-1 fs-5">
+                                <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id"
+                                   class="text-decoration-none text-dark stretched-link">
+                                    @item.Name
+                                </a>
+                            </h5>
+                            
+                            <div class="text-muted small mb-3">
+                                <i class="bi bi-clock me-1"></i> @item.Date.ToString("HH:mm")
+                            </div>
+
+                            <div class="d-flex align-items-center text-muted small mb-3">
+                                <i class="bi bi-geo-alt-fill me-2 text-danger opacity-75"></i>
+                                <span class="text-truncate">@item.VenueName</span>
+                            </div>
+
+                            <div class="mt-auto pt-3 border-top d-flex justify-content-end gap-2" style="position: relative; z-index: 2;">
+                                <button type="button" 
+                                        class="btn btn-sm btn-light border js-copy-link" 
                                         data-url="@Url.Action("Details", "Event", new { id = item.Id }, Context.Request.Scheme)"
                                         title="Copy Link">
                                     <i class="bi bi-link-45deg"></i>
                                 </button>
 
-                                <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id"
-                                   class="btn-icon-soft" title="View Details">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-
                                 @if (!isPast)
                                 {
                                     <a asp-controller="Event" asp-action="Edit" asp-route-id="@item.Id"
-                                       class="btn-icon-soft" title="Edit Event">
+                                       class="btn btn-sm btn-light border text-warning" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                 }
-
-                                <button type="button" class="btn-icon-soft danger"
+                                
+                                <button type="button" class="btn btn-sm btn-light border text-danger"
                                         data-bs-toggle="modal"
                                         data-bs-target="#deleteModal"
                                         data-event-id="@item.Id"
                                         data-event-name="@item.Name"
-                                        title="Delete Event">
+                                        title="Delete">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
-                        </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
 
-        <div class="mt-4">
+        <div class="mt-5">
             @if (Model.TotalPages > 1)
             {
                 <nav aria-label="Page navigation">
@@ -324,6 +333,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-}

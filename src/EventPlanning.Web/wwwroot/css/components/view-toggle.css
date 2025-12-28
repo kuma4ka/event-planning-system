@@ -1,0 +1,68 @@
+﻿/* --- VIEW TOGGLE BUTTONS --- */
+.view-toggle-btn {
+    border: 1px solid var(--color-cool-mist);
+    color: var(--color-air-force-blue);
+    background: white;
+    padding: 0.4rem 0.8rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.view-toggle-btn.active {
+    background-color: var(--color-air-force-blue);
+    color: white;
+    border-color: var(--color-air-force-blue);
+}
+
+.view-toggle-btn:first-child {
+    border-radius: 6px 0 0 6px;
+}
+
+.view-toggle-btn:last-child {
+    border-radius: 0 6px 6px 0;
+    border-left: none;
+}
+
+/* --- LIST VIEW MODIFICATIONS --- */
+
+.list-view .col-md-6,
+.list-view .col-lg-4,
+.list-view .col-xl-3 {
+    width: 100% !important;
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+.list-view .card {
+    flex-direction: row;
+    align-items: center;
+    min-height: 200px;
+}
+
+.list-view .card-img-top {
+    width: 250px;
+    height: 100%;
+    min-height: 220px;
+    object-fit: cover;
+    border-radius: 12px 0 0 12px !important;
+}
+
+.list-view .card-body {
+    flex: 1;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .list-view .card {
+        flex-direction: column;
+    }
+    .list-view .card-img-top {
+        width: 100%;
+        height: 200px;
+        min-height: auto;
+        border-radius: 12px 12px 0 0 !important;
+    }
+}
