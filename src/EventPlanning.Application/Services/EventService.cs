@@ -13,7 +13,8 @@ public class EventService(
     IEventRepository eventRepository,
     IValidator<CreateEventDto> createValidator,
     IValidator<UpdateEventDto> updateValidator,
-    IValidator<EventSearchDto> searchValidator) : IEventService
+    IValidator<EventSearchDto> searchValidator,
+    IIdentityService identityService) : IEventService
 {
     public async Task<PagedResult<EventDto>> GetEventsAsync(
         string userId,
@@ -25,7 +26,7 @@ public class EventService(
         var validationResult = await searchValidator.ValidateAsync(searchDto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-        var fromDate = searchDto.FromDate; 
+        var fromDate = searchDto.FromDate;
 
         var pagedEvents = await eventRepository.GetFilteredAsync(
             organizerIdFilter,
@@ -173,22 +174,36 @@ public class EventService(
     public async Task JoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
+
         if (eventEntity == null)
             throw new KeyNotFoundException($"Event {eventId} not found");
 
-        if (eventEntity.Date < DateTime.UtcNow)
+        if (eventEntity.Date < DateTime.Now)
             throw new InvalidOperationException("Cannot join an event that has already ended.");
 
         if (eventEntity.OrganizerId == userId)
             throw new InvalidOperationException("You cannot join your own event as a guest.");
 
-        if (eventEntity.Venue != null && eventEntity.Venue.Capacity > 0 &&
+        if (eventEntity.Venue is { Capacity: > 0 } &&
             eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
             throw new InvalidOperationException("Sorry, this event is fully booked.");
 
-        var isAlreadyJoined = await eventRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);
-        if (isAlreadyJoined)
+        var user = await identityService.GetUserByIdAsync(userId);
+        if (user == null) throw new KeyNotFoundException("User not found.");
+
+        if (eventEntity.Guests.Any(g => g.Email.Equals(user.Email, StringComparison.OrdinalIgnoreCase)))
             throw new InvalidOperationException("You are already registered for this event.");
+
+        if (!string.IsNullOrEmpty(user.PhoneNumber))
+        {
+            var isPhoneTaken = eventEntity.Guests.Any(g =>
+                !string.IsNullOrEmpty(g.PhoneNumber) &&
+                g.PhoneNumber == user.PhoneNumber);
+
+            if (isPhoneTaken)
+                throw new InvalidOperationException(
+                    "A participant with this phone number is already joined to this event.");
+        }
 
         await eventRepository.AddGuestAsync(eventId, userId, cancellationToken);
     }

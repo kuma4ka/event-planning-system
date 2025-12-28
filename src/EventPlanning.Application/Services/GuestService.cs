@@ -24,8 +24,11 @@ public class GuestService(
         if (eventEntity == null) throw new KeyNotFoundException("Event not found");
         if (eventEntity.OrganizerId != userId) throw new UnauthorizedAccessException("Not your event");
 
-        var guest = CreateGuestEntity(dto);
+        if (eventEntity.Guests.Any(g => g.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException(
+                $"Guest with email '{dto.Email}' is already registered for this event.");
 
+        var guest = CreateGuestEntity(dto);
         await guestRepository.AddAsync(guest, cancellationToken);
     }
 
@@ -45,9 +48,24 @@ public class GuestService(
         if (eventEntity.Date < DateTime.Now)
             throw new InvalidOperationException("Cannot add guests to an event that has already ended.");
 
-        if (eventEntity.Venue != null && eventEntity.Venue.Capacity > 0 &&
+        if (eventEntity.Venue is { Capacity: > 0 } &&
             eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
             throw new InvalidOperationException("Venue is fully booked.");
+
+        if (eventEntity.Guests.Any(g => g.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException($"Guest with email '{dto.Email}' is already added to this event.");
+
+        var fullPhoneNumber = dto.CountryCode + dto.PhoneNumber;
+        if (!string.IsNullOrEmpty(dto.PhoneNumber))
+        {
+            var phoneExists = eventEntity.Guests.Any(g => g.PhoneNumber == fullPhoneNumber);
+            if (phoneExists)
+            {
+                var displayPhone = fullPhoneNumber.StartsWith("+") ? fullPhoneNumber : $"+{fullPhoneNumber}";
+                throw new InvalidOperationException(
+                    $"Guest with phone number {displayPhone} is already added to this event.");
+            }
+        }
 
         var guest = CreateGuestEntity(dto);
 
@@ -63,22 +81,41 @@ public class GuestService(
         var guest = await guestRepository.GetByIdAsync(dto.Id, cancellationToken);
         if (guest == null) throw new KeyNotFoundException($"Guest with ID {dto.Id} not found.");
 
-        if (guest.Event == null)
-        {
-            var eventEntity = await eventRepository.GetByIdAsync(guest.EventId, cancellationToken);
-            if (eventEntity == null || eventEntity.OrganizerId != currentUserId)
-                throw new UnauthorizedAccessException("Not your event. Only the organizer can update guests.");
-        }
-        else if (guest.Event.OrganizerId != currentUserId)
-        {
+        var eventEntity = guest.Event ?? await eventRepository.GetByIdAsync(guest.EventId, cancellationToken);
+        if (eventEntity == null) throw new KeyNotFoundException("Event not found.");
+
+        if (eventEntity.OrganizerId != currentUserId)
             throw new UnauthorizedAccessException("Not your event. Only the organizer can update guests.");
+
+        if (!guest.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase))
+        {
+            var emailTaken = eventEntity.Guests.Any(g =>
+                g.Id != guest.Id &&
+                g.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase));
+
+            if (emailTaken)
+                throw new InvalidOperationException(
+                    $"Another guest with email '{dto.Email}' already exists in this event.");
+        }
+
+        var newFullPhone = dto.CountryCode + dto.PhoneNumber;
+        if (guest.PhoneNumber != newFullPhone && !string.IsNullOrEmpty(dto.PhoneNumber))
+        {
+            var phoneTaken = eventEntity.Guests.Any(g =>
+                g.Id != guest.Id &&
+                g.PhoneNumber == newFullPhone);
+
+            if (phoneTaken)
+            {
+                var displayPhone = newFullPhone.StartsWith("+") ? newFullPhone : $"+{newFullPhone}";
+                throw new InvalidOperationException($"Another guest with phone number {displayPhone} already exists.");
+            }
         }
 
         guest.FirstName = dto.FirstName;
         guest.LastName = dto.LastName;
         guest.Email = dto.Email;
-
-        guest.PhoneNumber = dto.CountryCode + dto.PhoneNumber;
+        guest.PhoneNumber = newFullPhone;
 
         await guestRepository.UpdateAsync(guest, cancellationToken);
     }
