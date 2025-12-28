@@ -1,7 +1,11 @@
 using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Interfaces;
+using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
+using EventPlanning.Web.Extensions;
+using EventPlanning.Web.Models;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,26 +31,66 @@ public class HomeController(
     {
         var userId = userManager.GetUserId(User) ?? string.Empty;
 
-        var effectiveFromDate = (from.HasValue && from.Value > DateTime.UtcNow) ? from.Value : DateTime.UtcNow;
+        var now = DateTime.Now;
+
+        DateTime effectiveFromDate;
+
+        if (!from.HasValue)
+        {
+            effectiveFromDate = now;
+        }
+        else
+        {
+            if (from.Value.Date < now.Date)
+                effectiveFromDate = now;
+            else if (from.Value.Date == now.Date)
+                effectiveFromDate = now;
+            else
+                effectiveFromDate = from.Value.Date;
+        }
+
+        var adjustedToDate = to?.Date.AddDays(1).AddTicks(-1);
 
         var searchDto = new EventSearchDto
         {
             SearchTerm = searchTerm,
             Type = type,
             FromDate = effectiveFromDate,
-            ToDate = to,
+            ToDate = adjustedToDate,
             PageNumber = page,
             PageSize = 9
         };
 
-        var result = await eventService.GetEventsAsync(userId, null, searchDto, null, cancellationToken);
+        PagedResult<EventDto> result;
 
-        ViewBag.CurrentSearch = searchTerm;
-        ViewBag.CurrentType = type;
-        ViewBag.CurrentFrom = from?.ToString("yyyy-MM-dd"); 
-        ViewBag.CurrentTo = to?.ToString("yyyy-MM-dd");
+        try
+        {
+            result = await eventService.GetEventsAsync(userId, null, searchDto, null, cancellationToken);
+        }
+        catch (ValidationException ex)
+        {
+            foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
 
-        return View(result);
+            result = new PagedResult<EventDto>(new List<EventDto>(), 0, 1, 9);
+        }
+
+        var viewModel = new HomeIndexViewModel
+        {
+            Events = result,
+
+            SearchTerm = searchTerm,
+            Type = type,
+            From = from,
+            To = to,
+
+            TypeOptions = type.ToSelectList("All Categories"),
+
+            MinDate = now.ToString("yyyy-MM-dd"),
+
+            HasFilters = !string.IsNullOrEmpty(searchTerm) || type.HasValue || from.HasValue || to.HasValue
+        };
+
+        return View(viewModel);
     }
 
     [HttpGet("privacy")]
@@ -55,7 +99,7 @@ public class HomeController(
     {
         return View();
     }
-    
+
     [HttpGet("error")]
     [AllowAnonymous]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

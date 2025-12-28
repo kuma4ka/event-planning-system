@@ -1,33 +1,7 @@
-﻿@using EventPlanning.Application.Models
-@using EventPlanning.Domain.Enums
-@using System.ComponentModel.DataAnnotations
-@using System.Reflection
-@model PagedResult<EventDto>
+﻿@model HomeIndexViewModel
 
 @{
     ViewData["Title"] = "Find Events";
-
-    var eventTypes = Enum.GetValues<EventType>().Select(e =>
-    {
-        var field = e.GetType().GetField(e.ToString());
-        var attribute = field?.GetCustomAttribute<DisplayAttribute>();
-        return new SelectListItem
-        {
-            Value = e.ToString(),
-            Text = attribute?.Name ?? e.ToString(),
-            Selected = Context.Request.Query["type"] == e.ToString()
-        };
-    });
-
-    var currentSearch = Context.Request.Query["searchTerm"];
-    var currentFrom = Context.Request.Query["from"];
-    var currentTo = Context.Request.Query["to"];
-    var currentType = Context.Request.Query["type"];
-
-    var hasFilters = !string.IsNullOrEmpty(currentSearch)
-                     || !string.IsNullOrEmpty(currentType)
-                     || !string.IsNullOrEmpty(currentFrom)
-                     || !string.IsNullOrEmpty(currentTo);
 }
 
 <div class="container">
@@ -69,10 +43,9 @@
 <div class="container mb-5" id="events-grid">
     <form method="get" asp-action="Index" class="filter-floating-card">
         <div class="card-body p-2">
-            <input type="hidden" name="searchTerm" value="@currentSearch"/>
+            <input type="hidden" name="searchTerm" value="@Model.SearchTerm"/>
 
             <div class="row g-2 align-items-center">
-
                 <div class="col-auto d-none d-lg-block px-3 border-end">
                     <span class="text-muted fw-bold small text-uppercase"
                           style="font-size: 0.75rem; letter-spacing: 1px;">
@@ -81,9 +54,9 @@
                 </div>
 
                 <div class="col-12 col-md-3">
-                    <select name="type" class="form-select border-0 bg-light fw-medium" asp-items="eventTypes"
+                    <select name="type" class="form-select border-0 bg-light fw-medium"
+                            asp-items="Model.TypeOptions"
                             style="cursor: pointer;" onchange="this.form.submit()">
-                        <option value="">All Categories</option>
                     </select>
                 </div>
 
@@ -92,21 +65,48 @@
                         <span class="input-group-text bg-white border-0 text-muted ps-3"><i
                                 class="bi bi-calendar-event"></i></span>
                         <input type="date" name="from" class="form-control border-0 text-muted"
-                               value="@currentFrom" title="From Date" onchange="this.form.submit()">
+                               value="@Model.From?.ToString("yyyy-MM-dd")"
+                               min="@Model.MinDate"
+                               title="From Date" onchange="this.form.submit()">
                     </div>
                 </div>
 
-                <div class="col-6 col-md-3">
+                <div class="col-6 col-md-3 position-relative">
+                    @{
+                        var toDateErrors = ViewData.ModelState["ToDate"]?.Errors;
+                        var hasToDateErrors = toDateErrors is { Count: > 0 };
+                    }
+
                     <div class="input-group">
                         <span class="input-group-text bg-white border-0 text-muted ps-3"><i
                                 class="bi bi-arrow-right"></i></span>
-                        <input type="date" name="to" class="form-control border-0 text-muted"
-                               value="@currentTo" title="To Date" onchange="this.form.submit()">
+                        <input type="date" name="to"
+                               class="form-control border-0 text-muted @(hasToDateErrors ? "is-invalid" : "")"
+                               value="@Model.To?.ToString("yyyy-MM-dd")"
+                               min="@Model.MinDate"
+                               title="To Date" onchange="this.form.submit()">
                     </div>
+
+                    @if (hasToDateErrors)
+                    {
+                        <div
+                            class="position-absolute start-0 top-100 mt-2 p-2 rounded shadow-lg bg-white border-start border-4 border-danger"
+                            style="z-index: 1050; min-width: 100%; width: max-content; max-width: 250px;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-exclamation-circle-fill text-danger me-2 fs-5"></i>
+                                <span class="text-dark fw-bold" style="font-size: 0.8rem; line-height: 1.2;">
+                                    @toDateErrors![0].ErrorMessage
+                                </span>
+                            </div>
+                            <div class="position-absolute top-0 start-50 translate-middle-x"
+                                 style="width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid white; margin-top: -6px;">
+                            </div>
+                        </div>
+                    }
                 </div>
 
                 <div class="col-12 col-md text-end">
-                    @if (hasFilters)
+                    @if (Model.HasFilters)
                     {
                         <a asp-action="Index" class="btn btn-link text-danger text-decoration-none fw-bold small">
                             <i class="bi bi-x-circle me-1"></i> Clear
@@ -122,7 +122,7 @@
         </div>
     </form>
 
-    @if (!Model.Items.Any())
+    @if (!Model.Events.Items.Any())
     {
         <div class="text-center py-5">
             <div class="mb-3">
@@ -140,21 +140,22 @@
                 Events</h4>
             <span class="badge bg-white text-dark border shadow-sm px-3 py-2"
                   style="border-radius: 8px !important; color: var(--color-dark-teal) !important;">
-                    @Model.TotalCount results
+                    @Model.Events.TotalCount results
             </span>
         </div>
 
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
-            @foreach (var item in Model.Items)
+            @foreach (var item in Model.Events.Items)
             {
+                var currentItem = item;
                 <div class="col">
                     <div class="card h-100 shadow-sm hover-effect transition-transform border-0 bg-white">
                         <div class="position-relative"
                              style="height: 220px; overflow: hidden; background-color: #f0f2f5;">
-                            @if (!string.IsNullOrEmpty(item.VenueImageUrl))
+                            @if (!string.IsNullOrEmpty(currentItem.VenueImageUrl))
                             {
-                                <img src="@item.VenueImageUrl" class="card-img-top w-100 h-100"
-                                     style="object-fit: cover;" alt="@item.Name">
+                                <img src="@currentItem.VenueImageUrl" class="card-img-top w-100 h-100"
+                                     style="object-fit: cover;" alt="@currentItem.Name">
                             }
                             else
                             {
@@ -165,31 +166,31 @@
                             }
 
                             <span class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm">
-                                @item.Type
+                                @currentItem.Type
                             </span>
                         </div>
 
                         <div class="card-body d-flex flex-column p-4">
                             <div class="text-uppercase fw-bold small mb-2"
-                                 style="color: var(--color-air-force-blue); letter-spacing: 0.5px;">
-                                <i class="bi bi-calendar3 me-1"></i> @item.Date.ToString("MMM dd, yyyy • HH:mm")
+                                 style="color: var(--color-air-force-blue); letter-spacing: 1px;">
+                                <i class="bi bi-calendar3 me-1"></i> @currentItem.Date.ToString("MMM dd, yyyy • HH:mm")
                             </div>
 
                             <h5 class="card-title fw-bold mb-2 fs-5">
-                                <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id"
+                                <a asp-controller="Event" asp-action="Details" asp-route-id="@currentItem.Id"
                                    class="text-decoration-none text-dark stretched-link">
-                                    @item.Name
+                                    @currentItem.Name
                                 </a>
                             </h5>
 
                             <p class="card-text text-muted small mb-3 flex-grow-1" style="line-height: 1.6;">
-                                @(item.Description?.Length > 100 ? item.Description.Substring(0, 97) + "..." : item.Description)
+                                @(currentItem.Description.Length > 100 ? currentItem.Description.Substring(0, 97) + "..." : currentItem.Description)
                             </p>
 
                             <div class="d-flex align-items-center text-muted small pt-3 border-top mt-auto"
                                  style="border-color: #f0f2f5 !important;">
                                 <i class="bi bi-geo-alt-fill me-2 text-danger"></i>
-                                <span class="text-truncate">@item.VenueName</span>
+                                <span class="text-truncate">@currentItem.VenueName</span>
                             </div>
                         </div>
                     </div>
@@ -197,73 +198,48 @@
             }
         </div>
 
-        @if (Model.TotalPages > 1)
+        @if (Model.Events.TotalPages > 1)
         {
             <nav aria-label="Page navigation" class="mt-5">
                 <ul class="pagination justify-content-center">
-                    <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                        @if (Model.PageNumber > 1)
-                        {
-                            <a class="page-link" asp-action="Index"
-                               asp-route-page="@(Model.PageNumber - 1)"
-                               asp-route-searchTerm="@currentSearch"
-                               asp-route-type="@currentType"
-                               asp-route-from="@currentFrom"
-                               asp-route-to="@currentTo"
-                               aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                                <span class="ms-1">Previous</span>
-                            </a>
-                        }
-                        else
-                        {
-                            <span class="page-link">
-                                <span aria-hidden="true">&laquo;</span>
-                                <span class="ms-1">Previous</span>
-                            </span>
-                        }
+                    <li class="page-item @(Model.Events.PageNumber == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@(Model.Events.PageNumber - 1)"
+                           asp-route-searchTerm="@Model.SearchTerm"
+                           asp-route-type="@Model.Type"
+                           asp-route-from="@Model.From?.ToString("yyyy-MM-dd")"
+                           asp-route-to="@Model.To?.ToString("yyyy-MM-dd")"
+                           aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="ms-1">Previous</span>
+                        </a>
                     </li>
 
-                    @for (var i = 1; i <= Model.TotalPages; i++)
+                    @for (var i = 1; i <= Model.Events.TotalPages; i++)
                     {
-                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                            @if (i == Model.PageNumber)
-                            {
-                                <span class="page-link">@i</span>
-                            }
-                            else
-                            {
-                                <a class="page-link" asp-action="Index"
-                                   asp-route-page="@i"
-                                   asp-route-searchTerm="@currentSearch"
-                                   asp-route-type="@currentType"
-                                   asp-route-from="@currentFrom"
-                                   asp-route-to="@currentTo">@i</a>
-                            }
+                        // Fix 199/203: Локальна копія змінної циклу
+                        var pageNumber = i;
+                        <li class="page-item @(pageNumber == Model.Events.PageNumber ? "active" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@pageNumber"
+                               asp-route-searchTerm="@Model.SearchTerm"
+                               asp-route-type="@Model.Type"
+                               asp-route-from="@Model.From?.ToString("yyyy-MM-dd")"
+                               asp-route-to="@Model.To?.ToString("yyyy-MM-dd")">@pageNumber</a>
                         </li>
                     }
 
-                    <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-                        @if (Model.PageNumber < Model.TotalPages)
-                        {
-                            <a class="page-link" asp-action="Index"
-                               asp-route-page="@(Model.PageNumber + 1)"
-                               asp-route-searchTerm="@currentSearch"
-                               asp-route-type="@currentType"
-                               asp-route-from="@currentFrom"
-                               asp-route-to="@currentTo"
-                               aria-label="Next">
-                                <span class="me-1">Next</span>
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        }
-                        else
-                        {
-                            <span class="page-link">
-                                <span class="me-1">Next</span>
-                                <span aria-hidden="true">&raquo;</span>
-                            </span>
-                        }
+                    <li class="page-item @(Model.Events.PageNumber == Model.Events.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@(Model.Events.PageNumber + 1)"
+                           asp-route-searchTerm="@Model.SearchTerm"
+                           asp-route-type="@Model.Type"
+                           asp-route-from="@Model.From?.ToString("yyyy-MM-dd")"
+                           asp-route-to="@Model.To?.ToString("yyyy-MM-dd")"
+                           aria-label="Next">
+                            <span class="me-1">Next</span>
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
                     </li>
                 </ul>
             </nav>
