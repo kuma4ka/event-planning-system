@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using EventPlanning.Domain.Interfaces;
 using EventPlanning.Infrastructure.Repositories;
 using EventPlanning.Infrastructure.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace EventPlanning.Infrastructure;
 
@@ -20,6 +21,8 @@ public static class DependencyInjection
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
 
+        services.AddMemoryCache();
+
         services.AddIdentity<User, IdentityRole>(options => 
             {
                 options.SignIn.RequireConfirmedAccount = false;
@@ -31,6 +34,20 @@ public static class DependencyInjection
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
+
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = "/Account/Login";
+            options.LogoutPath = "/Account/Logout";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+            
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SameSite = SameSiteMode.Lax;
+
+            options.ExpireTimeSpan = TimeSpan.FromDays(30);
+            options.SlidingExpiration = true;
+        });
         
         services.AddScoped<IEventRepository, EventRepository>();
         services.AddScoped<IVenueRepository, VenueRepository>();
