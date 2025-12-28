@@ -30,13 +30,26 @@ public class HomeController(
         CancellationToken cancellationToken = default)
     {
         var userId = userManager.GetUserId(User) ?? string.Empty;
-        var now = DateTime.UtcNow;
 
-        var effectiveFromDate = (from.HasValue && from.Value > now) ? from.Value : now;
+        var now = DateTime.Now;
 
-        DateTime? adjustedToDate = to.HasValue 
-            ? to.Value.Date.AddDays(1).AddTicks(-1) 
-            : null;
+        DateTime effectiveFromDate;
+
+        if (!from.HasValue)
+        {
+            effectiveFromDate = now;
+        }
+        else
+        {
+            if (from.Value.Date < now.Date)
+                effectiveFromDate = now;
+            else if (from.Value.Date == now.Date)
+                effectiveFromDate = now;
+            else
+                effectiveFromDate = from.Value.Date;
+        }
+
+        var adjustedToDate = to?.Date.AddDays(1).AddTicks(-1);
 
         var searchDto = new EventSearchDto
         {
@@ -56,10 +69,7 @@ public class HomeController(
         }
         catch (ValidationException ex)
         {
-            foreach (var error in ex.Errors)
-            {
-                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            }
+            foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
 
             result = new PagedResult<EventDto>(new List<EventDto>(), 0, 1, 9);
         }
@@ -67,14 +77,16 @@ public class HomeController(
         var viewModel = new HomeIndexViewModel
         {
             Events = result,
-            
+
             SearchTerm = searchTerm,
             Type = type,
             From = from,
             To = to,
 
             TypeOptions = type.ToSelectList("All Categories"),
+
             MinDate = now.ToString("yyyy-MM-dd"),
+
             HasFilters = !string.IsNullOrEmpty(searchTerm) || type.HasValue || from.HasValue || to.HasValue
         };
 
@@ -87,7 +99,7 @@ public class HomeController(
     {
         return View();
     }
-    
+
     [HttpGet("error")]
     [AllowAnonymous]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
