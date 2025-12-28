@@ -42,7 +42,6 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
     {
         await context.Events.AddAsync(eventEntity, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
-
         return eventEntity.Id;
     }
 
@@ -75,12 +74,12 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .AsNoTracking()
             .AsQueryable();
 
-        if (!string.IsNullOrEmpty(viewerId))
-            query = query.Where(e => !e.IsPrivate || e.OrganizerId == viewerId);
-        else
-            query = query.Where(e => !e.IsPrivate);
+        query = !string.IsNullOrEmpty(viewerId)
+            ? query.Where(e => !e.IsPrivate || e.OrganizerId == viewerId)
+            : query.Where(e => !e.IsPrivate);
 
-        if (!string.IsNullOrEmpty(organizerId)) query = query.Where(e => e.OrganizerId == organizerId);
+        if (!string.IsNullOrEmpty(organizerId))
+            query = query.Where(e => e.OrganizerId == organizerId);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
             query = query.Where(e =>
@@ -104,7 +103,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
 
     public async Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
-        var user = await context.Users.FindAsync(new object[] { userId }, cancellationToken);
+        var user = await context.Users.FindAsync([userId], cancellationToken);
         if (user == null || string.IsNullOrEmpty(user.Email)) return false;
 
         return await context.Guests
@@ -113,22 +112,17 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
 
     public async Task AddGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
-        var user = await context.Users.FindAsync(new object[] { userId }, cancellationToken);
+        var user = await context.Users.FindAsync([userId], cancellationToken);
         if (user == null) throw new KeyNotFoundException("User not found");
-
-        if (string.IsNullOrEmpty(user.Email))
-            throw new InvalidOperationException("User does not have an email address.");
+        if (string.IsNullOrEmpty(user.Email)) throw new InvalidOperationException("User has no email");
 
         var guest = new Guest
         {
             Id = Guid.NewGuid().ToString(),
-
             EventId = eventId,
-            FirstName = user.FirstName ?? "Unknown",
-            LastName = user.LastName ?? "User",
-
+            FirstName = user.FirstName,
+            LastName = user.LastName,
             Email = user.Email,
-
             PhoneNumber = user.PhoneNumber
         };
 
@@ -138,23 +132,22 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
 
     public async Task RemoveGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
-        var eventEntity = await context.Events
-            .Include(e => e.Guests)
-            .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
+        var user = await context.Users.FindAsync([userId], cancellationToken);
+        if (user == null || string.IsNullOrEmpty(user.Email)) return;
 
-        if (eventEntity == null) return;
+        var guest = await context.Guests
+            .FirstOrDefaultAsync(g => g.EventId == eventId && g.Email == user.Email, cancellationToken);
 
-        var guest = eventEntity.Guests.FirstOrDefault(g => g.Id == userId);
         if (guest != null)
         {
-            eventEntity.Guests.Remove(guest);
+            context.Guests.Remove(guest);
             await context.SaveChangesAsync(cancellationToken);
         }
     }
-    
+
     public async Task<int> CountJoinedEventsAsync(string userId, CancellationToken cancellationToken = default)
     {
-        var user = await context.Users.FindAsync(new object[] { userId }, cancellationToken);
+        var user = await context.Users.FindAsync([userId], cancellationToken);
         if (user == null || string.IsNullOrEmpty(user.Email)) return 0;
 
         return await context.Guests

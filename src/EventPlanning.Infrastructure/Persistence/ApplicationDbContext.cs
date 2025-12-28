@@ -55,13 +55,16 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.HasKey(g => g.Id);
             
             entity.Property(g => g.Email)
-                  .IsRequired()
-                  .HasMaxLength(100);
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.HasIndex(g => new { g.EventId, g.Email })
+                .IsUnique();
 
             entity.HasOne(g => g.Event)
-                  .WithMany(e => e.Guests)
-                  .HasForeignKey(g => g.EventId)
-                  .OnDelete(DeleteBehavior.Cascade);
+                .WithMany(e => e.Guests)
+                .HasForeignKey(g => g.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

@@ -38,6 +38,8 @@ public static class DependencyInjection
         
         services.AddScoped<IImageService, ImageService>();
         
+        services.AddScoped<IIdentityService, IdentityService>();
+        
         return services;
     }
 }

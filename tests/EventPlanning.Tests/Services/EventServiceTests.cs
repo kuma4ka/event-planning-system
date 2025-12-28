@@ -1,4 +1,5 @@
 ﻿using EventPlanning.Application.DTOs.Event;
+using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Services;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
@@ -14,8 +15,7 @@ public class EventServiceTests
 {
     private readonly Mock<IEventRepository> _eventRepoMock;
     private readonly Mock<IValidator<CreateEventDto>> _createValidatorMock;
-    private readonly Mock<IValidator<UpdateEventDto>> _updateValidatorMock;
-    private readonly Mock<IValidator<EventSearchDto>> _searchValidatorMock;
+    private readonly Mock<IIdentityService> _identityServiceMock;
 
     private readonly EventService _service;
 
@@ -23,14 +23,16 @@ public class EventServiceTests
     {
         _eventRepoMock = new Mock<IEventRepository>();
         _createValidatorMock = new Mock<IValidator<CreateEventDto>>();
-        _updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
-        _searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
+        Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
+        Mock<IValidator<EventSearchDto>> searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
+        _identityServiceMock = new Mock<IIdentityService>();
 
         _service = new EventService(
             _eventRepoMock.Object,
             _createValidatorMock.Object,
-            _updateValidatorMock.Object,
-            _searchValidatorMock.Object
+            updateValidatorMock.Object,
+            searchValidatorMock.Object,
+            _identityServiceMock.Object
         );
     }
 
@@ -79,7 +81,7 @@ public class EventServiceTests
         var userId = "user-1";
         var dto = new CreateEventDto("", "", DateTime.Now, EventType.Conference, 0);
 
-        var validationFailure = new ValidationResult(new[] { new ValidationFailure("Name", "Required") });
+        var validationFailure = new ValidationResult([new ValidationFailure("Name", "Required")]);
 
         _createValidatorMock
             .Setup(v => v.ValidateAsync(dto, It.IsAny<CancellationToken>()))
@@ -92,5 +94,54 @@ public class EventServiceTests
         await act.Should().ThrowAsync<ValidationException>();
 
         _eventRepoMock.Verify(x => x.AddAsync(It.IsAny<Event>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task JoinEventAsync_ShouldThrowInvalidOperation_WhenUserAlreadyJoined()
+    {
+        // Arrange
+        var eventId = 1;
+        var userId = "user-123";
+        var userEmail = "duplicate@test.com";
+
+        var existingGuest = new Guest 
+        { 
+            Email = userEmail,
+            FirstName = "Existing",
+            LastName = "Guest"
+        };
+        
+        var eventEntity = new Event
+        {
+            Id = eventId,
+            OrganizerId = "other-organizer",
+            Date = DateTime.Now.AddDays(5),
+            Guests = new List<Guest> { existingGuest }
+        };
+
+        var user = new User 
+        { 
+            Id = userId, 
+            Email = userEmail,
+            FirstName = "Test", // Додано
+            LastName = "User"   // Додано
+        };
+
+        _eventRepoMock
+            .Setup(r => r.GetByIdAsync(eventId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(eventEntity);
+
+        _identityServiceMock
+            .Setup(s => s.GetUserByIdAsync(userId))
+            .ReturnsAsync(user);
+
+        // Act
+        Func<Task> act = async () => await _service.JoinEventAsync(eventId, userId);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("You are already registered for this event.");
+            
+        _eventRepoMock.Verify(x => x.AddGuestAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }
