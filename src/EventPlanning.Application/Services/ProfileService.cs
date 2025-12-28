@@ -4,7 +4,9 @@ using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventPlanning.Application.Services;
 
@@ -48,17 +50,34 @@ public class ProfileService(
         var user = await userManager.FindByIdAsync(userId);
         if (user == null) throw new KeyNotFoundException("User not found");
 
+        var newFullPhoneNumber = string.IsNullOrEmpty(dto.PhoneNumber) 
+            ? null 
+            : $"{dto.CountryCode}{dto.PhoneNumber}";
+
+        if (newFullPhoneNumber != user.PhoneNumber && !string.IsNullOrEmpty(newFullPhoneNumber))
+        {
+            var isPhoneTaken = await userManager.Users
+                .AnyAsync(u => u.PhoneNumber == newFullPhoneNumber && u.Id != userId, cancellationToken);
+
+            if (isPhoneTaken)
+            {
+                throw new ValidationException([
+                    new ValidationFailure("PhoneNumber", "This phone number is already linked to another account.")
+                ]);
+            }
+        }
+
         user.FirstName = dto.FirstName;
         user.LastName = dto.LastName;
-
-        user.PhoneNumber = string.IsNullOrEmpty(dto.PhoneNumber) ? null : $"{dto.CountryCode}{dto.PhoneNumber}";
+        
+        user.PhoneNumber = newFullPhoneNumber;
 
         var result = await userManager.UpdateAsync(user);
 
         if (!result.Succeeded)
         {
             var errors = result.Errors.Select(e =>
-                new FluentValidation.Results.ValidationFailure(string.Empty, e.Description));
+                new ValidationFailure(string.Empty, e.Description));
             throw new ValidationException(errors);
         }
     }
@@ -78,7 +97,7 @@ public class ProfileService(
         if (!result.Succeeded)
         {
             var errors = result.Errors.Select(e =>
-                new FluentValidation.Results.ValidationFailure(string.Empty, e.Description));
+                new ValidationFailure(string.Empty, e.Description));
             throw new ValidationException(errors);
         }
     }
