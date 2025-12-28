@@ -15,7 +15,8 @@ public record EventDetailsDto(
     string OrganizerId,
     string VenueName,
     int? VenueId,
-    string? VenueImageUrl
+    string? VenueImageUrl,
+    string? VenueAddress
 ) : EventDto(Id, Name, Description, Date, Type, OrganizerId, VenueName, VenueId, VenueImageUrl)
 {
     public bool IsOrganizer { get; set; }

@@ -15,24 +15,30 @@ namespace EventPlanning.Web.Controllers;
 public class EventController(
     IEventService eventService,
     IVenueService venueService,
-    UserManager<User> userManager) : Controller
+    UserManager<User> userManager,
+    IConfiguration configuration) : Controller
 {
     [HttpGet("details/{id:int}")]
     [AllowAnonymous]
     public async Task<IActionResult> Details(int id, CancellationToken cancellationToken)
     {
-        var eventDetails = await eventService.GetEventDetailsAsync(id, cancellationToken);
-        if (eventDetails == null) return NotFound();
+        var sourceDetails = await eventService.GetEventDetailsAsync(id, cancellationToken);
+        if (sourceDetails == null) return NotFound();
 
         var userId = userManager.GetUserId(User);
 
-        eventDetails.IsOrganizer = userId != null && eventDetails.OrganizerId == userId;
-        eventDetails.IsJoined = userId != null && await eventService.IsUserJoinedAsync(id, userId, cancellationToken);
+        var eventDetails = sourceDetails with
+        {
+            IsOrganizer = userId != null && sourceDetails.OrganizerId == userId,
+            IsJoined = userId != null && await eventService.IsUserJoinedAsync(id, userId, cancellationToken)
+        };
 
         var organizer = await userManager.FindByIdAsync(eventDetails.OrganizerId);
         ViewBag.OrganizerName = organizer != null ? $"{organizer.FirstName} {organizer.LastName}" : "Unknown Organizer";
         ViewBag.OrganizerEmail = organizer?.Email ?? "";
 
+        ViewBag.GoogleMapsApiKey = configuration["GoogleMaps:ApiKey"];
+        
         return View(eventDetails);
     }
 
@@ -166,6 +172,25 @@ public class EventController(
         return RedirectToAction(nameof(Details), new { id });
     }
 
+    [HttpPost("leave/{id:int}")]
+    public async Task<IActionResult> Leave(int id, CancellationToken cancellationToken)
+    {
+        var userId = userManager.GetUserId(User);
+        if (userId == null) return RedirectToAction("Login", "Account");
+
+        try
+        {
+            await eventService.LeaveEventAsync(id, userId, cancellationToken);
+            TempData["SuccessMessage"] = "You have left the event.";
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
     [HttpGet("my-events")]
     public async Task<IActionResult> MyEvents(
         string? searchTerm,
@@ -178,19 +203,16 @@ public class EventController(
         CancellationToken cancellationToken = default)
     {
         var userId = userManager.GetUserId(User);
-
         var now = DateTime.Now;
 
         if (viewType == "past")
         {
             to ??= now;
-
             if (string.IsNullOrEmpty(sortOrder)) sortOrder = "date_desc";
         }
         else
         {
             from ??= now;
-
             if (string.IsNullOrEmpty(sortOrder)) sortOrder = "date_asc";
         }
 
