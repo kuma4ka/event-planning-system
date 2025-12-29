@@ -131,4 +131,103 @@ public class EventServiceTests
 
         _eventRepoMock.Verify(x => x.TryJoinEventAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
+
+    [Fact]
+    public async Task GetEventDetailsAsync_ShouldMaskData_WhenUserIsNotOrganizer()
+    {
+        // Arrange
+        var eventId = 1;
+        var organizerId = "user-1";
+        var currentUserId = "user-2";
+
+        var guest = new Guest
+        {
+            Id = "g1",
+            FirstName = "Test",
+            LastName = "Guest",
+            Email = "guest@test.com",
+            PhoneNumber = "1234567890"
+        };
+
+        var eventEntity = new Event
+        {
+            Id = eventId,
+            OrganizerId = organizerId,
+            Guests = new List<Guest> { guest }
+        };
+
+        _eventRepoMock
+            .Setup(r => r.GetDetailsByIdAsync(eventId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(eventEntity);
+
+        SetupHttpContextUser(currentUserId);
+
+        // Act
+        var result = await _service.GetEventDetailsAsync(eventId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Guests.Should().ContainSingle();
+        var guestDto = result.Guests.First();
+
+        guestDto.Email.Should().Be("REDACTED");
+        guestDto.PhoneNumber.Should().BeEmpty();
+        guestDto.CountryCode.Should().BeEmpty();
+        guestDto.FirstName.Should().Be("Test"); // Name should remain visible
+    }
+
+    [Fact]
+    public async Task GetEventDetailsAsync_ShouldShowData_WhenUserIsOrganizer()
+    {
+        // Arrange
+        var eventId = 1;
+        var organizerId = "user-1";
+        var currentUserId = "user-1"; // Is Organizer
+
+        var guest = new Guest
+        {
+            Id = "g1",
+            FirstName = "Test",
+            LastName = "Guest",
+            Email = "guest@test.com",
+            PhoneNumber = "+1234567890"
+        };
+
+        var eventEntity = new Event
+        {
+            Id = eventId,
+            OrganizerId = organizerId,
+            Guests = new List<Guest> { guest }
+        };
+
+        _eventRepoMock
+            .Setup(r => r.GetDetailsByIdAsync(eventId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(eventEntity);
+
+        SetupHttpContextUser(currentUserId);
+
+        // Act
+        var result = await _service.GetEventDetailsAsync(eventId);
+
+        // Assert
+        result.Should().NotBeNull();
+        var guestDto = result.Guests.First();
+
+        guestDto.Email.Should().Be("guest@test.com");
+        guestDto.PhoneNumber.Should().Be("234567890"); // Parsed local number
+        guestDto.CountryCode.Should().Be("+1"); // Parsed Code
+    }
+
+    private void SetupHttpContextUser(string userId)
+    {
+        var claims = new List<System.Security.Claims.Claim>
+        {
+            new(System.Security.Claims.ClaimTypes.NameIdentifier, userId)
+        };
+        var identity = new System.Security.Claims.ClaimsIdentity(claims, "TestAuth");
+        var claimsPrincipal = new System.Security.Claims.ClaimsPrincipal(identity);
+
+        var httpContext = new DefaultHttpContext { User = claimsPrincipal };
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+    }
 }

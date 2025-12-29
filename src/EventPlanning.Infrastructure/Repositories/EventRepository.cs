@@ -14,8 +14,51 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
     {
         return await context.Events
             .Include(e => e.Venue)
+            // .Include(e => e.Guests) // Removed for performance (lazy loading split)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    }
+
+    public async Task<Event?> GetDetailsByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await context.Events
+            .Include(e => e.Venue)
             .Include(e => e.Guests)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    }
+
+    public async Task<int> CountGuestsAsync(int eventId, CancellationToken cancellationToken = default)
+    {
+        return await context.Guests
+           .AsNoTracking()
+           .CountAsync(g => g.EventId == eventId, cancellationToken);
+    }
+
+    public async Task<bool> GuestEmailExistsAsync(int eventId, string email, string? excludeGuestId = null, CancellationToken cancellationToken = default)
+    {
+        var query = context.Guests
+            .AsNoTracking()
+            .Where(g => g.EventId == eventId && g.Email == email);
+
+        if (!string.IsNullOrEmpty(excludeGuestId))
+        {
+            query = query.Where(g => g.Id != excludeGuestId);
+        }
+
+        return await query.AnyAsync(cancellationToken);
+    }
+
+    public async Task<bool> GuestPhoneExistsAsync(int eventId, string phoneNumber, string? excludeGuestId = null, CancellationToken cancellationToken = default)
+    {
+        var query = context.Guests
+            .AsNoTracking()
+            .Where(g => g.EventId == eventId && g.PhoneNumber == phoneNumber);
+
+        if (!string.IsNullOrEmpty(excludeGuestId))
+        {
+            query = query.Where(g => g.Id != excludeGuestId);
+        }
+
+        return await query.AnyAsync(cancellationToken);
     }
 
     public async Task<List<Event>> GetAllAsync(CancellationToken cancellationToken = default)

@@ -90,7 +90,7 @@ public class EventService(
             return cachedEvent;
         }
 
-        var eventEntity = await eventRepository.GetByIdAsync(id, cancellationToken);
+        var eventEntity = await eventRepository.GetDetailsByIdAsync(id, cancellationToken);
         if (eventEntity == null) return null;
 
         var userId = httpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
