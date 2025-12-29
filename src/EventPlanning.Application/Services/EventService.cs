@@ -83,17 +83,30 @@ public class EventService(
 
     public async Task<EventDetailsDto?> GetEventDetailsAsync(int id, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"{EventCacheKeyPrefix}{id}";
+        var userId = httpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-        if (cache.TryGetValue(cacheKey, out EventDetailsDto? cachedEvent))
+        var publicCacheKey = $"{EventCacheKeyPrefix}{id}_public";
+        var organizerCacheKey = $"{EventCacheKeyPrefix}{id}_organizer";
+
+        if (cache.TryGetValue(publicCacheKey, out EventDetailsDto? publicCachedEvent) && publicCachedEvent != null)
         {
-            return cachedEvent;
+            if (publicCachedEvent.OrganizerId != userId)
+            {
+                return publicCachedEvent;
+            }
+        }
+
+        if (cache.TryGetValue(organizerCacheKey, out EventDetailsDto? organizerCachedEvent) && organizerCachedEvent != null)
+        {
+            if (organizerCachedEvent.OrganizerId == userId)
+            {
+                return organizerCachedEvent;
+            }
         }
 
         var eventEntity = await eventRepository.GetDetailsByIdAsync(id, cancellationToken);
         if (eventEntity == null) return null;
 
-        var userId = httpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         var isOrganizer = !string.IsNullOrEmpty(userId) && eventEntity.OrganizerId == userId;
 
         var guestsDto = eventEntity.Guests.Select(g =>
@@ -106,8 +119,8 @@ public class EventService(
                     g.FirstName,
                     g.LastName,
                     "REDACTED", // Masked Email
-                    "",         // Masked CountryCode
-                    ""          // Masked Phone
+                    "",   // Masked CountryCode
+                    ""   // Masked Phone
                 );
             }
 
@@ -143,19 +156,20 @@ public class EventService(
             IsJoined = false
         };
 
-        // Cache for shorter duration or based on user role? 
-        // CAUTION: Caching masked data might serve it to the organizer if we are not careful with keys.
-        // For now, let's disable caching OR make key user-specific if we want to support this.
-        // Given the requirement to fix privacy, disabling cache for details is safer 
-        // OR we just execute the mapping after retrieving from cache (which stores raw entity? No, it stores DTO).
-        // Safest quick fix: Use different cache keys for Organizer vs Public.
 
-        // Simplified Logic: Just don't cache for now to ensure correctness, or cache the "Public" version.
-        // Let's rely on the repository cache or assume low traffic for now.
-        // But to better follow the user's "Fix" request, I will remove the cache logic for this DTO 
-        // to avoid serving masked data to organizer or unmasked to others.
 
-        // var cacheOptions = new MemoryCacheEntryOptions()... cache.Set...
+        var cacheOptions = new MemoryCacheEntryOptions()
+            .SetSlidingExpiration(TimeSpan.FromMinutes(10))
+            .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+
+        if (isOrganizer)
+        {
+            cache.Set(organizerCacheKey, eventDetails, cacheOptions);
+        }
+        else
+        {
+            cache.Set(publicCacheKey, eventDetails, cacheOptions);
+        }
 
         return eventDetails;
     }
@@ -191,7 +205,7 @@ public class EventService(
 
         if (eventEntity.OrganizerId != userId) throw new UnauthorizedAccessException("Not your event");
 
-        if (eventEntity.Date < DateTime.Now)
+        if (eventEntity.Date < DateTime.UtcNow)
             throw new InvalidOperationException("Cannot edit an event that has already ended.");
 
         eventEntity.Name = dto.Name;
@@ -223,25 +237,21 @@ public class EventService(
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException($"Event {eventId} not found");
 
-        if (eventEntity.Date < DateTime.Now)
+        if (eventEntity.Date < DateTime.UtcNow)
             throw new InvalidOperationException("Cannot join an event that has already ended.");
 
         if (eventEntity.OrganizerId == userId)
             throw new InvalidOperationException("You cannot join your own event as a guest.");
 
-        // Check if already joined (lightweight check)
         var isJoined = await eventRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);
         if (isJoined)
         {
             throw new InvalidOperationException("You are already registered for this event.");
         }
 
-        // Try to join atomically
         var success = await eventRepository.TryJoinEventAsync(eventId, userId, cancellationToken);
         if (!success)
         {
-            // If failed, it's likely full or a race condition occurred
-            // We can double check capacity for a better error message, but generally:
             throw new InvalidOperationException("Sorry, this event is fully booked or unavailable.");
         }
 
@@ -262,7 +272,8 @@ public class EventService(
 
     private void InvalidateEventCache(int eventId)
     {
-        cache.Remove($"{EventCacheKeyPrefix}{eventId}");
+        cache.Remove($"{EventCacheKeyPrefix}{eventId}_public");
+        cache.Remove($"{EventCacheKeyPrefix}{eventId}_organizer");
     }
 
     private static (string CountryCode, string PhoneNumber) ParsePhoneNumber(string? fullPhoneNumber)

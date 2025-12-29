@@ -1,5 +1,4 @@
 ﻿using EventPlanning.Application.DTOs.Event;
-using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Services;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
@@ -28,7 +27,7 @@ public class EventServiceTests
         Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
         Mock<IValidator<EventSearchDto>> searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        Mock<IMemoryCache> cacheMock = new Mock<IMemoryCache>();
+        IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
 
         _service = new EventService(
             _eventRepoMock.Object,
@@ -36,7 +35,7 @@ public class EventServiceTests
             updateValidatorMock.Object,
             searchValidatorMock.Object,
             _httpContextAccessorMock.Object,
-            cacheMock.Object
+            cache
         );
     }
 
@@ -50,7 +49,7 @@ public class EventServiceTests
         var dto = new CreateEventDto(
             "Test Event",
             "Description",
-            DateTime.Now.AddDays(1),
+            DateTime.UtcNow.AddDays(5),
             EventType.Conference,
             1
         );
@@ -83,7 +82,7 @@ public class EventServiceTests
     {
         // Arrange
         var userId = "user-1";
-        var dto = new CreateEventDto("", "", DateTime.Now, EventType.Conference, 0);
+        var dto = new CreateEventDto("", "", DateTime.UtcNow, EventType.Conference, 0);
 
         var validationFailure = new ValidationResult([new ValidationFailure("Name", "Required")]);
 
@@ -111,7 +110,7 @@ public class EventServiceTests
         {
             Id = eventId,
             OrganizerId = "other-organizer",
-            Date = DateTime.Now.AddDays(5)
+            Date = DateTime.UtcNow.AddDays(5)
         };
 
         _eventRepoMock
