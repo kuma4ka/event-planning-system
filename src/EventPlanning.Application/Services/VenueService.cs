@@ -70,15 +70,14 @@ public class VenueService(
         if (dto.ImageFile != null)
             imageUrl = await imageService.UploadImageAsync(dto.ImageFile, "venues", cancellationToken);
 
-        var venue = new Venue
-        {
-            Name = dto.Name,
-            Address = dto.Address,
-            Capacity = dto.Capacity,
-            Description = dto.Description,
-            ImageUrl = imageUrl,
-            OrganizerId = adminId
-        };
+        var venue = new Venue(
+            dto.Name,
+            dto.Address,
+            dto.Capacity,
+            adminId,
+            dto.Description,
+            imageUrl
+        );
 
         await venueRepository.AddAsync(venue, cancellationToken);
     }
@@ -91,17 +90,22 @@ public class VenueService(
         var venue = await venueRepository.GetByIdAsync(dto.Id, cancellationToken);
         if (venue == null) throw new KeyNotFoundException($"Venue {dto.Id} not found");
 
+        string? newImageUrl = venue.ImageUrl;
+
         if (dto.ImageFile != null)
         {
             if (!string.IsNullOrEmpty(venue.ImageUrl)) imageService.DeleteImage(venue.ImageUrl);
 
-            venue.ImageUrl = await imageService.UploadImageAsync(dto.ImageFile, "venues", cancellationToken);
+            newImageUrl = await imageService.UploadImageAsync(dto.ImageFile, "venues", cancellationToken);
         }
 
-        venue.Name = dto.Name;
-        venue.Address = dto.Address;
-        venue.Capacity = dto.Capacity;
-        venue.Description = dto.Description;
+        venue.UpdateDetails(
+            dto.Name,
+            dto.Address,
+            dto.Capacity,
+            dto.Description,
+            newImageUrl // Pass the new (or existing) ImageUrl
+        );
 
         await venueRepository.UpdateAsync(venue, cancellationToken);
     }
