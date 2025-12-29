@@ -98,7 +98,7 @@
     background-color: var(--bg-surface-glass);
     border-radius: var(--radius-xl);
     border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-strong);
+    box-shadow: var(--shadow-soft);
     position: relative;
     z-index: 30;
     padding: 1rem;
@@ -107,6 +107,7 @@
 
 .filter-floating-card.hero-overlay {
     margin-top: -60px;
+    box-shadow: var(--shadow-strong);
 }
 
 /* Responsive adjustments for Hero */
