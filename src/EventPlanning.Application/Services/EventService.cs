@@ -6,6 +6,7 @@ using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace EventPlanning.Application.Services;
@@ -16,6 +17,7 @@ public class EventService(
     IValidator<UpdateEventDto> updateValidator,
     IValidator<EventSearchDto> searchValidator,
     IIdentityService identityService,
+    IHttpContextAccessor httpContextAccessor,
     IMemoryCache cache) : IEventService
 {
     private const string EventCacheKeyPrefix = "event_details_";
@@ -30,7 +32,7 @@ public class EventService(
         var validationResult = await searchValidator.ValidateAsync(searchDto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-        var fromDate = searchDto.FromDate; 
+        var fromDate = searchDto.FromDate;
 
         var pagedEvents = await eventRepository.GetFilteredAsync(
             organizerIdFilter,
@@ -92,8 +94,24 @@ public class EventService(
         var eventEntity = await eventRepository.GetByIdAsync(id, cancellationToken);
         if (eventEntity == null) return null;
 
+        var userId = httpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var isOrganizer = !string.IsNullOrEmpty(userId) && eventEntity.OrganizerId == userId;
+
         var guestsDto = eventEntity.Guests.Select(g =>
         {
+            // Mask data if not organizer
+            if (!isOrganizer)
+            {
+                return new GuestDto(
+                    g.Id,
+                    g.FirstName,
+                    g.LastName,
+                    "REDACTED", // Masked Email
+                    "",         // Masked CountryCode
+                    ""          // Masked Phone
+                );
+            }
+
             var (countryCode, localNumber) = ParsePhoneNumber(g.PhoneNumber);
 
             return new GuestDto(
@@ -122,16 +140,23 @@ public class EventService(
             eventEntity.Venue?.Address
         )
         {
-            IsOrganizer = false,
+            IsOrganizer = isOrganizer,
             IsJoined = false
         };
 
-        var cacheOptions = new MemoryCacheEntryOptions()
-            .SetAbsoluteExpiration(TimeSpan.FromMinutes(10))
-            .SetSlidingExpiration(TimeSpan.FromMinutes(2))
-            .SetSize(1);
+        // Cache for shorter duration or based on user role? 
+        // CAUTION: Caching masked data might serve it to the organizer if we are not careful with keys.
+        // For now, let's disable caching OR make key user-specific if we want to support this.
+        // Given the requirement to fix privacy, disabling cache for details is safer 
+        // OR we just execute the mapping after retrieving from cache (which stores raw entity? No, it stores DTO).
+        // Safest quick fix: Use different cache keys for Organizer vs Public.
 
-        cache.Set(cacheKey, eventDetails, cacheOptions);
+        // Simplified Logic: Just don't cache for now to ensure correctness, or cache the "Public" version.
+        // Let's rely on the repository cache or assume low traffic for now.
+        // But to better follow the user's "Fix" request, I will remove the cache logic for this DTO 
+        // to avoid serving masked data to organizer or unmasked to others.
+
+        // var cacheOptions = new MemoryCacheEntryOptions()... cache.Set...
 
         return eventDetails;
     }
@@ -177,7 +202,7 @@ public class EventService(
         eventEntity.VenueId = dto.VenueId == 0 ? null : dto.VenueId;
 
         await eventRepository.UpdateAsync(eventEntity, cancellationToken);
-        
+
         InvalidateEventCache(dto.Id);
     }
 
@@ -190,7 +215,7 @@ public class EventService(
             throw new UnauthorizedAccessException("Not your event");
 
         await eventRepository.DeleteAsync(eventEntity, cancellationToken);
-        
+
         InvalidateEventCache(eventId);
     }
 
@@ -221,8 +246,8 @@ public class EventService(
 
         if (!string.IsNullOrEmpty(user.PhoneNumber))
         {
-            var isPhoneTaken = eventEntity.Guests.Any(g => 
-                !string.IsNullOrEmpty(g.PhoneNumber) && 
+            var isPhoneTaken = eventEntity.Guests.Any(g =>
+                !string.IsNullOrEmpty(g.PhoneNumber) &&
                 g.PhoneNumber == user.PhoneNumber);
 
             if (isPhoneTaken)
@@ -231,16 +256,16 @@ public class EventService(
                 throw new InvalidOperationException($"A participant with this phone number {displayPhone} is already joined to this event.");
             }
         }
-        
+
         await eventRepository.AddGuestAsync(eventId, userId, cancellationToken);
-        
+
         InvalidateEventCache(eventId);
     }
 
     public async Task LeaveEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
         await eventRepository.RemoveGuestAsync(eventId, userId, cancellationToken);
-        
+
         InvalidateEventCache(eventId);
     }
 

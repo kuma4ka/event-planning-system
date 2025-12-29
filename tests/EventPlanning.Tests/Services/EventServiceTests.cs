@@ -7,6 +7,7 @@ using EventPlanning.Domain.Interfaces;
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 
@@ -17,6 +18,7 @@ public class EventServiceTests
     private readonly Mock<IEventRepository> _eventRepoMock;
     private readonly Mock<IValidator<CreateEventDto>> _createValidatorMock;
     private readonly Mock<IIdentityService> _identityServiceMock;
+    private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock;
 
     private readonly EventService _service;
 
@@ -27,6 +29,7 @@ public class EventServiceTests
         Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
         Mock<IValidator<EventSearchDto>> searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
         _identityServiceMock = new Mock<IIdentityService>();
+        _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         Mock<IMemoryCache> cacheMock = new Mock<IMemoryCache>();
 
         _service = new EventService(
@@ -35,6 +38,7 @@ public class EventServiceTests
             updateValidatorMock.Object,
             searchValidatorMock.Object,
             _identityServiceMock.Object,
+            _httpContextAccessorMock.Object,
             cacheMock.Object
         );
     }
@@ -50,7 +54,7 @@ public class EventServiceTests
             "Test Event",
             "Description",
             DateTime.Now.AddDays(1),
-            EventType.Conference, 
+            EventType.Conference,
             1
         );
 
@@ -107,13 +111,13 @@ public class EventServiceTests
         var userId = "user-123";
         var userEmail = "duplicate@test.com";
 
-        var existingGuest = new Guest 
-        { 
+        var existingGuest = new Guest
+        {
             Email = userEmail,
             FirstName = "Existing",
             LastName = "Guest"
         };
-        
+
         var eventEntity = new Event
         {
             Id = eventId,
@@ -122,9 +126,9 @@ public class EventServiceTests
             Guests = new List<Guest> { existingGuest }
         };
 
-        var user = new User 
-        { 
-            Id = userId, 
+        var user = new User
+        {
+            Id = userId,
             Email = userEmail,
             FirstName = "Test",
             LastName = "User"
@@ -144,7 +148,7 @@ public class EventServiceTests
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("You are already registered for this event.");
-            
+
         _eventRepoMock.Verify(x => x.AddGuestAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }
