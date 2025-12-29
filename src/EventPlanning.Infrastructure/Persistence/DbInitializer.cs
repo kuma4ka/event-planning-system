@@ -31,8 +31,16 @@ public static class DbInitializer
 
         var adminUser = await EnsureUserAsync(userManager, adminEmail, adminPassword, "System", "Admin", "Admin");
 
+        var organizerEmail = configuration["Seed:OrganizerEmail"];
+        var organizerPassword = configuration["Seed:OrganizerPassword"];
+
+        if (string.IsNullOrEmpty(organizerEmail) || string.IsNullOrEmpty(organizerPassword))
+            throw new InvalidOperationException(
+                "Seeding failed: Organizer credentials are missing. " +
+                "Use 'dotnet user-secrets set' or Environment Variables to set 'Seed:OrganizerEmail' and 'Seed:OrganizerPassword'.");
+
         var organizerUser =
-            await EnsureUserAsync(userManager, "organizer@example.com", "Password123!", "John", "Doe", "User");
+            await EnsureUserAsync(userManager, organizerEmail, organizerPassword, "John", "Doe", "User");
 
         IList<Venue> venues;
         if (!await context.Venues.AnyAsync())
