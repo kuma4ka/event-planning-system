@@ -8,46 +8,52 @@
     var initials = !string.IsNullOrEmpty(Model.FirstName) ? Model.FirstName.Substring(0, 1).ToUpper() : "G";
 }
 
-<div class="guest-list-item d-flex justify-content-between align-items-center mb-2 p-2 rounded border-bottom bg-white">
-    <div class="d-flex align-items-center">
-        <div
-            class="guest-avatar me-3 bg-light text-primary fw-bold d-flex align-items-center justify-content-center rounded-circle border"
-            style="width: 36px; height: 36px; min-width: 36px; font-size: 0.9rem;">
+<div class="guest-list-item justify-content-between">
+    <div class="d-flex align-items-center overflow-hidden">
+        
+        <div class="guest-avatar flex-shrink-0">
             @initials
         </div>
 
-        <div class="overflow-hidden">
-            <span class="small fw-bold text-dark d-block text-truncate" style="max-width: 160px;" title="@fullName">
+        <div class="overflow-hidden ms-3">
+            <span class="d-block text-truncate fw-bold" 
+                  style="color: var(--text-main); max-width: 180px;" 
+                  title="@fullName">
                 @fullName
             </span>
             @if (isOrganizer)
             {
-                <small class="text-muted text-truncate d-block" style="font-size: 0.75rem; max-width: 160px;"
+                <small class="d-block text-truncate" 
+                       style="color: var(--text-muted); font-size: 0.75rem; max-width: 180px;"
                        title="@Model.Email">
                     @Model.Email
                 </small>
-                @* Телефон прибрано з відображення, як ви просили *@
             }
         </div>
     </div>
 
     @if (isOrganizer && !isPast)
     {
-        <div class="dropdown">
-            <button class="btn btn-sm btn-link text-secondary p-0 px-2" type="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">
+        <div class="dropdown ms-2">
+            <button class="btn btn-sm btn-link p-0 px-2" 
+                    type="button" 
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    style="color: var(--text-muted);">
                 <i class="bi bi-three-dots-vertical"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 animate-fade-in">
+            
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 animate-fade-in" 
+                style="background-color: var(--bg-surface);">
                 <li>
-                    @* Дані про телефон передаються тут, щоб заповнити форму редагування *@
-                    <button class="dropdown-item small"
+                    <button class="dropdown-item small" 
+                            style="color: var(--text-main);"
                             onclick="window.openEditGuestModal('@Model.Id', '@Model.FirstName', '@Model.LastName', '@Model.Email', '@Model.CountryCode', '@Model.PhoneNumber')">
                         <i class="bi bi-pencil me-2 text-warning"></i> Edit
                     </button>
                 </li>
                 <li>
-                    <hr class="dropdown-divider my-1">
+                    <hr class="dropdown-divider my-1" style="border-color: var(--border-light);">
                 </li>
                 <li>
                     <button class="dropdown-item small text-danger"

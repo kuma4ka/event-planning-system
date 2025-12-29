@@ -1,26 +1,13 @@
-﻿/* =========================================
-   PROFILE PAGE STYLES
-   ========================================= */
-
-/* --- COLORS & FONTS VARIABLES (FALLBACKS) --- */
-:root {
-    --color-air-force-blue: #5D737E;
-    --color-dark-teal: #114B5F;
-    --color-ink-black: #212529;
-    --color-ash-grey: #B2B2B2;
-    --color-cool-mist: #F0F2F5;
-    --font-heading: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* --- SIDEBAR CARD --- */
+﻿/* --- SIDEBAR CARD --- */
 .profile-card {
-    background-color: #fff;
-    border: 1px solid rgba(174, 195, 176, 0.3);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-light);
     border-radius: 12px;
     padding: 2rem;
     text-align: center;
     position: sticky;
     top: 100px;
+    box-shadow: var(--shadow-soft);
 }
 
 /* --- AVATAR --- */
@@ -36,27 +23,27 @@
     height: 100%;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));
-    color: #fff;
+    color: var(--text-on-image);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 3rem;
     font-weight: 700;
-    font-family: var(--font-heading), serif;
-    box-shadow: 0 10px 25px rgba(18, 69, 89, 0.25);
-    border: 4px solid #fff;
+    font-family: var(--font-heading, serif), serif;
+    box-shadow: var(--shadow-strong);
+    border: 4px solid var(--bg-surface);
 }
 
 /* --- USER INFO --- */
 .profile-name {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--color-ink-black);
+    color: var(--text-main);
     margin-bottom: 0.25rem;
 }
 
 .profile-email {
-    color: var(--color-air-force-blue);
+    color: var(--text-muted);
     font-size: 0.9rem;
     margin-bottom: 1.5rem;
 }
@@ -66,7 +53,7 @@
     display: flex;
     justify-content: center;
     padding-top: 1.5rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--border-light);
 }
 
 .stat-item {
@@ -86,34 +73,35 @@
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: var(--color-ash-grey);
+    color: var(--text-muted);
     font-weight: 600;
 }
 
 .stat-divider {
     width: 1px;
-    background-color: rgba(0,0,0,0.05);
+    background-color: var(--border-light);
 }
 
 /* --- MAIN CONTENT CARD --- */
 .profile-content-card {
-    background-color: #fff;
-    border: 1px solid rgba(174, 195, 176, 0.3);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-light);
     border-radius: 12px;
     padding: 2rem;
     min-height: 100%;
+    box-shadow: var(--shadow-soft);
 }
 
 /* --- TABS --- */
 .nav-tabs-stanza {
-    border-bottom: 2px solid #f0f2f5;
+    border-bottom: 2px solid var(--border-light);
     margin-bottom: 2rem;
 }
 
 .nav-tabs-stanza .nav-link {
     border: none;
     background: transparent;
-    color: var(--color-air-force-blue);
+    color: var(--text-muted);
     font-weight: 600;
     padding: 1rem 1.5rem;
     position: relative;
@@ -148,9 +136,9 @@
 .form-label-profile {
     font-size: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     font-weight: 700;
-    color: var(--color-ink-black);
+    color: var(--text-main);
     margin-bottom: 0.5rem;
 }
 
@@ -158,13 +146,11 @@
 .profile-footer {
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid #f0f2f5;
+    border-top: 1px solid var(--border-light);
     text-align: right;
 }
 
-/* =========================================================
-   UNIFIED INPUT GROUP STYLES (Fixed & Consolidated)
-   ========================================================= */
+/* --- UNIFIED INPUT GROUP STYLES --- */
 
 .profile-input-group {
     display: flex;
@@ -172,7 +158,7 @@
     flex-wrap: nowrap;
     width: 100%;
 
-    background-color: var(--color-cool-mist);
+    background-color: var(--bg-body);
     border: 1px solid transparent;
     border-radius: 8px;
 
@@ -181,7 +167,7 @@
 }
 
 .profile-input-group:focus-within {
-    background-color: #fff;
+    background-color: var(--bg-surface);
     border-color: var(--color-dark-teal);
     box-shadow: 0 0 0 4px rgba(18, 69, 89, 0.15);
     z-index: 2;
@@ -193,7 +179,7 @@
     justify-content: center;
     background-color: transparent;
     border: none;
-    color: var(--color-air-force-blue);
+    color: var(--text-muted);
     padding-left: 1rem;
     padding-right: 0.5rem;
     flex-shrink: 0;
@@ -204,11 +190,11 @@
     background-color: transparent;
     border: none;
     box-shadow: none;
-    color: var(--color-ink-black);
+    color: var(--text-main);
     font-weight: 600;
     padding: 0.8rem 2.25rem 0.8rem 1rem;
     cursor: pointer;
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: 1px solid var(--border-light);
     border-radius: 0;
     flex: 0 0 auto;
     width: auto;
@@ -220,12 +206,17 @@
     background-color: transparent;
     border: none;
     box-shadow: none;
-    color: var(--color-ink-black);
+    color: var(--text-main);
     padding: 0.8rem 1rem;
     font-weight: 500;
-
     flex: 1 1 auto;
     width: 1%;
+}
+
+/* Placeholder styling */
+.profile-input-group .form-control::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
 }
 
 .profile-input-group .form-control:focus,
@@ -237,5 +228,5 @@
 
 .profile-input-group .form-select:-moz-focusring {
     color: transparent;
-    text-shadow: 0 0 0 var(--color-ink-black);
+    text-shadow: 0 0 0 var(--text-main);
 }

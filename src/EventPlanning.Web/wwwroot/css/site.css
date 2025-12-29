@@ -1,16 +1,10 @@
-@import url('variables.css');
-
-@import url('base/typography.css');
 @import url('base/global.css');
+@import url('base/variables.css');
+@import url('base/typography.css');
 
 @import url('components/buttons.css');
 @import url('components/forms.css');
 @import url('components/cards.css');
-@import url('components/profile.css');
-@import url('components/auth.css');
-@import url('components/dashboard.css');
-@import url('components/event-form.css');
-@import url('components/event-details.css');
 @import url('components/pagination.css');
 @import url('components/view-toggle.css');
 
@@ -18,6 +12,13 @@
 @import url('components/admin/navigation.css');
 @import url('components/admin/tables.css');
 @import url('components/admin/forms.css');
+
+@import url('pages/account/profile.css');
+@import url('pages/account/auth.css');
+
+@import url('pages/events/details.css');
+@import url('pages/events/form.css');
+@import url('pages/events/my-events.css');
 
 @import url('layout/navbar.css');
 @import url('layout/hero.css');

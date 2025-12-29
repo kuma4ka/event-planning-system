@@ -1,16 +1,16 @@
 ﻿/* Admin Card Container */
 .c-admin-card {
-    border: none;
+    border: 1px solid var(--border-light);
     border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-soft);
     overflow: hidden;
-    background-color: #fff;
+    background-color: var(--bg-surface);
 }
 
 /* Admin Header (Gradient strip) */
 .c-admin-header {
     background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));
-    color: white;
+    color: var(--color-white);
     padding: 1.5rem;
     display: flex;
     justify-content: space-between;
@@ -19,22 +19,36 @@
 
 /* Danger Zone (Delete Page) */
 .c-danger-card {
-    border: 1px solid #fee2e2;
-    background: #fff;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    background: var(--bg-surface);
     border-radius: 12px;
     overflow: hidden;
 }
 
 .c-danger-header {
-    background-color: #fef2f2;
-    color: #991b1b;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--color-danger);
     padding: 2rem;
     text-align: center;
-    border-bottom: 1px solid #fee2e2;
+    border-bottom: 1px solid rgba(220, 53, 69, 0.1);
 }
 
 .c-danger-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
     display: block;
+    color: var(--color-danger);
+}
+
+.c-dashboard-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: var(--bg-surface);
+    box-shadow: var(--shadow-soft);
+    flex-shrink: 0;
+    color: var(--color-dark-teal);
 }

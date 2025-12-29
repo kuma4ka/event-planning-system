@@ -7,8 +7,8 @@ html {
 
 body {
     margin-bottom: 0;
-    background-color: var(--bs-body-bg);
-    color: var(--bs-body-color);
+    background-color: var(--bg-body);
+    color: var(--text-main);
     font-family: var(--font-body), sans-serif;
 
     /* Flexbox for sticky footer */
@@ -24,7 +24,12 @@ body {
 }
 
 /* --- FOCUS RINGS --- */
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem var(--color-cool-mist), 0 0 0 0.25rem var(--color-air-force-blue);
-    border-color: var(--color-air-force-blue);
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(18, 69, 89, 0.25);
+    border-color: var(--color-dark-teal);
+    outline: none;
 }

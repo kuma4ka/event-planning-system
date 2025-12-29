@@ -1,22 +1,27 @@
 ﻿/* Admin Dropdown Link */
 .c-admin-link {
-    background-color: rgba(17, 75, 95, 0.1);
+    background-color: rgba(17, 75, 95, 0.05);
     color: var(--color-dark-teal);
     font-weight: 700;
     transition: all 0.2s ease-in-out;
     padding: 10px 16px;
     border: 1px solid rgba(17, 75, 95, 0.1);
+    text-decoration: none;
+    display: block;
+    border-radius: 8px;
 }
 
 .c-admin-link:hover,
 .c-admin-link:focus {
     background-color: var(--color-dark-teal);
-    color: #fff !important;
+    color: var(--color-white);
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-soft);
+    border-color: var(--color-dark-teal);
 }
 
-.c-admin-link:hover .badge {
-    background-color: #fff !important;
-    color: var(--color-dark-teal) !important;
+a.c-admin-link:hover span.badge {
+    background-color: var(--color-white);
+    color: var(--color-dark-teal);
+    transition: all 0.2s ease;
 }

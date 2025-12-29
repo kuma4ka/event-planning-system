@@ -1,37 +1,40 @@
 ﻿/* --- HERO SECTION --- */
 .hero-stanza-container {
-    background: radial-gradient(circle at top right, #1a5f7a 0%, var(--color-ink-black) 60%);
+    background: radial-gradient(circle at top right, var(--color-dark-teal) 0%, var(--color-ink-black) 60%);
     border-radius: 4px 4px 24px 24px;
     position: relative;
     overflow: hidden;
     min-height: 520px;
     display: flex;
     align-items: center;
-    box-shadow: 0 20px 40px rgba(1, 22, 30, 0.15);
+    box-shadow: var(--shadow-strong);
 }
 
 .hero-content-left {
     position: relative;
     z-index: 20;
     padding: 5rem;
-    color: #fff;
+    color: var(--color-white);
     max-width: 700px;
 }
 
 .hero-title-poetic {
-    font-family: "Georgia", "Times New Roman", serif;
+    font-family: var(--font-heading, serif), serif;
     font-weight: 400;
     font-size: 4rem;
     line-height: 1.05;
     margin-bottom: 2rem;
     letter-spacing: -0.04em;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    color: var(--color-white);
 }
 
 .hero-title-accent {
     font-style: italic;
-    background: linear-gradient(90deg, #81f7e5, #fff);
+    background: linear-gradient(90deg, var(--color-accent-cyan), var(--color-white));
+
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 600;
 }
@@ -39,12 +42,35 @@
 .hero-subtitle {
     font-size: 1.25rem;
     font-weight: 300;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.9);
     line-height: 1.6;
     margin-bottom: 3rem;
     padding-left: 1.5rem;
     border-left: 1px solid rgba(255,255,255,0.3);
 }
+
+/* --- Buttons & Links --- */
+
+.hero-content-left .hero-action-btn {
+    background-color: var(--color-white);
+    color: var(--color-dark-teal);
+    transition: all 0.3s ease;
+}
+
+.hero-content-left .hero-action-btn:hover {
+    background-color: var(--color-cool-mist);
+    color: var(--color-dark-teal);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.hero-content-left .hero-scroll-hint {
+    color: rgba(255, 255, 255, 0.6);
+    display: inline-flex;
+    align-items: center;
+}
+
+/* --- Visual Elements --- */
 
 .hero-visual-right {
     position: absolute;
@@ -69,15 +95,15 @@
 
 /* --- FILTER FLOATING CARD --- */
 .filter-floating-card {
-    background-color: #fff;
+    background-color: var(--bg-surface-glass);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-strong);
     margin-top: -60px;
     position: relative;
     z-index: 30;
     padding: 1rem;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
 }
 
 /* Responsive adjustments for Hero */

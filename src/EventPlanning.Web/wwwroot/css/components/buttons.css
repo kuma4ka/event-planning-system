@@ -1,22 +1,25 @@
 ﻿/* --- BUTTONS --- */
 .btn {
-    border-radius: 8px !important;
+    border-radius: 8px;
 }
 
 .btn-primary {
     background-color: var(--color-dark-teal);
     border-color: var(--color-dark-teal);
-    color: #fff;
+    color: var(--color-white);
     font-weight: 500;
     transition: all 0.3s ease;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     padding: 0.6rem 1.5rem;
 }
 
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
-    background-color: var(--color-air-force-blue) !important;
-    border-color: var(--color-air-force-blue) !important;
-    color: #fff !important;
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active {
+    background-color: var(--color-air-force-blue);
+    border-color: var(--color-air-force-blue);
+    color: var(--color-white);
     box-shadow: 0 4px 12px rgba(18, 69, 89, 0.3);
     transform: translateY(-2px);
 }
@@ -24,8 +27,57 @@
 .btn-outline-primary {
     color: var(--color-dark-teal);
     border-color: var(--color-dark-teal);
+    background-color: transparent;
 }
+
 .btn-outline-primary:hover {
     background-color: var(--color-dark-teal);
-    color: #fff;
+    color: var(--color-white);
+}
+
+/* --- ACTION BUTTON --- */
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+
+    background-color: transparent;
+    border: 1px solid var(--border-light);
+    color: var(--text-muted);
+}
+
+/* 1. Base Hover */
+.btn-action:hover {
+    background-color: var(--bg-body);
+    border-color: var(--color-dark-teal);
+    color: var(--color-dark-teal);
+}
+
+/* 2. Warning Hover */
+.btn-action.text-warning:hover {
+    background-color: rgba(255, 193, 7, 0.1);
+    border-color: var(--color-warning);
+    color: var(--color-warning);
+}
+
+/* 3. Danger Hover */
+.btn-action.text-danger:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
+.btn-action:active {
+    transform: translateY(1px);
 }

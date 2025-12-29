@@ -20,8 +20,8 @@
 }
 
 .footer-heading {
-    color: #fff;
-    font-family: var(--font-heading), serif;
+    color: var(--color-white);
+    font-family: var(--font-heading, serif), serif;
     font-weight: 700;
     margin-bottom: 1.5rem;
     font-size: 1.2rem;
@@ -36,7 +36,7 @@
 }
 
 .footer-link:hover {
-    color: #fff;
+    color: var(--color-white);
     transform: translateX(5px);
 }
 
@@ -48,7 +48,7 @@
     height: 40px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    color: var(--color-white);
     margin-right: 0.5rem;
     transition: all 0.3s ease;
     text-decoration: none;
@@ -57,22 +57,29 @@
 .social-icon-link:hover {
     background-color: var(--color-dark-teal);
     transform: translateY(-3px);
-    color: #fff;
+    color: var(--color-white);
 }
 
-.footer-subscribe-input {
+/* --- INPUT OVERRIDES --- */
+
+.footer-stanza .footer-subscribe-input {
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fff;
+    color: var(--color-white);
     padding: 0.75rem 1rem;
     border-radius: 8px;
 }
 
-.footer-subscribe-input:focus {
+.footer-stanza .footer-subscribe-input:focus {
     background-color: rgba(255, 255, 255, 0.1);
     border-color: var(--color-air-force-blue);
-    color: #fff;
+    color: var(--color-white);
     box-shadow: none;
+    outline: none;
+}
+
+.footer-stanza .footer-subscribe-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .footer-bottom {
@@ -83,12 +90,12 @@
 }
 
 .footer-brand {
-    font-family: var(--font-heading), serif;
+    font-family: var(--font-heading, serif), serif;
     font-size: 2rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #fff, var(--color-ash-grey));
-    background-clip: text;
+    background: linear-gradient(135deg, var(--color-white), var(--color-ash-grey));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
     margin-bottom: 1rem;
