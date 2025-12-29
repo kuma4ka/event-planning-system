@@ -1,4 +1,10 @@
-﻿/* --- FORMS --- */
+﻿/* INPUT STYLES */
+input[type="date"],
+select {
+    cursor: pointer;
+}
+
+/* --- FORMS --- */
 .form-control,
 .form-select,
 .input-group-text {
@@ -16,14 +22,14 @@
 }
 
 /* Placeholder styling */
-.form-floating > .form-control-plaintext::placeholder,
-.form-floating > .form-control::placeholder {
+.form-floating>.form-control-plaintext::placeholder,
+.form-floating>.form-control::placeholder {
     color: var(--text-muted);
     text-align: end;
     opacity: 0.7;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder,
-.form-floating > .form-control:focus::placeholder {
+.form-floating>.form-control-plaintext:focus::placeholder,
+.form-floating>.form-control:focus::placeholder {
     text-align: start;
 }

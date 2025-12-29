@@ -25,83 +25,53 @@
     <ul class="nav nav-tabs mb-4 border-bottom-0">
         <li class="nav-item">
             <a class="nav-link @(currentViewType == "upcoming" ? "active fw-bold border-bottom-0 border" : "border-0")"
-               asp-controller="Event"
-               asp-action="MyEvents"
-               asp-route-viewType="upcoming"
-               style="cursor: pointer; color: @(currentViewType == "upcoming" ? "var(--color-dark-teal)" : "var(--text-muted)"); background-color: @(currentViewType == "upcoming" ? "var(--bg-surface)" : "transparent");">
+                asp-controller="Event" asp-action="MyEvents" asp-route-viewType="upcoming"
+                style="cursor: pointer; color: @(currentViewType == "upcoming" ? "var(--color-dark-teal)" : "var(--text-muted)"); background-color: @(currentViewType == "upcoming" ? "var(--bg-surface)" : "transparent");">
                 📅 Upcoming
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link @(currentViewType == "past" ? "active fw-bold border-bottom-0 border" : "border-0")"
-               asp-controller="Event"
-               asp-action="MyEvents"
-               asp-route-viewType="past"
-               style="cursor: pointer; color: @(currentViewType == "past" ? "var(--color-dark-teal)" : "var(--text-muted)"); background-color: @(currentViewType == "past" ? "var(--bg-surface)" : "transparent");">
+                asp-controller="Event" asp-action="MyEvents" asp-route-viewType="past"
+                style="cursor: pointer; color: @(currentViewType == "past" ? "var(--color-dark-teal)" : "var(--text-muted)"); background-color: @(currentViewType == "past" ? "var(--bg-surface)" : "transparent");">
                 📂 History
             </a>
         </li>
     </ul>
 
-    <div class="dashboard-toolbar mb-4">
-        <form method="get" asp-controller="Event" asp-action="MyEvents" class="row g-3 align-items-center">
-            <input type="hidden" name="viewType" value="@currentViewType"/>
-            <input type="hidden" name="sortOrder" value="@ViewBag.CurrentSort"/>
+    <div class="mb-5">
+        @{
+            var fromDate = ViewBag.CurrentFrom as string != null ? DateTime.Parse(ViewBag.CurrentFrom) : (DateTime?)null;
+            var toDate = ViewBag.CurrentTo as string != null ? DateTime.Parse(ViewBag.CurrentTo) : (DateTime?)null;
 
-            <div class="col-xl-4 col-lg-4 col-md-12">
-                <div class="input-group dashboard-input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" name="searchTerm" class="form-control"
-                           placeholder="Search events..." value="@ViewBag.CurrentSearch">
-                </div>
-            </div>
-
-            <div class="col-xl-2 col-lg-3 col-md-6">
-                <div class="input-group dashboard-input-group">
-                    <select name="type" class="form-select"
-                            asp-items="typeSelectList"
-                            onchange="this.form.submit()"
-                            style="cursor: pointer;">
-                    </select>
-                </div>
-            </div>
-
-            <div class="col-xl-4 col-lg-5 col-md-6">
-                <div class="d-flex gap-2">
-                    <div class="input-group dashboard-input-group flex-grow-1">
-                        <input type="date" name="from" class="form-control" value="@ViewBag.CurrentFrom"
-                               placeholder="From">
-                    </div>
-                    <span class="date-separator">-</span>
-                    <div class="input-group dashboard-input-group flex-grow-1">
-                        <input type="date" name="to" class="form-control" value="@ViewBag.CurrentTo" placeholder="To">
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-2 col-lg-12 text-end">
-                <div class="d-flex gap-2 justify-content-end">
-                    <button type="submit" class="btn btn-outline-primary flex-grow-1 flex-lg-grow-0 px-4">Filter
-                    </button>
-                    @if (ViewBag.CurrentSearch != null || ViewBag.CurrentType != null || ViewBag.CurrentFrom != null || ViewBag.CurrentTo != null)
-                    {
-                        <a asp-controller="Event" asp-action="MyEvents" asp-route-viewType="@currentViewType"
-                           class="btn btn-link text-danger text-decoration-none" title="Clear Filters">
-                            <i class="bi bi-x-circle fs-5"></i>
-                        </a>
-                    }
-                </div>
-            </div>
-        </form>
+            var filterModel = new EventPlanning.Web.Models.Shared.EventFilterViewModel
+            {
+                SearchTerm = ViewBag.CurrentSearch,
+                Type = currentTypeEnum,
+                From = fromDate,
+                To = toDate,
+                TypeOptions = typeSelectList,
+                HasFilters = ViewBag.CurrentSearch != null || ViewBag.CurrentType != null || ViewBag.CurrentFrom != null ||
+            ViewBag.CurrentTo != null,
+                ControllerName = "Event",
+                ActionName = "MyEvents",
+                ViewType = currentViewType,
+                SortOrder = ViewBag.CurrentSort,
+                ShowSearch = true
+            };
+        }
+        <partial name="_EventFilter" model="filterModel" />
     </div>
 
     @if (!Model.Items.Any())
     {
-        <div class="text-center py-5 rounded-3 border shadow-sm" style="background-color: var(--bg-surface); border-color: var(--border-light) !important;">
+        <div class="text-center py-5 rounded-3 border shadow-sm"
+            style="background-color: var(--bg-surface); border-color: var(--border-light) !important;">
             <div class="mb-4">
                 <div class="rounded-circle d-inline-flex align-items-center justify-content-center"
-                     style="width: 80px; height: 80px; background-color: var(--bg-body);">
-                    <i class="bi @(currentViewType == "upcoming" ? "bi-calendar-event" : "bi-archive") fs-1 opacity-50" style="color: var(--text-muted);"></i>
+                    style="width: 80px; height: 80px; background-color: var(--bg-body);">
+                    <i class="bi @(currentViewType == "upcoming" ? "bi-calendar-event" : "bi-archive") fs-1 opacity-50"
+                        style="color: var(--text-muted);"></i>
                 </div>
             </div>
             <h3 class="fw-bold" style="color: var(--text-main);">
@@ -119,7 +89,7 @@
             else
             {
                 <a asp-controller="Event" asp-action="MyEvents" asp-route-viewType="@currentViewType"
-                   class="btn btn-outline-secondary mt-3">Reset Filters</a>
+                    class="btn btn-outline-secondary mt-3">Reset Filters</a>
             }
         </div>
     }
@@ -130,12 +100,12 @@
                 <h4 class="mb-0 fw-bold" style="color: var(--text-main);">
                     @(currentViewType == "upcoming" ? "Your Upcoming Events" : "Event History")
                 </h4>
-                <span class="badge border shadow-sm px-2 py-1 mt-1 fw-normal" 
-                      style="background-color: var(--bg-surface); color: var(--text-muted);">
+                <span class="badge border shadow-sm px-2 py-1 mt-1 fw-normal"
+                    style="background-color: var(--bg-surface); color: var(--text-muted);">
                     @Model.TotalCount items
                 </span>
             </div>
-            
+
             <div class="d-flex rounded shadow-sm overflow-hidden" style="background-color: var(--bg-surface);">
                 <button id="btnGridView" class="view-toggle-btn active" title="Grid View">
                     <i class="bi bi-grid-fill"></i>
@@ -150,25 +120,25 @@
             @foreach (var item in Model.Items)
             {
                 var isPast = item.Date < DateTime.Now;
-                
+
                 <div class="col-md-6 col-lg-4 d-flex">
-                    <div class="card h-100 w-100 shadow-sm border-0 hover-effect overflow-hidden" 
-                         style="background-color: var(--bg-surface);">
-                        
+                    <div class="card h-100 w-100 shadow-sm border-0 hover-effect overflow-hidden"
+                        style="background-color: var(--bg-surface);">
+
                         <div class="position-relative">
                             @if (!string.IsNullOrEmpty(item.VenueImageUrl))
                             {
-                                <img src="@item.VenueImageUrl" class="card-img-top" 
-                                     style="height: 200px; object-fit: cover;" alt="@item.Name">
+                                <img src="@item.VenueImageUrl" class="card-img-top" style="height: 200px; object-fit: cover;"
+                                    alt="@item.Name">
                             }
                             else
                             {
                                 <div class="card-img-top w-100 d-flex align-items-center justify-content-center text-white"
-                                     style="height: 200px; background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));">
+                                    style="height: 200px; background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));">
                                     <i class="bi bi-calendar-event fs-1 opacity-50"></i>
                                 </div>
                             }
-                            
+
                             <div class="position-absolute top-0 end-0 m-3">
                                 @if (isPast)
                                 {
@@ -183,8 +153,8 @@
 
                         <div class="card-body d-flex flex-column p-4">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="badge border fw-normal" 
-                                      style="background-color: var(--bg-body); color: var(--text-main);">
+                                <span class="badge border fw-normal"
+                                    style="background-color: var(--bg-body); color: var(--text-main);">
                                     @item.Type.GetDisplayName()
                                 </span>
                                 <small class="fw-bold" style="color: var(--text-muted);">
@@ -194,12 +164,11 @@
 
                             <h5 class="card-title fw-bold mb-1 fs-5">
                                 <a asp-controller="Event" asp-action="Details" asp-route-id="@item.Id"
-                                   class="text-decoration-none stretched-link"
-                                   style="color: var(--text-main);">
+                                    class="text-decoration-none stretched-link" style="color: var(--text-main);">
                                     @item.Name
                                 </a>
                             </h5>
-                            
+
                             <div class="small mb-3" style="color: var(--text-muted);">
                                 <i class="bi bi-clock me-1"></i> @item.Date.ToString("HH:mm")
                             </div>
@@ -209,30 +178,26 @@
                                 <span class="text-truncate">@item.VenueName</span>
                             </div>
 
-                            <div class="mt-auto pt-3 border-top d-flex justify-content-end gap-2" 
-                                 style="position: relative; z-index: 2; border-color: var(--border-light) !important;">
-                                
-                                <button type="button" 
-                                        class="btn-action js-copy-link" 
-                                        data-url="@Url.Action("Details", "Event", new { id = item.Id }, Context.Request.Scheme)"
-                                        title="Copy Link">
+                            <div class="mt-auto pt-3 border-top d-flex justify-content-end gap-2"
+                                style="position: relative; z-index: 2; border-color: var(--border-light) !important;">
+
+                                <button type="button" class="btn-action js-copy-link"
+                                    data-url="@Url.Action("Details", "Event", new { id = item.Id }, Context.Request.Scheme)"
+                                    title="Copy Link">
                                     <i class="bi bi-link-45deg"></i> Copy
                                 </button>
 
                                 @if (!isPast)
                                 {
                                     <a asp-controller="Event" asp-action="Edit" asp-route-id="@item.Id"
-                                       class="btn-action text-warning" title="Edit Event">
+                                        class="btn-action text-warning" title="Edit Event">
                                         <i class="bi bi-pencil-fill"></i> Edit
                                     </a>
                                 }
-                                
-                                <button type="button" class="btn-action text-danger"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteModal"
-                                        data-event-id="@item.Id"
-                                        data-event-name="@item.Name"
-                                        title="Delete Event">
+
+                                <button type="button" class="btn-action text-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal" data-event-id="@item.Id" data-event-name="@item.Name"
+                                    title="Delete Event">
                                     <i class="bi bi-trash-fill"></i> Remove
                                 </button>
                             </div>
@@ -251,12 +216,9 @@
                             @if (Model.PageNumber > 1)
                             {
                                 <a class="page-link" asp-controller="Event" asp-action="MyEvents"
-                                   asp-route-page="@(Model.PageNumber - 1)"
-                                   asp-route-viewType="@currentViewType"
-                                   asp-route-sortOrder="@ViewBag.CurrentSort"
-                                   asp-route-searchTerm="@ViewBag.CurrentSearch"
-                                   asp-route-type="@ViewBag.CurrentType"
-                                   aria-label="Previous">
+                                    asp-route-page="@(Model.PageNumber - 1)" asp-route-viewType="@currentViewType"
+                                    asp-route-sortOrder="@ViewBag.CurrentSort" asp-route-searchTerm="@ViewBag.CurrentSearch"
+                                    asp-route-type="@ViewBag.CurrentType" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                     <span class="ms-1">Previous</span>
                                 </a>
@@ -281,12 +243,10 @@
                                 }
                                 else
                                 {
-                                    <a class="page-link" asp-controller="Event" asp-action="MyEvents"
-                                       asp-route-page="@pageIndex"
-                                       asp-route-viewType="@currentViewType"
-                                       asp-route-sortOrder="@ViewBag.CurrentSort"
-                                       asp-route-searchTerm="@ViewBag.CurrentSearch"
-                                       asp-route-type="@ViewBag.CurrentType">@pageIndex</a>
+                                    <a class="page-link" asp-controller="Event" asp-action="MyEvents" asp-route-page="@pageIndex"
+                                        asp-route-viewType="@currentViewType" asp-route-sortOrder="@ViewBag.CurrentSort"
+                                        asp-route-searchTerm="@ViewBag.CurrentSearch"
+                                        asp-route-type="@ViewBag.CurrentType">@pageIndex</a>
                                 }
                             </li>
                         }
@@ -295,12 +255,9 @@
                             @if (Model.PageNumber < Model.TotalPages)
                             {
                                 <a class="page-link" asp-controller="Event" asp-action="MyEvents"
-                                   asp-route-page="@(Model.PageNumber + 1)"
-                                   asp-route-viewType="@currentViewType"
-                                   asp-route-sortOrder="@ViewBag.CurrentSort"
-                                   asp-route-searchTerm="@ViewBag.CurrentSearch"
-                                   asp-route-type="@ViewBag.CurrentType"
-                                   aria-label="Next">
+                                    asp-route-page="@(Model.PageNumber + 1)" asp-route-viewType="@currentViewType"
+                                    asp-route-sortOrder="@ViewBag.CurrentSort" asp-route-searchTerm="@ViewBag.CurrentSearch"
+                                    asp-route-type="@ViewBag.CurrentType" aria-label="Next">
                                     <span class="me-1">Next</span>
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
@@ -321,12 +278,13 @@
 </div>
 
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true"
-     data-url-template="@Url.Action("Delete", "Event", new { id = 0 })">
-    
+    data-url-template="@Url.Action("Delete", "Event", new { id = 0 })">
+
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 overflow-hidden rounded-4" style="background-color: var(--bg-surface);">
-            
-            <div class="c-danger-header py-4" style="background-color: rgba(220, 53, 69, 0.1); text-align: center; border-bottom: 1px solid rgba(220, 53, 69, 0.1);">
+
+            <div class="c-danger-header py-4"
+                style="background-color: rgba(220, 53, 69, 0.1); text-align: center; border-bottom: 1px solid rgba(220, 53, 69, 0.1);">
                 <i class="bi bi-exclamation-triangle fs-1 mb-2 d-block text-danger"></i>
                 <h5 class="fw-bold mb-0 text-danger">Delete Event?</h5>
                 <p class="mb-0 opacity-75 small text-danger">This action cannot be undone.</p>
@@ -337,12 +295,13 @@
                     Are you sure you want to permanently delete <br />
                     <strong style="color: var(--text-main);" class="fs-5" id="modalEventName">Event Name</strong>?
                 </p>
-                
+
                 <div class="d-flex gap-2 justify-content-center">
-                    <button type="button" class="btn btn-light flex-grow-1 py-2 text-muted fw-bold border" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-light flex-grow-1 py-2 text-muted fw-bold border"
+                        data-bs-dismiss="modal">
                         Cancel
                     </button>
-                    
+
                     <form id="deleteForm" method="post" class="flex-grow-1">
                         <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">
                             Yes, Delete It

@@ -1,5 +1,6 @@
 ﻿using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Interfaces;
+using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
 using FluentValidation;
@@ -38,7 +39,7 @@ public class EventController(
         ViewBag.OrganizerEmail = organizer?.Email ?? "";
 
         ViewBag.GoogleMapsApiKey = configuration["GoogleMaps:ApiKey"];
-        
+
         return View(eventDetails);
     }
 
@@ -216,12 +217,14 @@ public class EventController(
             if (string.IsNullOrEmpty(sortOrder)) sortOrder = "date_asc";
         }
 
+        var adjustedToDate = to?.Date.AddDays(1).AddTicks(-1);
+
         var searchDto = new EventSearchDto
         {
             SearchTerm = searchTerm,
             Type = type,
             FromDate = from,
-            ToDate = to,
+            ToDate = adjustedToDate,
             PageNumber = page,
             PageSize = 10
         };
@@ -242,7 +245,17 @@ public class EventController(
         ViewBag.DateSortParam = sortOrder == "date_desc" ? "date_asc" : "date_desc";
         ViewBag.NameSortParam = sortOrder == "name_asc" ? "name_desc" : "name_asc";
 
-        var result = await eventService.GetEventsAsync(userId!, userId, searchDto, sortOrder, cancellationToken);
+        PagedResult<EventDto> result;
+
+        try
+        {
+            result = await eventService.GetEventsAsync(userId!, userId, searchDto, sortOrder, cancellationToken);
+        }
+        catch (ValidationException ex)
+        {
+            foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            result = new PagedResult<EventDto>(new List<EventDto>(), 0, 1, 10);
+        }
 
         return View(result);
     }
