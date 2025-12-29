@@ -123,7 +123,7 @@
 /* Access Denied Specific */
 .access-denied-icon {
     font-size: 5rem;
-    color: #dc3545;
+    color: var(--color-danger);
     opacity: 0.8;
     margin-bottom: 1rem;
 }

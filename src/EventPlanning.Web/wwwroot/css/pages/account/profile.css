@@ -136,7 +136,7 @@
 .form-label-profile {
     font-size: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     font-weight: 700;
     color: var(--text-main);
     margin-bottom: 0.5rem;
