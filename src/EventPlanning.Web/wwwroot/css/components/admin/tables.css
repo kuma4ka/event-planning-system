@@ -6,52 +6,28 @@
 }
 
 .c-admin-table thead th {
-    background-color: #f8f9fa;
-    color: var(--color-air-force-blue);
+    background-color: var(--bg-body);
+    color: var(--text-muted);
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 1px;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 2px solid var(--border-light);
     padding: 1rem;
 }
 
 .c-admin-table tbody td {
     padding: 1rem;
     vertical-align: middle;
-    color: var(--color-ink-black);
-    border-bottom: 1px solid #f0f2f5;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-light);
+    background-color: var(--bg-surface);
 }
 
 .c-admin-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-.c-admin-table tbody tr:hover {
-    background-color: #f8f9fa;
-}
-
-/* Action Buttons (Edit/Delete icons) */
-.c-action-btn {
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    transition: all 0.2s;
-    color: var(--color-air-force-blue);
-    background-color: #f0f2f5;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.c-action-btn:hover {
-    background-color: var(--color-dark-teal);
-    color: white;
-}
-
-.c-action-btn.text-danger:hover {
-    background-color: #dc3545;
-    color: white !important;
+.c-admin-table tbody tr:hover td {
+    background-color: var(--bg-body);
 }

@@ -8,9 +8,11 @@
 
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div class="d-flex align-items-center">
-            <div class="bg-white p-3 rounded-circle shadow-sm me-3 text-primary">
+
+            <div class="c-dashboard-icon me-3">
                 <i class="bi bi-building-gear fs-3"></i>
             </div>
+
             <div>
                 <h4 class="mb-0 fw-bold">Manage Venues</h4>
                 <small class="text-muted">Overview of all platform locations</small>
@@ -18,7 +20,7 @@
         </div>
 
         <div class="d-flex align-items-center gap-3">
-            <div class="d-flex bg-white rounded shadow-sm">
+            <div class="d-flex rounded shadow-sm overflow-hidden" style="background-color: var(--bg-surface);">
                 <button id="btnGridView" class="view-toggle-btn active" title="Grid View">
                     <i class="bi bi-grid-fill"></i>
                 </button>
@@ -35,7 +37,7 @@
 
     @if (!Model.Any())
     {
-        <div class="card border-0 shadow-sm py-5 text-center">
+        <div class="card border-0 shadow-sm py-5 text-center" style="background-color: var(--bg-surface);">
             <div class="mb-3">
                 <i class="bi bi-inbox text-muted opacity-25" style="font-size: 4rem;"></i>
             </div>
@@ -52,7 +54,7 @@
             @foreach (var venue in Model)
             {
                 <div class="col-md-6 col-lg-4 d-flex">
-                    <div class="card h-100 w-100 shadow-sm border-0 hover-lift bg-white overflow-hidden">
+                    <div class="card h-100 w-100 shadow-sm border-0 hover-effect overflow-hidden">
 
                         <div class="position-relative">
                             @if (!string.IsNullOrEmpty(venue.ImageUrl))
@@ -62,21 +64,23 @@
                             }
                             else
                             {
-                                <div class="card-img-top w-100 d-flex align-items-center justify-content-center text-white"
-                                     style="height: 200px; background: linear-gradient(135deg, #6c757d, #adb5bd);">
+                                <div
+                                    class="card-img-top w-100 d-flex align-items-center justify-content-center text-white"
+                                    style="height: 200px; background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));">
                                     <i class="bi bi-building fs-1 opacity-50"></i>
                                 </div>
                             }
 
                             <div class="position-absolute top-0 end-0 m-3">
-                                <span class="badge bg-white text-dark shadow-sm border">
+                                <span class="badge shadow-sm border"
+                                      style="background-color: var(--bg-surface); color: var(--text-main);">
                                     <i class="bi bi-people me-1"></i> @venue.Capacity
                                 </span>
                             </div>
                         </div>
 
                         <div class="card-body d-flex flex-column p-4">
-                            <h5 class="card-title fw-bold mb-2 text-dark">
+                            <h5 class="card-title fw-bold mb-2">
                                 @venue.Name
                             </h5>
 
@@ -85,20 +89,23 @@
                                 @(venue.Address)
                             </p>
 
-                            <div class="pt-3 border-top d-flex justify-content-end gap-2 mt-auto">
+                            <div class="pt-3 border-top d-flex justify-content-end gap-2 mt-auto"
+                                 style="border-color: var(--border-light) !important;">
+
                                 <a asp-action="Edit" asp-route-id="@venue.Id"
-                                   class="btn btn-sm btn-light border text-primary fw-bold" title="Edit">
-                                    <i class="bi bi-pencil-fill me-1"></i> Edit
+                                   class="btn-action text-warning"
+                                   title="Edit Venue">
+                                    <i class="bi bi-pencil-fill"></i> Edit
                                 </a>
 
                                 <button type="button"
-                                        class="btn btn-sm btn-light border text-danger fw-bold"
+                                        class="btn-action text-danger"
                                         data-bs-toggle="modal"
                                         data-bs-target="#deleteModal"
                                         data-venue-id="@venue.Id"
                                         data-venue-name="@venue.Name"
-                                        title="Delete">
-                                    <i class="bi bi-trash-fill me-1"></i> Delete
+                                        title="Remove Venue">
+                                    <i class="bi bi-trash-fill"></i> Remove
                                 </button>
                             </div>
                         </div>
@@ -113,22 +120,23 @@
      data-url-template='@Url.Action("Delete", "Venue", new { area = "Admin", id = "PLACEHOLDER" })'>
 
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 overflow-hidden rounded-4">
+        <div class="modal-content border-0 overflow-hidden rounded-4" style="background-color: var(--bg-surface);">
 
-            <div class="c-danger-header py-4" style="background-color: #fdf2f2; text-align: center; border-bottom: 1px solid #f8d7da;">
-                <i class="bi bi-exclamation-triangle text-danger fs-1 mb-2 d-block"></i>
-                <h5 class="fw-bold mb-0 text-danger">Delete Venue?</h5>
-                <p class="mb-0 opacity-75 small text-danger">This action cannot be undone.</p>
+            <div class="c-danger-header py-4">
+                <i class="bi bi-exclamation-triangle fs-1 mb-2 d-block"></i>
+                <h5 class="fw-bold mb-0">Delete Venue?</h5>
+                <p class="mb-0 opacity-75 small">This action cannot be undone.</p>
             </div>
 
             <div class="modal-body p-4 text-center">
                 <p class="text-muted mb-4">
-                    Are you sure you want to permanently remove <br />
-                    <strong class="text-dark fs-5" id="modalVenueName">Venue Name</strong>?
+                    Are you sure you want to permanently remove <br/>
+                    <strong style="color: var(--text-main);" class="fs-5" id="modalVenueName">Venue Name</strong>?
                 </p>
 
                 <div class="d-flex gap-2 justify-content-center">
-                    <button type="button" class="btn btn-light flex-grow-1 py-2 text-muted fw-bold" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-light flex-grow-1 py-2 text-muted fw-bold border"
+                            data-bs-dismiss="modal">
                         Cancel
                     </button>
 
