@@ -11,15 +11,15 @@
             <form asp-action="Edit" method="post" enctype="multipart/form-data">
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="CurrentImageUrl" />
-                
+
                 <div class="card c-admin-card">
-                    
+
                     <div class="c-admin-header">
                         <div class="d-flex align-items-center">
-                            <i class="bi bi-pencil-square fs-4 me-3"></i>
+                            <i class="bi bi-pencil-square fs-4 me-3 text-white"></i>
                             <div>
-                                <h5 class="mb-0 fw-bold">Edit Venue</h5>
-                                <small class="opacity-75">@Model.Name</small>
+                                <h5 class="mb-0 fw-bold text-white">Edit Venue</h5>
+                                <small class="text-white-50">@Model.Name</small>
                             </div>
                         </div>
                     </div>
