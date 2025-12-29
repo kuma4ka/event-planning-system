@@ -3,12 +3,12 @@
     background-color: rgba(17, 75, 95, 0.05);
     color: var(--color-dark-teal);
     font-weight: 700;
-    transition: all 0.2s ease-in-out;
+    transition: var(--transition-base);
     padding: 10px 16px;
     border: 1px solid rgba(17, 75, 95, 0.1);
     text-decoration: none;
     display: block;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
 }
 
 .c-admin-link:hover,
@@ -23,5 +23,5 @@
 a.c-admin-link:hover span.badge {
     background-color: var(--color-white);
     color: var(--color-dark-teal);
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
 }
