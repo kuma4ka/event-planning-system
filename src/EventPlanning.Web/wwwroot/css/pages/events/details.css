@@ -29,27 +29,42 @@
     left: 0;
     width: 100%;
     padding: 3rem 2.5rem;
-    background: var(--gradient-hero-overlay);
-    color: var(--text-on-image);
-    pointer-events: none;
+
+    background: linear-gradient(to top,
+    rgba(1, 22, 30, 0.98) 0%,
+    rgba(1, 22, 30, 0.7) 50%,
+    rgba(1, 22, 30, 0.3) 80%,
+    transparent 100%);
+
+    z-index: 2;
+    color: var(--color-white);
 }
 
 /* Typography in Hero */
-.event-title {
+.event-hero-overlay .event-title {
     font-family: var(--font-heading, serif), serif;
     font-weight: 700;
     font-size: 3rem;
     margin-bottom: 0.5rem;
     line-height: 1.1;
-    text-shadow: var(--shadow-text);
+    color: var(--color-white);
+    text-shadow: 0 4px 15px rgba(0,0,0,0.9);
 }
 
-.event-hero-meta {
+.event-hero-overlay .event-hero-meta {
     font-size: 1.1rem;
-    opacity: 0.9;
+    opacity: 0.95;
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+}
+
+/* Гарантуємо, що іконки теж білі */
+.event-hero-overlay .event-hero-meta i {
+    color: var(--color-white);
 }
 
 /* Content Area */
@@ -140,7 +155,7 @@
 }
 
 .progress-bar-custom.full {
-    background-color: #dc3545;
+    background-color: var(--color-danger);
 }
 
 /* Action Buttons Area */
