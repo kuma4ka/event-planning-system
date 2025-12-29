@@ -1,9 +1,9 @@
 ﻿/* --- NAVBAR --- */
 .navbar-meetup {
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: var(--bg-surface-glass);
     backdrop-filter: blur(12px);
     padding: 1rem 2rem;
-    border-bottom: 1px solid var(--color-ash-grey);
+    border-bottom: 1px solid var(--border-light);
 }
 
 .brand-logo {
@@ -11,8 +11,8 @@
     font-weight: 800;
     letter-spacing: -0.5px;
     background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));
-    background-clip: text;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     color: var(--color-dark-teal);
     text-decoration: none;
@@ -20,17 +20,18 @@
 
 .brand-logo:hover {
     background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));
-    background-clip: text;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-/* Search Pill */
-.search-pill-container {
+/* --- Search Pill --- */
+
+.navbar-meetup .search-pill-container {
     display: flex;
     align-items: center;
-    background-color: #fff;
-    border: 1px solid var(--color-ash-grey);
+    background-color: var(--bg-body);
+    border: 1px solid var(--border-light);
     border-radius: 12px;
     padding: 6px 6px 6px 20px;
     max-width: 500px;
@@ -38,24 +39,29 @@
     transition: all 0.3s ease;
 }
 
-.search-pill-container:focus-within {
+.navbar-meetup .search-pill-container:focus-within {
     border-color: var(--color-dark-teal);
     box-shadow: 0 4px 15px rgba(89, 131, 146, 0.15);
 }
 
-.search-input-header {
+.navbar-meetup .search-input-header {
     border: none;
     outline: none;
     width: 100%;
-    color: var(--color-ink-black);
+    color: var(--text-main);
     font-size: 1rem;
     background: transparent;
     font-family: var(--font-body), sans-serif;
 }
 
-.search-btn-header {
+/* Placeholder fix */
+.navbar-meetup .search-input-header::placeholder {
+    color: var(--text-muted);
+}
+
+.navbar-meetup .search-btn-header {
     background-color: var(--color-dark-teal);
-    color: #fff;
+    color: var(--color-white);
     border: none;
     border-radius: 8px;
     width: 40px;
@@ -68,13 +74,14 @@
     transition: all 0.2s;
 }
 
-.search-btn-header:hover {
+.navbar-meetup .search-btn-header:hover {
     background-color: var(--color-air-force-blue);
 }
 
-/* Auth Buttons */
-.nav-link-login {
-    color: var(--color-dark-teal) !important;
+/* --- Auth Buttons --- */
+
+.navbar-meetup .nav-link-login {
+    color: var(--color-dark-teal);
     font-weight: 600;
     margin-right: 1.5rem;
     font-size: 1rem;
@@ -82,25 +89,25 @@
     font-family: var(--font-heading), serif;
 }
 
-.nav-link-login:hover {
-    color: var(--color-air-force-blue) !important;
+.navbar-meetup .nav-link-login:hover {
+    color: var(--color-air-force-blue);
 }
 
-.btn-signup-header {
+.navbar-meetup .btn-signup-header {
     background-color: var(--color-ink-black);
-    color: #fff !important;
+    color: var(--color-white);
     font-weight: 600;
     padding: 0.7rem 1.5rem;
-    border-radius: 8px !important;
+    border-radius: 8px;
     font-size: 0.95rem;
     border: 2px solid transparent;
     transition: all 0.3s;
     font-family: var(--font-heading), serif;
 }
 
-.btn-signup-header:hover {
+.navbar-meetup .btn-signup-header:hover {
     background-color: var(--color-dark-teal);
-    color: #fff !important;
+    color: var(--color-white);
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(1, 22, 30, 0.2);
 }
