@@ -27,6 +27,7 @@ public abstract class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : 
 
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required.")
+            .MaximumLength(254).WithMessage("Email cannot exceed 254 characters.")
             .EmailAddress().WithMessage("Invalid email format.")
             .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
             .WithMessage("Email must be a valid address with a domain (e.g., user@example.com).");

@@ -16,7 +16,7 @@ public class CreateEventDtoValidator : AbstractValidator<CreateEventDto>
             .MaximumLength(1000).WithMessage("Description must not exceed 1000 characters.");
 
         RuleFor(x => x.Date)
-            .GreaterThan(DateTime.Now).WithMessage("Event date must be in the future.");
+            .GreaterThan(DateTime.UtcNow).WithMessage("Event date must be in the future.");
 
         RuleFor(x => x.Type)
             .IsInEnum().WithMessage("Invalid event type.");

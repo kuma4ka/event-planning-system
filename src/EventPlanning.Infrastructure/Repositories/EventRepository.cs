@@ -14,8 +14,51 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
     {
         return await context.Events
             .Include(e => e.Venue)
+            // .Include(e => e.Guests) // Removed for performance (lazy loading split)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    }
+
+    public async Task<Event?> GetDetailsByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await context.Events
+            .Include(e => e.Venue)
             .Include(e => e.Guests)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    }
+
+    public async Task<int> CountGuestsAsync(int eventId, CancellationToken cancellationToken = default)
+    {
+        return await context.Guests
+           .AsNoTracking()
+           .CountAsync(g => g.EventId == eventId, cancellationToken);
+    }
+
+    public async Task<bool> GuestEmailExistsAsync(int eventId, string email, string? excludeGuestId = null, CancellationToken cancellationToken = default)
+    {
+        var query = context.Guests
+            .AsNoTracking()
+            .Where(g => g.EventId == eventId && g.Email == email);
+
+        if (!string.IsNullOrEmpty(excludeGuestId))
+        {
+            query = query.Where(g => g.Id != excludeGuestId);
+        }
+
+        return await query.AnyAsync(cancellationToken);
+    }
+
+    public async Task<bool> GuestPhoneExistsAsync(int eventId, string phoneNumber, string? excludeGuestId = null, CancellationToken cancellationToken = default)
+    {
+        var query = context.Guests
+            .AsNoTracking()
+            .Where(g => g.EventId == eventId && g.PhoneNumber == phoneNumber);
+
+        if (!string.IsNullOrEmpty(excludeGuestId))
+        {
+            query = query.Where(g => g.Id != excludeGuestId);
+        }
+
+        return await query.AnyAsync(cancellationToken);
     }
 
     public async Task<List<Event>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -110,24 +153,64 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .AnyAsync(g => g.EventId == eventId && g.Email == user.Email, cancellationToken);
     }
 
-    public async Task AddGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task<bool> TryJoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
-        var user = await context.Users.FindAsync([userId], cancellationToken);
-        if (user == null) throw new KeyNotFoundException("User not found");
-        if (string.IsNullOrEmpty(user.Email)) throw new InvalidOperationException("User has no email");
+        // Use a Serializable transaction to prevent race conditions (overbooking)
+        // This ensures that between reading the count and inserting, no other transaction can modify the data.
+        using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
 
-        var guest = new Guest
+        try
         {
-            Id = Guid.NewGuid().ToString(),
-            EventId = eventId,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email,
-            PhoneNumber = user.PhoneNumber
-        };
+            var user = await context.Users.FindAsync([userId], cancellationToken);
+            if (user == null || string.IsNullOrEmpty(user.Email)) return false;
 
-        await context.Guests.AddAsync(guest, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
+            var eventEntity = await context.Events
+                .Include(e => e.Venue)
+                .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
+
+            if (eventEntity == null) return false;
+
+            // Check capacity
+            if (eventEntity.Venue is { Capacity: > 0 })
+            {
+                // We must query the count from the DB within this transaction scope
+                var currentCount = await context.Guests.CountAsync(g => g.EventId == eventId, cancellationToken);
+                if (currentCount >= eventEntity.Venue.Capacity)
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    return false; // Event is full
+                }
+            }
+
+            // Check if already joined
+            var alreadyJoined = await context.Guests.AnyAsync(g => g.EventId == eventId && g.Email == user.Email, cancellationToken);
+            if (alreadyJoined)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                return false; // Already joined
+            }
+
+            var guest = new Guest
+            {
+                Id = Guid.NewGuid().ToString(),
+                EventId = eventId,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber
+            };
+
+            await context.Guests.AddAsync(guest, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+
+            return true;
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 
     public async Task RemoveGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default)
