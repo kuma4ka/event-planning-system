@@ -180,17 +180,14 @@ public class EventService(
         var validationResult = await createValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-        var eventEntity = new Event
-        {
-            Name = dto.Name,
-            Description = dto.Description,
-            Date = dto.Date,
-            Type = dto.Type,
-            VenueId = dto.VenueId == 0 ? null : dto.VenueId,
-            OrganizerId = userId,
-            IsPrivate = false,
-            CreatedAt = DateTime.UtcNow
-        };
+        var eventEntity = new Event(
+            dto.Name,
+            dto.Description,
+            dto.Date,
+            dto.Type,
+            userId,
+            dto.VenueId == 0 ? null : dto.VenueId
+        );
 
         return await eventRepository.AddAsync(eventEntity, cancellationToken);
     }
@@ -208,11 +205,13 @@ public class EventService(
         if (eventEntity.Date < DateTime.UtcNow)
             throw new InvalidOperationException("Cannot edit an event that has already ended.");
 
-        eventEntity.Name = dto.Name;
-        eventEntity.Description = dto.Description;
-        eventEntity.Date = dto.Date;
-        eventEntity.Type = dto.Type;
-        eventEntity.VenueId = dto.VenueId == 0 ? null : dto.VenueId;
+        eventEntity.UpdateDetails(
+            dto.Name,
+            dto.Description,
+            dto.Date,
+            dto.Type,
+            dto.VenueId == 0 ? null : dto.VenueId
+        );
 
         await eventRepository.UpdateAsync(eventEntity, cancellationToken);
 

@@ -159,56 +159,11 @@ public static class DbInitializer
 
         var events = new List<Event>
         {
-            new()
-            {
-                Name = "Global Tech Summit 2024",
-                Description = "Annual gathering of tech leaders and innovators.",
-                Date = DateTime.Now.AddMonths(2),
-                Type = EventType.Conference,
-                OrganizerId = organizerUser.Id,
-                VenueId = venues[1].Id,
-                IsPrivate = false
-            },
-            new()
-            {
-                Name = "Rock Legends Live",
-                Description = "A night of classic rock hits under the stars.",
-                Date = DateTime.Now.AddDays(14),
-                Type = EventType.Concert,
-                OrganizerId = adminUser.Id,
-                VenueId = venues[2].Id,
-                IsPrivate = false
-            },
-            new()
-            {
-                Name = "Kyiv Startup Day",
-                Description = "Networking and pitch sessions for UA startups.",
-                Date = DateTime.Now.AddDays(5),
-                Type = EventType.Workshop,
-                OrganizerId = organizerUser.Id,
-                VenueId = venues[7].Id,
-                IsPrivate = false
-            },
-            new()
-            {
-                Name = "Classic Evening",
-                Description = "Mozart and Bach performed by the Symphony Orchestra.",
-                Date = DateTime.Now.AddMonths(1),
-                Type = EventType.Concert,
-                OrganizerId = adminUser.Id,
-                VenueId = venues[5].Id,
-                IsPrivate = false
-            },
-            new()
-            {
-                Name = "Past Event Example",
-                Description = "This event already happened.",
-                Date = DateTime.Now.AddMonths(-1),
-                Type = EventType.NetworkingEvent,
-                OrganizerId = organizerUser.Id,
-                VenueId = venues[0].Id,
-                IsPrivate = false
-            }
+            new("Global Tech Summit 2024", "Annual gathering of tech leaders and innovators.", DateTime.Now.AddMonths(2), EventType.Conference, organizerUser.Id, venues[1].Id, false),
+            new("Rock Legends Live", "A night of classic rock hits under the stars.", DateTime.Now.AddDays(14), EventType.Concert, adminUser.Id, venues[2].Id, false),
+            new("Kyiv Startup Day", "Networking and pitch sessions for UA startups.", DateTime.Now.AddDays(5), EventType.Workshop, organizerUser.Id, venues[7].Id, false),
+            new("Classic Evening", "Mozart and Bach performed by the Symphony Orchestra.", DateTime.Now.AddMonths(1), EventType.Concert, adminUser.Id, venues[5].Id, false),
+            new("Past Event Example", "This event already happened.", DateTime.Now.AddMonths(-1), EventType.NetworkingEvent, organizerUser.Id, venues[0].Id, false)
         };
 
         await context.Events.AddRangeAsync(events);
