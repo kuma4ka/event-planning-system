@@ -190,15 +190,14 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
                 return false; // Already joined
             }
 
-            var guest = new Guest
-            {
-                Id = Guid.NewGuid().ToString(),
-                EventId = eventId,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber
-            };
+            var guest = new Guest(
+                Guid.NewGuid().ToString(),
+                user.FirstName,
+                user.LastName,
+                user.Email,
+                eventId,
+                user.PhoneNumber
+            );
 
             await context.Guests.AddAsync(guest, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);

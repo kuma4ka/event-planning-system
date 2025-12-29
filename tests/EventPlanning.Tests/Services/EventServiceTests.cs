@@ -142,14 +142,7 @@ public class EventServiceTests
         var organizerId = "user-1";
         var currentUserId = "user-2";
 
-        var guest = new Guest
-        {
-            Id = "g1",
-            FirstName = "Test",
-            LastName = "Guest",
-            Email = "guest@test.com",
-            PhoneNumber = "1234567890"
-        };
+        var guest = new Guest("g1", "Test", "Guest", "guest@test.com", eventId, "1234567890");
 
         var eventEntity = new Event(
             "Test Event",
@@ -188,14 +181,7 @@ public class EventServiceTests
         var organizerId = "user-1";
         var currentUserId = "user-1"; // Is Organizer
 
-        var guest = new Guest
-        {
-            Id = "g1",
-            FirstName = "Test",
-            LastName = "Guest",
-            Email = "guest@test.com",
-            PhoneNumber = "+1234567890"
-        };
+        var guest = new Guest("g1", "Test", "Guest", "guest@test.com", eventId, "+1234567890");
 
         var eventEntity = new Event(
             "Test Event",
