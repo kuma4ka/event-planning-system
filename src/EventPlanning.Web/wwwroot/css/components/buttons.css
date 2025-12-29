@@ -1,6 +1,6 @@
 ﻿/* --- BUTTONS --- */
 .btn {
-    border-radius: 8px;
+    border-radius: var(--radius-md);
 }
 
 .btn-primary {
@@ -8,7 +8,7 @@
     border-color: var(--color-dark-teal);
     color: var(--color-white);
     font-weight: 500;
-    transition: all 0.3s ease;
+    transition: var(--transition-base);
     letter-spacing: 1px;
     padding: 0.6rem 1.5rem;
 }
