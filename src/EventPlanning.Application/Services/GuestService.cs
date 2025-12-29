@@ -149,7 +149,8 @@ public class GuestService(
 
     private void InvalidateEventCache(int eventId)
     {
-        cache.Remove($"{EventCacheKeyPrefix}{eventId}");
+        cache.Remove($"{EventCacheKeyPrefix}{eventId}_public");
+        cache.Remove($"{EventCacheKeyPrefix}{eventId}_organizer");
     }
 
     private static Guest CreateGuestEntity(GuestBaseDto dto)
