@@ -13,60 +13,7 @@
 }
 
 /* --- TOOLBAR / FILTER SECTION --- */
-.dashboard-toolbar {
-    background-color: var(--bg-surface);
-    border-radius: 12px;
-    border: 1px solid var(--border-light);
-    padding: 1.5rem;
-    box-shadow: var(--shadow-soft);
-    margin-bottom: 2rem;
-}
-
-.dashboard-input-group {
-    background-color: var(--bg-body);
-    border-radius: 8px;
-    border: 1px solid transparent;
-    transition: all 0.3s ease;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-}
-
-.dashboard-input-group:focus-within {
-    background-color: var(--bg-surface);
-    border-color: var(--color-dark-teal);
-    box-shadow: 0 0 0 3px rgba(18, 69, 89, 0.1);
-}
-
-.dashboard-input-group .input-group-text {
-    background-color: transparent;
-    border: none;
-    color: var(--text-muted);
-    padding-right: 0;
-    padding-left: 1rem;
-}
-
-.dashboard-input-group .form-control,
-.dashboard-input-group .form-select {
-    background-color: transparent;
-    border: none;
-    color: var(--text-main);
-    padding: 0.7rem 1rem;
-    font-weight: 500;
-}
-
-.dashboard-input-group .form-control:focus,
-.dashboard-input-group .form-select:focus {
-    box-shadow: none;
-    background-color: transparent;
-}
-
-.date-separator {
-    color: var(--text-muted);
-    font-weight: bold;
-    align-self: center;
-    padding: 0 0.5rem;
-}
+/* (Refactored to use shared partial _EventFilter) */
 
 /* --- EVENTS TABLE/LIST --- */
 .dashboard-table {
@@ -87,7 +34,7 @@
 
 .dashboard-row {
     background-color: var(--bg-surface);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
