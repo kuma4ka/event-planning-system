@@ -6,8 +6,6 @@
 @import url('components/buttons.css');
 @import url('components/forms.css');
 @import url('components/cards.css');
-@import url('components/profile.css');
-@import url('components/auth.css');
 @import url('components/pagination.css');
 @import url('components/view-toggle.css');
 
@@ -15,6 +13,9 @@
 @import url('components/admin/navigation.css');
 @import url('components/admin/tables.css');
 @import url('components/admin/forms.css');
+
+@import url('pages/account/profile.css');
+@import url('pages/account/auth.css');
 
 @import url('pages/events/details.css');
 @import url('pages/events/form.css');
