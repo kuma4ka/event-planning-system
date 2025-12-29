@@ -16,7 +16,6 @@ public class EventService(
     IValidator<CreateEventDto> createValidator,
     IValidator<UpdateEventDto> updateValidator,
     IValidator<EventSearchDto> searchValidator,
-    IIdentityService identityService,
     IHttpContextAccessor httpContextAccessor,
     IMemoryCache cache) : IEventService
 {
@@ -230,34 +229,21 @@ public class EventService(
         if (eventEntity.OrganizerId == userId)
             throw new InvalidOperationException("You cannot join your own event as a guest.");
 
-        if (eventEntity.Venue is { Capacity: > 0 } &&
-            eventEntity.Guests.Count >= eventEntity.Venue.Capacity)
-        {
-            throw new InvalidOperationException("Sorry, this event is fully booked.");
-        }
-
-        var user = await identityService.GetUserByIdAsync(userId);
-        if (user == null) throw new KeyNotFoundException("User not found.");
-
-        if (eventEntity.Guests.Any(g => g.Email.Equals(user.Email, StringComparison.OrdinalIgnoreCase)))
+        // Check if already joined (lightweight check)
+        var isJoined = await eventRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);
+        if (isJoined)
         {
             throw new InvalidOperationException("You are already registered for this event.");
         }
 
-        if (!string.IsNullOrEmpty(user.PhoneNumber))
+        // Try to join atomically
+        var success = await eventRepository.TryJoinEventAsync(eventId, userId, cancellationToken);
+        if (!success)
         {
-            var isPhoneTaken = eventEntity.Guests.Any(g =>
-                !string.IsNullOrEmpty(g.PhoneNumber) &&
-                g.PhoneNumber == user.PhoneNumber);
-
-            if (isPhoneTaken)
-            {
-                var displayPhone = user.PhoneNumber.StartsWith("+") ? user.PhoneNumber : $"+{user.PhoneNumber}";
-                throw new InvalidOperationException($"A participant with this phone number {displayPhone} is already joined to this event.");
-            }
+            // If failed, it's likely full or a race condition occurred
+            // We can double check capacity for a better error message, but generally:
+            throw new InvalidOperationException("Sorry, this event is fully booked or unavailable.");
         }
-
-        await eventRepository.AddGuestAsync(eventId, userId, cancellationToken);
 
         InvalidateEventCache(eventId);
     }

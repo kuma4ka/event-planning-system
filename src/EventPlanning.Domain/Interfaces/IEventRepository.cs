@@ -24,7 +24,7 @@ public interface IEventRepository
         CancellationToken cancellationToken = default);
 
     Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default);
-    Task AddGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default);
+    Task<bool> TryJoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default);
     Task RemoveGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default);
     Task<int> CountJoinedEventsAsync(string userId, CancellationToken cancellationToken = default);
 }

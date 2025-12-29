@@ -17,7 +17,6 @@ public class EventServiceTests
 {
     private readonly Mock<IEventRepository> _eventRepoMock;
     private readonly Mock<IValidator<CreateEventDto>> _createValidatorMock;
-    private readonly Mock<IIdentityService> _identityServiceMock;
     private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock;
 
     private readonly EventService _service;
@@ -28,7 +27,6 @@ public class EventServiceTests
         _createValidatorMock = new Mock<IValidator<CreateEventDto>>();
         Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
         Mock<IValidator<EventSearchDto>> searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
-        _identityServiceMock = new Mock<IIdentityService>();
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         Mock<IMemoryCache> cacheMock = new Mock<IMemoryCache>();
 
@@ -37,7 +35,6 @@ public class EventServiceTests
             _createValidatorMock.Object,
             updateValidatorMock.Object,
             searchValidatorMock.Object,
-            _identityServiceMock.Object,
             _httpContextAccessorMock.Object,
             cacheMock.Object
         );
@@ -109,38 +106,21 @@ public class EventServiceTests
         // Arrange
         var eventId = 1;
         var userId = "user-123";
-        var userEmail = "duplicate@test.com";
-
-        var existingGuest = new Guest
-        {
-            Email = userEmail,
-            FirstName = "Existing",
-            LastName = "Guest"
-        };
 
         var eventEntity = new Event
         {
             Id = eventId,
             OrganizerId = "other-organizer",
-            Date = DateTime.Now.AddDays(5),
-            Guests = new List<Guest> { existingGuest }
-        };
-
-        var user = new User
-        {
-            Id = userId,
-            Email = userEmail,
-            FirstName = "Test",
-            LastName = "User"
+            Date = DateTime.Now.AddDays(5)
         };
 
         _eventRepoMock
             .Setup(r => r.GetByIdAsync(eventId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(eventEntity);
 
-        _identityServiceMock
-            .Setup(s => s.GetUserByIdAsync(userId))
-            .ReturnsAsync(user);
+        _eventRepoMock
+            .Setup(r => r.IsUserJoinedAsync(eventId, userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
 
         // Act
         Func<Task> act = async () => await _service.JoinEventAsync(eventId, userId);
@@ -149,6 +129,6 @@ public class EventServiceTests
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("You are already registered for this event.");
 
-        _eventRepoMock.Verify(x => x.AddGuestAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _eventRepoMock.Verify(x => x.TryJoinEventAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }
