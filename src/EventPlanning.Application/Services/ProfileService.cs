@@ -50,8 +50,8 @@ public class ProfileService(
         var user = await userManager.FindByIdAsync(userId);
         if (user == null) throw new KeyNotFoundException("User not found");
 
-        var newFullPhoneNumber = string.IsNullOrEmpty(dto.PhoneNumber) 
-            ? null 
+        var newFullPhoneNumber = string.IsNullOrEmpty(dto.PhoneNumber)
+            ? null
             : $"{dto.CountryCode}{dto.PhoneNumber}";
 
         if (newFullPhoneNumber != user.PhoneNumber && !string.IsNullOrEmpty(newFullPhoneNumber))
@@ -66,8 +66,7 @@ public class ProfileService(
             }
         }
 
-        user.FirstName = dto.FirstName;
-        user.LastName = dto.LastName;
+        user.UpdateProfile(dto.FirstName, dto.LastName);
         user.PhoneNumber = newFullPhoneNumber;
 
         var result = await userManager.UpdateAsync(user);

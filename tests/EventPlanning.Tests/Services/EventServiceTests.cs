@@ -106,12 +106,15 @@ public class EventServiceTests
         var eventId = 1;
         var userId = "user-123";
 
-        var eventEntity = new Event
-        {
-            Id = eventId,
-            OrganizerId = "other-organizer",
-            Date = DateTime.UtcNow.AddDays(5)
-        };
+        var eventEntity = new Event(
+            "Test Event",
+            "Description",
+            DateTime.UtcNow.AddDays(5),
+            EventType.Conference,
+            "other-organizer");
+
+        // Reflection to set Id for testing
+        typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
 
         _eventRepoMock
             .Setup(r => r.GetByIdAsync(eventId, It.IsAny<CancellationToken>()))
@@ -139,21 +142,16 @@ public class EventServiceTests
         var organizerId = "user-1";
         var currentUserId = "user-2";
 
-        var guest = new Guest
-        {
-            Id = "g1",
-            FirstName = "Test",
-            LastName = "Guest",
-            Email = "guest@test.com",
-            PhoneNumber = "1234567890"
-        };
+        var guest = new Guest("g1", "Test", "Guest", "guest@test.com", eventId, "1234567890");
 
-        var eventEntity = new Event
-        {
-            Id = eventId,
-            OrganizerId = organizerId,
-            Guests = new List<Guest> { guest }
-        };
+        var eventEntity = new Event(
+            "Test Event",
+            "Desc",
+            DateTime.UtcNow.AddDays(1),
+            EventType.Conference,
+            organizerId);
+        typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
+        eventEntity.AddGuest(guest);
 
         _eventRepoMock
             .Setup(r => r.GetDetailsByIdAsync(eventId, It.IsAny<CancellationToken>()))
@@ -183,21 +181,16 @@ public class EventServiceTests
         var organizerId = "user-1";
         var currentUserId = "user-1"; // Is Organizer
 
-        var guest = new Guest
-        {
-            Id = "g1",
-            FirstName = "Test",
-            LastName = "Guest",
-            Email = "guest@test.com",
-            PhoneNumber = "+1234567890"
-        };
+        var guest = new Guest("g1", "Test", "Guest", "guest@test.com", eventId, "+1234567890");
 
-        var eventEntity = new Event
-        {
-            Id = eventId,
-            OrganizerId = organizerId,
-            Guests = new List<Guest> { guest }
-        };
+        var eventEntity = new Event(
+            "Test Event",
+            "Desc",
+            DateTime.UtcNow.AddDays(1),
+            EventType.Conference,
+            organizerId);
+        typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
+        eventEntity.AddGuest(guest);
 
         _eventRepoMock
             .Setup(r => r.GetDetailsByIdAsync(eventId, It.IsAny<CancellationToken>()))

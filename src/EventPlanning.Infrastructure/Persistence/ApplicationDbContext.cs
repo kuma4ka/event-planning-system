@@ -1,10 +1,11 @@
 ﻿using EventPlanning.Domain.Entities;
+using EventPlanning.Domain.ValueObjects;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace EventPlanning.Infrastructure.Persistence;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
     : IdentityDbContext<User>(options)
 {
     public DbSet<Event> Events => Set<Event>();
@@ -18,7 +19,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Entity<Event>(entity =>
         {
             entity.HasKey(e => e.Id);
-            
+
             entity.Property(e => e.Name)
                   .IsRequired()
                   .HasMaxLength(200);
@@ -38,7 +39,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Entity<Venue>(entity =>
         {
             entity.HasKey(v => v.Id);
-            
+
             entity.Property(v => v.Name)
                   .IsRequired()
                   .HasMaxLength(200);
@@ -53,10 +54,18 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Entity<Guest>(entity =>
         {
             entity.HasKey(g => g.Id);
-            
+
             entity.Property(g => g.Email)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(100)
+                .HasConversion(
+                    v => v.Value,
+                    v => EmailAddress.Create(v));
+
+            entity.Property(g => g.PhoneNumber)
+                .HasConversion(
+                    v => v != null ? v.Value : null,
+                    v => v != null ? PhoneNumber.Create(v) : null);
 
             entity.HasIndex(g => new { g.EventId, g.Email })
                 .IsUnique();

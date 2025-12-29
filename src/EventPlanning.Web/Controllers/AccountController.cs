@@ -32,14 +32,13 @@ public class AccountController(
             return View(model);
         }
 
-        var user = new User
-        {
-            UserName = model.Email,
-            Email = model.Email,
-            FirstName = model.FirstName,
-            LastName = model.LastName,
-            Role = UserRole.User
-        };
+        var user = new User(
+            model.FirstName,
+            model.LastName,
+            UserRole.User,
+            model.Email,
+            model.Email
+        );
 
         var result = await userManager.CreateAsync(user, model.Password);
 
@@ -49,7 +48,7 @@ public class AccountController(
             return RedirectToAction("Index", "Home");
         }
 
-        foreach (var error in result.Errors) 
+        foreach (var error in result.Errors)
             ModelState.AddModelError(string.Empty, error.Description);
 
         return View(model);
@@ -87,11 +86,11 @@ public class AccountController(
         {
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
         }
-        
+
         return View(model);
     }
 
-    [HttpGet] 
+    [HttpGet]
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Logout()
@@ -99,7 +98,7 @@ public class AccountController(
         await signInManager.SignOutAsync();
         return RedirectToAction("Index", "Home");
     }
-    
+
     [HttpGet]
     public IActionResult AccessDenied()
     {

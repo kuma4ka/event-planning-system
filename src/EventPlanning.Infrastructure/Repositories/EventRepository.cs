@@ -37,7 +37,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
     {
         var query = context.Guests
             .AsNoTracking()
-            .Where(g => g.EventId == eventId && g.Email == email);
+            .Where(g => g.EventId == eventId && (string)g.Email == email);
 
         if (!string.IsNullOrEmpty(excludeGuestId))
         {
@@ -51,7 +51,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
     {
         var query = context.Guests
             .AsNoTracking()
-            .Where(g => g.EventId == eventId && g.PhoneNumber == phoneNumber);
+            .Where(g => g.EventId == eventId && (string)g.PhoneNumber! == phoneNumber);
 
         if (!string.IsNullOrEmpty(excludeGuestId))
         {
@@ -150,7 +150,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
         if (user == null || string.IsNullOrEmpty(user.Email)) return false;
 
         return await context.Guests
-            .AnyAsync(g => g.EventId == eventId && g.Email == user.Email, cancellationToken);
+            .AnyAsync(g => g.EventId == eventId && (string)g.Email == user.Email, cancellationToken);
     }
 
     public async Task<bool> TryJoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
@@ -183,22 +183,21 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             }
 
             // Check if already joined
-            var alreadyJoined = await context.Guests.AnyAsync(g => g.EventId == eventId && g.Email == user.Email, cancellationToken);
+            var alreadyJoined = await context.Guests.AnyAsync(g => g.EventId == eventId && (string)g.Email == user.Email, cancellationToken);
             if (alreadyJoined)
             {
                 await transaction.RollbackAsync(cancellationToken);
                 return false; // Already joined
             }
 
-            var guest = new Guest
-            {
-                Id = Guid.NewGuid().ToString(),
-                EventId = eventId,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber
-            };
+            var guest = new Guest(
+                Guid.NewGuid().ToString(),
+                user.FirstName,
+                user.LastName,
+                user.Email,
+                eventId,
+                user.PhoneNumber
+            );
 
             await context.Guests.AddAsync(guest, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
@@ -219,7 +218,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
         if (user == null || string.IsNullOrEmpty(user.Email)) return;
 
         var guest = await context.Guests
-            .FirstOrDefaultAsync(g => g.EventId == eventId && g.Email == user.Email, cancellationToken);
+            .FirstOrDefaultAsync(g => g.EventId == eventId && (string)g.Email == user.Email, cancellationToken);
 
         if (guest != null)
         {
@@ -235,6 +234,6 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
 
         return await context.Guests
             .AsNoTracking()
-            .CountAsync(g => g.Email == user.Email, cancellationToken);
+            .CountAsync(g => (string)g.Email == user.Email, cancellationToken);
     }
 }

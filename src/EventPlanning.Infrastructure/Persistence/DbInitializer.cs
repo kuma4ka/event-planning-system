@@ -39,119 +39,20 @@ public static class DbInitializer
         var venues = new List<Venue>
         {
             // USA
-            new()
-            {
-                Name = "Madison Square Garden",
-                Address = "4 Pennsylvania Plaza, New York, NY 10001, USA",
-                Capacity = 20789,
-                Description = "The World's Most Famous Arena. A multi-purpose indoor arena in New York City.",
-                OrganizerId = adminUser.Id,
-                ImageUrl =
-                    "https://images.unsplash.com/photo-1588196406432-0433f6ed5927?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            },
-            new()
-            {
-                Name = "Moscone Center",
-                Address = "747 Howard St, San Francisco, CA 94103, USA",
-                Capacity = 5000,
-                Description = "The largest convention and exhibition complex in San Francisco.",
-                OrganizerId = organizerUser.Id,
-                ImageUrl =
-                    "https://images.unsplash.com/photo-1639527027808-7d178a943028?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            },
-            new()
-            {
-                Name = "Red Rocks Amphitheatre",
-                Address = "18300 W Alameda Pkwy, Morrison, CO 80465, USA",
-                Capacity = 9525,
-                Description = "An open-air amphitheatre built into a rock structure in the western United States.",
-                OrganizerId = organizerUser.Id,
-                ImageUrl =
-                    "https://images.unsplash.com/photo-1593621198039-c87c6f91cbb1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            },
+            new("Madison Square Garden", "4 Pennsylvania Plaza, New York, NY 10001, USA", 20789, adminUser.Id, "The World's Most Famous Arena. A multi-purpose indoor arena in New York City.", "https://images.unsplash.com/photo-1588196406432-0433f6ed5927?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+            new("Moscone Center", "747 Howard St, San Francisco, CA 94103, USA", 5000, organizerUser.Id, "The largest convention and exhibition complex in San Francisco.", "https://images.unsplash.com/photo-1639527027808-7d178a943028?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+            new("Red Rocks Amphitheatre", "18300 W Alameda Pkwy, Morrison, CO 80465, USA", 9525, organizerUser.Id, "An open-air amphitheatre built into a rock structure in the western United States.", "https://images.unsplash.com/photo-1593621198039-c87c6f91cbb1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
             // Europe
-            new()
-            {
-                Name = "The Royal Albert Hall",
-                Address = "Kensington Gore, South Kensington, London SW7 2AP, UK",
-                Capacity = 5272,
-                Description = "A concert hall on the northern edge of South Kensington, London.",
-                OrganizerId = adminUser.Id,
-                ImageUrl =
-                    "https://images.unsplash.com/photo-1655769121160-253b1b01888c?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            },
-            new()
-            {
-                Name = "Station F",
-                Address = "5 Parvis Alan Turing, 75013 Paris, France",
-                Capacity = 3000,
-                Description = "The world's largest startup facility, located in the 13th arrondissement of Paris.",
-                OrganizerId = organizerUser.Id,
-                ImageUrl =
-                    "https://images.unsplash.com/photo-1632042856663-90ba0e32bf7a?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            },
-            new()
-            {
-                Name = "Elbphilharmonie",
-                Address = "Platz d. Deutschen Einheit 4, 20457 Hamburg, Germany",
-                Capacity = 2100,
-                Description = "One of the largest and most acoustically advanced concert halls in the world.",
-                OrganizerId = adminUser.Id,
-                ImageUrl =
-                    "https://images.unsplash.com/photo-1553547274-0df401ae03c9?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            },
+            new("The Royal Albert Hall", "Kensington Gore, South Kensington, London SW7 2AP, UK", 5272, adminUser.Id, "A concert hall on the northern edge of South Kensington, London.", "https://images.unsplash.com/photo-1655769121160-253b1b01888c?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+            new("Station F", "5 Parvis Alan Turing, 75013 Paris, France", 3000, organizerUser.Id, "The world's largest startup facility, located in the 13th arrondissement of Paris.", "https://images.unsplash.com/photo-1632042856663-90ba0e32bf7a?q=80&w=1176&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+            new("Elbphilharmonie", "Platz d. Deutschen Einheit 4, 20457 Hamburg, Germany", 2100, adminUser.Id, "One of the largest and most acoustically advanced concert halls in the world.", "https://images.unsplash.com/photo-1553547274-0df401ae03c9?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
             // Ukraine
-            new()
-            {
-                Name = "NSC Olimpiyskiy",
-                Address = "Velyka Vasylkivska St, 55, Kyiv, Ukraine, 02000",
-                Capacity = 70050,
-                Description = "The premier sports and entertainment venue in Ukraine.",
-                OrganizerId = adminUser.Id,
-                ImageUrl =
-                    "https://images.unsplash.com/photo-1636241502039-3b8e908f7197?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            },
-            new()
-            {
-                Name = "Unit.City",
-                Address = "Dorohozhytska St, 3, Kyiv, Ukraine, 04119",
-                Capacity = 1000,
-                Description = "First innovation park in Ukraine. Perfect for tech conferences and hackathons.",
-                OrganizerId = organizerUser.Id,
-                ImageUrl =
-                    "https://images.unsplash.com/photo-1686902318140-c8ba4f3812b8?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            },
-            new()
-            {
-                Name = "Lviv Theatre of Opera and Ballet",
-                Address = "Svobody Ave, 28, Lviv, Lviv Oblast, Ukraine, 79000",
-                Capacity = 1100,
-                Description = "An architectural gem and one of the most beautiful opera houses in Europe.",
-                OrganizerId = organizerUser.Id,
-                ImageUrl =
-                    "https://images.unsplash.com/photo-1748466991647-725993f162eb?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            },
+            new("NSC Olimpiyskiy", "Velyka Vasylkivska St, 55, Kyiv, Ukraine, 02000", 70050, adminUser.Id, "The premier sports and entertainment venue in Ukraine.", "https://images.unsplash.com/photo-1636241502039-3b8e908f7197?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+            new("Unit.City", "Dorohozhytska St, 3, Kyiv, Ukraine, 04119", 1000, organizerUser.Id, "First innovation park in Ukraine. Perfect for tech conferences and hackathons.", "https://images.unsplash.com/photo-1686902318140-c8ba4f3812b8?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+            new("Lviv Theatre of Opera and Ballet", "Svobody Ave, 28, Lviv, Lviv Oblast, Ukraine, 79000", 1100, organizerUser.Id, "An architectural gem and one of the most beautiful opera houses in Europe.", "https://images.unsplash.com/photo-1748466991647-725993f162eb?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
             // Asia / Australia
-            new()
-            {
-                Name = "Sydney Opera House",
-                Address = "Bennelong Point, Sydney NSW 2000, Australia",
-                Capacity = 5738,
-                Description = "A multi-venue performing arts centre at Sydney Harbour.",
-                OrganizerId = adminUser.Id,
-                ImageUrl =
-                    "https://images.unsplash.com/photo-1523059623039-a9ed027e7fad?q=80&w=1132&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            },
-            new()
-            {
-                Name = "Marina Bay Sands Expo",
-                Address = "10 Bayfront Ave, Singapore 018956",
-                Capacity = 45000,
-                Description = "Asia's leading destination for business, leisure and entertainment.",
-                OrganizerId = organizerUser.Id,
-                ImageUrl =
-                    "https://images.unsplash.com/photo-1727549150616-21b6853f2fb2?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            }
+            new("Sydney Opera House", "Bennelong Point, Sydney NSW 2000, Australia", 5738, adminUser.Id, "A multi-venue performing arts centre at Sydney Harbour.", "https://images.unsplash.com/photo-1523059623039-a9ed027e7fad?q=80&w=1132&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+            new("Marina Bay Sands Expo", "10 Bayfront Ave, Singapore 018956", 45000, organizerUser.Id, "Asia's leading destination for business, leisure and entertainment.", "https://images.unsplash.com/photo-1727549150616-21b6853f2fb2?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
         };
 
         await context.Venues.AddRangeAsync(venues);
@@ -159,56 +60,11 @@ public static class DbInitializer
 
         var events = new List<Event>
         {
-            new()
-            {
-                Name = "Global Tech Summit 2024",
-                Description = "Annual gathering of tech leaders and innovators.",
-                Date = DateTime.Now.AddMonths(2),
-                Type = EventType.Conference,
-                OrganizerId = organizerUser.Id,
-                VenueId = venues[1].Id,
-                IsPrivate = false
-            },
-            new()
-            {
-                Name = "Rock Legends Live",
-                Description = "A night of classic rock hits under the stars.",
-                Date = DateTime.Now.AddDays(14),
-                Type = EventType.Concert,
-                OrganizerId = adminUser.Id,
-                VenueId = venues[2].Id,
-                IsPrivate = false
-            },
-            new()
-            {
-                Name = "Kyiv Startup Day",
-                Description = "Networking and pitch sessions for UA startups.",
-                Date = DateTime.Now.AddDays(5),
-                Type = EventType.Workshop,
-                OrganizerId = organizerUser.Id,
-                VenueId = venues[7].Id,
-                IsPrivate = false
-            },
-            new()
-            {
-                Name = "Classic Evening",
-                Description = "Mozart and Bach performed by the Symphony Orchestra.",
-                Date = DateTime.Now.AddMonths(1),
-                Type = EventType.Concert,
-                OrganizerId = adminUser.Id,
-                VenueId = venues[5].Id,
-                IsPrivate = false
-            },
-            new()
-            {
-                Name = "Past Event Example",
-                Description = "This event already happened.",
-                Date = DateTime.Now.AddMonths(-1),
-                Type = EventType.NetworkingEvent,
-                OrganizerId = organizerUser.Id,
-                VenueId = venues[0].Id,
-                IsPrivate = false
-            }
+            new("Global Tech Summit 2024", "Annual gathering of tech leaders and innovators.", DateTime.Now.AddMonths(2), EventType.Conference, organizerUser.Id, venues[1].Id, false),
+            new("Rock Legends Live", "A night of classic rock hits under the stars.", DateTime.Now.AddDays(14), EventType.Concert, adminUser.Id, venues[2].Id, false),
+            new("Kyiv Startup Day", "Networking and pitch sessions for UA startups.", DateTime.Now.AddDays(5), EventType.Workshop, organizerUser.Id, venues[7].Id, false),
+            new("Classic Evening", "Mozart and Bach performed by the Symphony Orchestra.", DateTime.Now.AddMonths(1), EventType.Concert, adminUser.Id, venues[5].Id, false),
+            new("Future Event Example", "This event will happen soon.", DateTime.Now.AddMonths(1), EventType.NetworkingEvent, organizerUser.Id, venues[0].Id, false)
         };
 
         await context.Events.AddRangeAsync(events);
@@ -226,15 +82,8 @@ public static class DbInitializer
         var user = await userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            user = new User
-            {
-                UserName = email,
-                Email = email,
-                FirstName = fName,
-                LastName = lName,
-                Role = Enum.Parse<UserRole>(role),
-                EmailConfirmed = true
-            };
+            user = new User(fName, lName, Enum.Parse<UserRole>(role), email, email);
+            user.EmailConfirmed = true;
             var result = await userManager.CreateAsync(user, password);
             if (!result.Succeeded)
                 throw new Exception(

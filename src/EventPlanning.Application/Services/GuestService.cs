@@ -99,7 +99,7 @@ public class GuestService(
         if (eventEntity.OrganizerId != currentUserId)
             throw new UnauthorizedAccessException("Not your event. Only the organizer can update guests.");
 
-        if (!guest.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase))
+        if (!guest.Email.Value.Equals(dto.Email, StringComparison.OrdinalIgnoreCase))
         {
             if (await eventRepository.GuestEmailExistsAsync(guest.EventId, dto.Email, guest.Id, cancellationToken))
             {
@@ -108,7 +108,7 @@ public class GuestService(
         }
 
         var newFullPhone = dto.CountryCode + dto.PhoneNumber;
-        if (guest.PhoneNumber != newFullPhone && !string.IsNullOrEmpty(dto.PhoneNumber))
+        if ((guest.PhoneNumber != null ? guest.PhoneNumber.Value : null) != newFullPhone && !string.IsNullOrEmpty(dto.PhoneNumber))
         {
             if (await eventRepository.GuestPhoneExistsAsync(guest.EventId, newFullPhone, guest.Id, cancellationToken))
             {
@@ -117,10 +117,7 @@ public class GuestService(
             }
         }
 
-        guest.FirstName = dto.FirstName;
-        guest.LastName = dto.LastName;
-        guest.Email = dto.Email;
-        guest.PhoneNumber = newFullPhone;
+        guest.UpdateDetails(dto.FirstName, dto.LastName, dto.Email, newFullPhone);
 
         await guestRepository.UpdateAsync(guest, cancellationToken);
 
@@ -157,14 +154,13 @@ public class GuestService(
 
     private static Guest CreateGuestEntity(GuestBaseDto dto)
     {
-        return new Guest
-        {
-            Id = Guid.NewGuid().ToString(),
-            EventId = dto.EventId,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            Email = dto.Email,
-            PhoneNumber = dto.CountryCode + dto.PhoneNumber
-        };
+        return new Guest(
+            Guid.NewGuid().ToString(),
+            dto.FirstName,
+            dto.LastName,
+            dto.Email,
+            dto.EventId,
+            dto.CountryCode + dto.PhoneNumber
+        );
     }
 }
