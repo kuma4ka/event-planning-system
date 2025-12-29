@@ -51,6 +51,7 @@ public class EventController(
     }
 
     [HttpPost("create")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateEventDto model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
@@ -100,6 +101,7 @@ public class EventController(
     }
 
     [HttpPost("edit/{id:int}")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, UpdateEventDto model, CancellationToken cancellationToken)
     {
         if (id != model.Id) return BadRequest("ID mismatch");
@@ -140,6 +142,7 @@ public class EventController(
     }
 
     [HttpPost("delete/{id:int}")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
@@ -155,6 +158,7 @@ public class EventController(
     }
 
     [HttpPost("join/{id:int}")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Join(int id, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
@@ -174,6 +178,7 @@ public class EventController(
     }
 
     [HttpPost("leave/{id:int}")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Leave(int id, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
