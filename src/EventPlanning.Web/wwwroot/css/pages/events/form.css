@@ -1,16 +1,16 @@
-﻿/* --- EVENT FORM COMPONENT --- */
+﻿/* --- EVENT FORM CONTAINER --- */
 
 .event-card {
-    background: #fff;
-    border: 1px solid rgba(174, 195, 176, 0.3);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
     border-radius: 16px;
     padding: 2.5rem;
-    box-shadow: 0 10px 30px rgba(1, 22, 30, 0.05);
+    box-shadow: var(--shadow-strong);
 }
 
 .event-form-title {
-    font-family: var(--font-heading), serif;
-    color: var(--color-ink-black);
+    font-family: var(--font-heading, serif), serif;
+    color: var(--text-main);
     font-weight: 700;
     margin-bottom: 0.5rem;
 }
@@ -20,7 +20,7 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 700;
-    color: var(--color-air-force-blue);
+    color: var(--text-muted);
     margin-bottom: 0.5rem;
     display: block;
 }
@@ -29,7 +29,7 @@
 .event-input-group {
     display: flex;
     align-items: center;
-    background-color: var(--color-cool-mist);
+    background-color: var(--bg-body);
     border: 1px solid transparent;
     border-radius: 8px;
     overflow: hidden;
@@ -41,7 +41,7 @@
 }
 
 .event-input-group:focus-within {
-    background-color: #fff;
+    background-color: var(--bg-surface);
     border-color: var(--color-dark-teal);
     box-shadow: 0 0 0 4px rgba(18, 69, 89, 0.15);
 }
@@ -49,7 +49,7 @@
 .event-input-group .input-group-text {
     background-color: transparent;
     border: none;
-    color: var(--color-air-force-blue);
+    color: var(--text-muted);
     padding-left: 1rem;
     padding-right: 0.5rem;
     padding-top: 0.8rem;
@@ -60,9 +60,14 @@
     background-color: transparent;
     border: none;
     box-shadow: none;
-    color: var(--color-ink-black);
+    color: var(--text-main);
     padding: 0.8rem 1rem 0.8rem 0.5rem;
     font-weight: 500;
+}
+
+.event-input-group .form-control::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
 }
 
 .event-input-group .form-control:focus,
@@ -76,11 +81,11 @@
     resize: vertical;
 }
 
-/* Footer buttons */
+/* --- FOOTER ACTIONS --- */
 .form-actions {
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid rgba(174, 195, 176, 0.3);
+    border-top: 1px solid var(--border-light);
     display: flex;
     gap: 1rem;
     justify-content: flex-end;

@@ -1,4 +1,4 @@
-﻿/* --- EVENT DETAILS COMPONENT --- */
+﻿/* --- EVENT DETAILS PAGE --- */
 
 /* Hero Section */
 .event-hero {
@@ -7,7 +7,7 @@
     border-radius: 16px;
     overflow: hidden;
     margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(1, 22, 30, 0.1);
+    box-shadow: var(--shadow-strong);
     background-color: var(--color-ink-black);
 }
 
@@ -29,19 +29,19 @@
     left: 0;
     width: 100%;
     padding: 3rem 2.5rem;
-    background: linear-gradient(to top, rgba(1, 22, 30, 0.9), transparent);
-    color: #fff;
+    background: var(--gradient-hero-overlay);
+    color: var(--text-on-image);
     pointer-events: none;
 }
 
 /* Typography in Hero */
 .event-title {
-    font-family: var(--font-heading), serif;
+    font-family: var(--font-heading, serif), serif;
     font-weight: 700;
     font-size: 3rem;
     margin-bottom: 0.5rem;
     line-height: 1.1;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    text-shadow: var(--shadow-text);
 }
 
 .event-hero-meta {
@@ -58,28 +58,28 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 800;
-    color: var(--color-air-force-blue);
+    color: var(--text-muted);
     margin-bottom: 1rem;
-    border-bottom: 2px solid var(--color-cool-mist);
+    border-bottom: 2px solid var(--border-light);
     padding-bottom: 0.5rem;
 }
 
 .event-description {
     font-size: 1.1rem;
     line-height: 1.8;
-    color: var(--color-ink-black);
+    color: var(--text-main);
     margin-bottom: 2rem;
     white-space: pre-line;
 }
 
 /* Sidebar Cards */
 .event-sidebar-card {
-    background: #fff;
-    border: 1px solid rgba(174, 195, 176, 0.3);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    box-shadow: var(--shadow-soft);
 }
 
 .organizer-info {
@@ -92,7 +92,7 @@
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: var(--color-cool-mist);
+    background: var(--border-light);
     color: var(--color-dark-teal);
     display: flex;
     align-items: center;
@@ -106,7 +106,7 @@
     display: flex;
     align-items: center;
     padding: 0.75rem 0;
-    border-bottom: 1px solid var(--color-cool-mist);
+    border-bottom: 1px solid var(--border-light);
 }
 
 .guest-list-item:last-child {
@@ -117,8 +117,8 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background-color: var(--color-cool-mist);
-    color: var(--color-air-force-blue);
+    background-color: var(--border-light);
+    color: var(--text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -131,7 +131,7 @@
 .progress-thin {
     height: 6px;
     border-radius: 3px;
-    background-color: var(--color-cool-mist);
+    background-color: var(--border-light);
     overflow: hidden;
 }
 
@@ -149,20 +149,20 @@
     gap: 0.75rem;
 }
 
-/* Map Container Styling */
+/* Map Container */
 .event-map-container {
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(174, 195, 176, 0.3);
-    background-color: #fff;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-light);
+    background-color: var(--bg-surface);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
 }
 
 .event-map-container:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(1, 22, 30, 0.1);
+    box-shadow: var(--shadow-strong);
 }
 
 .event-map-frame {
