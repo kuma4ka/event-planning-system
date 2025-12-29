@@ -1,58 +1,22 @@
 ﻿/* --- CARDS & HELPERS --- */
 .card {
-    background-color: #fff;
-    border: 1px solid rgba(174, 195, 176, 0.3);
-    border-radius: 12px !important;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
     overflow: hidden;
 }
 
 .badge {
-    border-radius: 6px !important;
+    border-radius: 6px;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
 }
 
 .hover-effect {
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.hover-effect:hover {
+.card.hover-effect:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* --- PAGINATION COMPONENT --- */
-.page-link {
-    color: var(--color-dark-teal);
-    background-color: #fff;
-    margin: 0 4px;
-    border-radius: 8px;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 500;
-    border: 1px solid var(--color-ash-grey);
-    text-decoration: none;
-}
-
-.page-item.active .page-link {
-    background-color: var(--color-dark-teal);
-    border-color: var(--color-dark-teal);
-    color: white;
-    box-shadow: 0 4px 10px rgba(18, 69, 89, 0.3);
-}
-
-.page-item.disabled .page-link {
-    color: var(--color-ash-grey);
-    pointer-events: none;
-    background-color: transparent;
-    border-color: rgba(174, 195, 176, 0.3);
-}
-
-.page-link:hover {
-    background-color: #eef2f6;
-    color: var(--color-dark-teal);
-    border-color: var(--color-dark-teal);
+    box-shadow: var(--shadow-strong);
 }
