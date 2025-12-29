@@ -22,6 +22,7 @@ public class AccountController(
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterUserDto model)
     {
         var validationResult = await registerValidator.ValidateAsync(model);
@@ -62,6 +63,7 @@ public class AccountController(
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginUserDto model, string? returnUrl = null)
     {
         returnUrl ??= Url.Content("~/");
@@ -93,6 +95,7 @@ public class AccountController(
     [HttpGet]
     [HttpPost]
     [Authorize]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
         await signInManager.SignOutAsync();
