@@ -33,21 +33,7 @@ public class HomeController(
 
         var now = DateTime.Now;
 
-        DateTime effectiveFromDate;
-
-        if (!from.HasValue)
-        {
-            effectiveFromDate = now;
-        }
-        else
-        {
-            if (from.Value.Date < now.Date)
-                effectiveFromDate = now;
-            else if (from.Value.Date == now.Date)
-                effectiveFromDate = now;
-            else
-                effectiveFromDate = from.Value.Date;
-        }
+        var effectiveFromDate = CalculateEffectiveFromDate(from, now);
 
         var adjustedToDate = to?.Date.AddDays(1).AddTicks(-1);
 
@@ -106,5 +92,10 @@ public class HomeController(
     public IActionResult Error()
     {
         return View();
+    }
+    private static DateTime CalculateEffectiveFromDate(DateTime? from, DateTime now)
+    {
+        if (!from.HasValue) return now;
+        return from.Value.Date < now.Date ? now : from.Value.Date;
     }
 }
