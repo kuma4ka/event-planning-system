@@ -2,6 +2,7 @@
 h1, h2, h3, h4, h5, h6, .display-4, .brand-logo, .navbar-brand {
     font-family: var(--font-heading), serif;
     letter-spacing: normal;
+    color: var(--text-main);
 }
 
 html {
