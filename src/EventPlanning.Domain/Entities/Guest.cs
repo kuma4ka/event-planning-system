@@ -1,13 +1,15 @@
-﻿namespace EventPlanning.Domain.Entities;
+﻿using EventPlanning.Domain.ValueObjects;
+
+namespace EventPlanning.Domain.Entities;
 
 public class Guest
 {
     public string Id { get; private set; }
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
-    public string Email { get; private set; }
+    public EmailAddress Email { get; private set; }
 
-    public string? PhoneNumber { get; private set; }
+    public PhoneNumber? PhoneNumber { get; private set; }
 
     public int EventId { get; private set; }
     public Event? Event { get; private set; }
@@ -32,9 +34,9 @@ public class Guest
         Id = id;
         FirstName = firstName;
         LastName = lastName;
-        Email = email;
+        Email = EmailAddress.Create(email);
         EventId = eventId;
-        PhoneNumber = phoneNumber;
+        PhoneNumber = phoneNumber != null ? PhoneNumber.Create(phoneNumber) : null;
     }
 
     public void UpdateDetails(string firstName, string lastName, string email, string? phoneNumber)
@@ -45,7 +47,7 @@ public class Guest
 
         FirstName = firstName;
         LastName = lastName;
-        Email = email;
-        PhoneNumber = phoneNumber;
+        Email = EmailAddress.Create(email);
+        PhoneNumber = phoneNumber != null ? PhoneNumber.Create(phoneNumber) : null;
     }
 }

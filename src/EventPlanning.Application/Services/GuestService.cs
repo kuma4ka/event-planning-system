@@ -99,7 +99,7 @@ public class GuestService(
         if (eventEntity.OrganizerId != currentUserId)
             throw new UnauthorizedAccessException("Not your event. Only the organizer can update guests.");
 
-        if (!guest.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase))
+        if (!guest.Email.Value.Equals(dto.Email, StringComparison.OrdinalIgnoreCase))
         {
             if (await eventRepository.GuestEmailExistsAsync(guest.EventId, dto.Email, guest.Id, cancellationToken))
             {
@@ -108,7 +108,7 @@ public class GuestService(
         }
 
         var newFullPhone = dto.CountryCode + dto.PhoneNumber;
-        if (guest.PhoneNumber != newFullPhone && !string.IsNullOrEmpty(dto.PhoneNumber))
+        if ((guest.PhoneNumber != null ? guest.PhoneNumber.Value : null) != newFullPhone && !string.IsNullOrEmpty(dto.PhoneNumber))
         {
             if (await eventRepository.GuestPhoneExistsAsync(guest.EventId, newFullPhone, guest.Id, cancellationToken))
             {
