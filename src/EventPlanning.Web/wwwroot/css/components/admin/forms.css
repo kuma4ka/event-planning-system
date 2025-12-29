@@ -26,10 +26,10 @@
 .c-admin-input {
     padding-left: 2.5rem;
     border: 1px solid var(--border-light);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     padding-top: 0.7rem;
     padding-bottom: 0.7rem;
-    transition: all 0.2s;
+    transition: var(--transition-base);
     background-color: var(--bg-body);
     color: var(--text-main);
 }
