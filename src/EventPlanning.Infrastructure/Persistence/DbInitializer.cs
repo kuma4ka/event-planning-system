@@ -82,15 +82,8 @@ public static class DbInitializer
         var user = await userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            user = new User
-            {
-                UserName = email,
-                Email = email,
-                FirstName = fName,
-                LastName = lName,
-                Role = Enum.Parse<UserRole>(role),
-                EmailConfirmed = true
-            };
+            user = new User(fName, lName, Enum.Parse<UserRole>(role), email, email);
+            user.EmailConfirmed = true;
             var result = await userManager.CreateAsync(user, password);
             if (!result.Succeeded)
                 throw new Exception(
