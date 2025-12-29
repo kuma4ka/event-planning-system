@@ -16,9 +16,9 @@ public class VenueController(
     UserManager<User> userManager) : Controller
 {
     [HttpGet("")]
-    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    public async Task<IActionResult> Index(int page = 1, CancellationToken cancellationToken = default)
     {
-        var venues = await venueService.GetVenuesAsync(cancellationToken);
+        var venues = await venueService.GetVenuesPagedAsync(page, 9, cancellationToken);
         return View(venues);
     }
 
@@ -52,7 +52,7 @@ public class VenueController(
     public async Task<IActionResult> Edit(int id, CancellationToken cancellationToken)
     {
         var venueDto = await venueService.GetVenueByIdAsync(id, cancellationToken);
-    
+
         if (venueDto == null) return NotFound();
 
         var updateModel = new UpdateVenueDto(
@@ -68,11 +68,11 @@ public class VenueController(
         return View(updateModel);
     }
 
-    [HttpPost("edit/{id:int}")] 
+    [HttpPost("edit/{id:int}")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, UpdateVenueDto model, CancellationToken cancellationToken)
     {
-        if (id != model.Id) 
+        if (id != model.Id)
         {
             return BadRequest("ID mismatch");
         }
@@ -101,7 +101,7 @@ public class VenueController(
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         await venueService.DeleteVenueAsync(id, cancellationToken);
-        
+
         return RedirectToAction(nameof(Index));
     }
 }

@@ -1,4 +1,5 @@
-﻿@model IEnumerable<EventPlanning.Application.DTOs.Venue.VenueDto>
+﻿@using EventPlanning.Application.Models
+@model PagedResult<EventPlanning.Application.DTOs.Venue.VenueDto>
 
 @{
     ViewData["Title"] = "Manage Venues";
@@ -35,85 +36,143 @@
         </div>
     </div>
 
-    @if (!Model.Any())
+    @if (!Model.Items.Any())
     {
-        <div class="card border-0 shadow-sm py-5 text-center" style="background-color: var(--bg-surface);">
-            <div class="mb-3">
-                <i class="bi bi-inbox text-muted opacity-25" style="font-size: 4rem;"></i>
+            <div class="card border-0 shadow-sm py-5 text-center" style="background-color: var(--bg-surface);">
+                <div class="mb-3">
+                    <i class="bi bi-inbox text-muted opacity-25" style="font-size: 4rem;"></i>
+                </div>
+                <h5 class="text-muted">No venues found</h5>
+                <p class="text-muted small mb-4">Get started by adding the first location to the platform.</p>
+                <div>
+                    <a asp-action="Create" class="btn btn-primary">Create New Venue</a>
+                </div>
             </div>
-            <h5 class="text-muted">No venues found</h5>
-            <p class="text-muted small mb-4">Get started by adding the first location to the platform.</p>
-            <div>
-                <a asp-action="Create" class="btn btn-primary">Create New Venue</a>
-            </div>
-        </div>
     }
     else
     {
-        <div id="itemsContainer" class="row g-4">
-            @foreach (var venue in Model)
+            <div id="itemsContainer" class="row g-4">
+            @foreach (var venue in Model.Items)
             {
-                <div class="col-md-6 col-lg-4 d-flex">
-                    <div class="card h-100 w-100 shadow-sm border-0 hover-effect overflow-hidden">
+                        <div class="col-md-6 col-lg-4 d-flex">
+                            <div class="card h-100 w-100 shadow-sm border-0 hover-effect overflow-hidden">
 
-                        <div class="position-relative">
+                                <div class="position-relative">
                             @if (!string.IsNullOrEmpty(venue.ImageUrl))
                             {
-                                <img src="@venue.ImageUrl" class="card-img-top"
-                                     style="height: 200px; object-fit: cover;" alt="@venue.Name">
+                                            <img src="@venue.ImageUrl" class="card-img-top"
+                                                 style="height: 200px; object-fit: cover;" alt="@venue.Name">
                             }
                             else
                             {
-                                <div
-                                    class="card-img-top w-100 d-flex align-items-center justify-content-center text-white"
-                                    style="height: 200px; background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));">
-                                    <i class="bi bi-building fs-1 opacity-50"></i>
-                                </div>
+                                            <div
+                                                class="card-img-top w-100 d-flex align-items-center justify-content-center text-white"
+                                                style="height: 200px; background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));">
+                                                <i class="bi bi-building fs-1 opacity-50"></i>
+                                            </div>
                             }
 
-                            <div class="position-absolute top-0 end-0 m-3">
-                                <span class="badge shadow-sm border"
-                                      style="background-color: var(--bg-surface); color: var(--text-main);">
-                                    <i class="bi bi-people me-1"></i> @venue.Capacity
-                                </span>
-                            </div>
-                        </div>
+                                    <div class="position-absolute top-0 end-0 m-3">
+                                        <span class="badge shadow-sm border"
+                                              style="background-color: var(--bg-surface); color: var(--text-main);">
+                                            <i class="bi bi-people me-1"></i> @venue.Capacity
+                                        </span>
+                                    </div>
+                                </div>
 
-                        <div class="card-body d-flex flex-column p-4">
-                            <h5 class="card-title fw-bold mb-2">
+                                <div class="card-body d-flex flex-column p-4">
+                                    <h5 class="card-title fw-bold mb-2">
                                 @venue.Name
-                            </h5>
+                                    </h5>
 
-                            <p class="card-text text-muted small mb-3 flex-grow-1">
-                                <i class="bi bi-geo-alt me-1 text-danger opacity-75"></i>
+                                    <p class="card-text text-muted small mb-3 flex-grow-1">
+                                        <i class="bi bi-geo-alt me-1 text-danger opacity-75"></i>
                                 @(venue.Address)
-                            </p>
+                                    </p>
 
-                            <div class="pt-3 border-top d-flex justify-content-end gap-2 mt-auto"
-                                 style="border-color: var(--border-light) !important;">
+                                    <div class="pt-3 border-top d-flex justify-content-end gap-2 mt-auto"
+                                         style="border-color: var(--border-light) !important;">
 
-                                <a asp-action="Edit" asp-route-id="@venue.Id"
-                                   class="btn-action text-warning"
-                                   title="Edit Venue">
-                                    <i class="bi bi-pencil-fill"></i> Edit
-                                </a>
+                                        <a asp-action="Edit" asp-route-id="@venue.Id"
+                                           class="btn-action text-warning"
+                                           title="Edit Venue">
+                                            <i class="bi bi-pencil-fill"></i> Edit
+                                        </a>
 
-                                <button type="button"
-                                        class="btn-action text-danger"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteModal"
-                                        data-venue-id="@venue.Id"
-                                        data-venue-name="@venue.Name"
-                                        title="Remove Venue">
-                                    <i class="bi bi-trash-fill"></i> Remove
-                                </button>
+                                        <button type="button"
+                                                class="btn-action text-danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal"
+                                                data-venue-id="@venue.Id"
+                                                data-venue-name="@venue.Name"
+                                                title="Remove Venue">
+                                            <i class="bi bi-trash-fill"></i> Remove
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
             }
-        </div>
+            </div>
     }
+
+    <div class="mt-5">
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                        @if (Model.PageNumber > 1)
+                        {
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.PageNumber - 1)" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="ms-1">Previous</span>
+                            </a>
+                        }
+                        else
+                        {
+                             <span class="page-link">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="ms-1">Previous</span>
+                            </span>
+                        }
+                    </li>
+
+                    @for (var i = 1; i <= Model.TotalPages; i++)
+                    {
+                        var pageIndex = i;
+                         <li class="page-item @(pageIndex == Model.PageNumber ? "active" : "")">
+                            @if (pageIndex == Model.PageNumber)
+                            {
+                                <span class="page-link">@pageIndex</span>
+                            }
+                            else
+                            {
+                                <a class="page-link" asp-action="Index" asp-route-page="@pageIndex">@pageIndex</a>
+                            }
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                        @if (Model.PageNumber < Model.TotalPages)
+                        {
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.PageNumber + 1)" aria-label="Next">
+                                <span class="me-1">Next</span>
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="page-link">
+                                <span class="me-1">Next</span>
+                                <span aria-hidden="true">&raquo;</span>
+                            </span>
+                        }
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
 </div>
 
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true"
