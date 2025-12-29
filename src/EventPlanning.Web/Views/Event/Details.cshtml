@@ -3,10 +3,10 @@
 @{
     ViewData["Title"] = Model.Name;
     var guestItemViewData = new ViewDataDictionary(ViewData)
-    {
-        { "IsOrganizer", Model.IsOrganizer },
-        { "IsPast", Model.IsPast }
-    };
+{
+{ "IsOrganizer", Model.IsOrganizer },
+{ "IsPast", Model.IsPast }
+};
 }
 
 <div class="container py-4 animate-fade-in">
@@ -34,7 +34,7 @@
         else
         {
             <div class="event-hero-img"
-                 style="background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));"></div>
+                style="background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));"></div>
         }
 
         <div class="event-hero-overlay">
@@ -88,7 +88,8 @@
                 </div>
 
                 @* --- GOOGLE MAPS EMBED --- *@
-                @if (!string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string) && !string.IsNullOrEmpty(Model.VenueAddress))
+                @if (!string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string) &&
+                !string.IsNullOrEmpty(Model.VenueAddress))
                 {
                     var addressQuery = $"{Model.VenueName}, {Model.VenueAddress}";
                     var encodedQuery = System.Net.WebUtility.UrlEncode(addressQuery);
@@ -96,23 +97,26 @@
                     var mapUrl = $"https://www.google.com/maps/embed/v1/place?key={apiKey}&q={encodedQuery}";
 
                     <div class="ratio ratio-21x9 event-map-container">
-                        <iframe
-                            class="event-map-frame"
-                            loading="lazy"
-                            allowfullscreen
-                            referrerpolicy="no-referrer-when-downgrade"
-                            src="@mapUrl">
+                        <iframe class="event-map-frame" loading="lazy" allowfullscreen
+                            referrerpolicy="no-referrer-when-downgrade" src="@mapUrl">
                         </iframe>
                     </div>
                 }
                 else
                 {
-                    <div class="alert alert-secondary border-0 d-flex align-items-center rounded-3 shadow-sm" role="alert" style="background-color: var(--color-cool-mist); color: var(--color-ink-black);">
+                    <div class="alert alert-secondary border-0 d-flex align-items-center rounded-3 shadow-sm" role="alert"
+                        style="background-color: var(--color-cool-mist); color: var(--color-ink-black);">
                         <i class="bi bi-map-fill me-2 fs-5"></i>
                         <div>
                             Map is currently unavailable.
-                            @if(string.IsNullOrEmpty(Model.VenueAddress)) { <span>(Address missing)</span> }
-                            @if(string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string)) { <span>(API Key missing)</span> }
+                            @if (string.IsNullOrEmpty(Model.VenueAddress))
+                            {
+                                <span>(Address missing)</span>
+                            }
+                            @if (string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string))
+                            {
+                                <span>(API Key missing)</span>
+                            }
                         </div>
                     </div>
                 }
@@ -128,8 +132,8 @@
                         <span class="fw-bold text-dark">@Model.GuestsCount / @Model.VenueCapacity</span>
                     </div>
                     <div class="progress progress-thin mb-4">
-                        <div class="progress-bar progress-bar-custom @(Model.IsFull ? "full" : "")"
-                             role="progressbar" style="width: @Model.FillPercent%"></div>
+                        <div class="progress-bar progress-bar-custom @(Model.IsFull ? "full" : "")" role="progressbar"
+                            style="width: @Model.FillPercent%"></div>
                     </div>
                 }
 
@@ -142,8 +146,8 @@
                     {
                         <div class="d-grid gap-2">
                             <button class="btn btn-secondary w-100" disabled>You are the Organizer</button>
-                            <button type="button" class="btn btn-outline-primary w-100"
-                                    data-bs-toggle="modal" data-bs-target="#addGuestModal">
+                            <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal"
+                                data-bs-target="#addGuestModal">
                                 <i class="bi bi-person-plus"></i> Add Guest
                             </button>
                             <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning w-100">
@@ -154,7 +158,8 @@
                     else if (Model.IsJoined)
                     {
                         @* ЗМІНА ТУТ: Кнопка тепер відкриває модальне вікно *@
-                        <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#leaveEventModal">
+                        <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal"
+                            data-bs-target="#leaveEventModal">
                             <i class="bi bi-box-arrow-right me-2"></i> Leave Event
                         </button>
                     }
@@ -175,12 +180,13 @@
                 <h6 class="event-section-title mb-3">Organizer</h6>
                 <div class="organizer-info">
                     <div class="organizer-avatar">
-                        @(!string.IsNullOrEmpty(ViewBag.OrganizerName as string) ? (ViewBag.OrganizerName as string)!.Substring(0, 1).ToUpper() : "U")
+                        @(!string.IsNullOrEmpty(ViewBag.OrganizerName as string) ? (ViewBag.OrganizerName as
+                            string)!.Substring(0, 1).ToUpper() : "U")
                     </div>
                     <div class="overflow-hidden">
                         <h6 class="fw-bold mb-0 text-truncate">@ViewBag.OrganizerName</h6>
                         <a href="mailto:@ViewBag.OrganizerEmail"
-                           class="text-decoration-none text-muted small text-truncate d-block">
+                            class="text-decoration-none text-muted small text-truncate d-block">
                             @ViewBag.OrganizerEmail
                         </a>
                     </div>
@@ -198,15 +204,15 @@
                     <div class="mb-2">
                         @foreach (var guest in Model.Guests.Take(5))
                         {
-                            <partial name="_GuestListItem" model="guest" view-data="guestItemViewData"/>
+                            <partial name="_GuestListItem" model="guest" view-data="guestItemViewData" />
                         }
                     </div>
 
                     @if (Model.GuestsCount > 5)
                     {
                         <div class="text-center border-top pt-2">
-                            <button class="btn btn-link btn-sm text-decoration-none text-muted fw-bold"
-                                    data-bs-toggle="modal" data-bs-target="#viewAllGuestsModal">
+                            <button class="btn btn-link btn-sm text-decoration-none text-muted fw-bold" data-bs-toggle="modal"
+                                data-bs-target="#viewAllGuestsModal">
                                 + @(Model.GuestsCount - 5) more guests
                             </button>
                         </div>
@@ -233,7 +239,7 @@
                 {
                     foreach (var guest in Model.Guests)
                     {
-                        <partial name="_GuestListItem" model="guest" view-data="guestItemViewData"/>
+                        <partial name="_GuestListItem" model="guest" view-data="guestItemViewData" />
                     }
                 }
             </div>
@@ -252,7 +258,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="mb-0">Are you sure you want to leave <strong>@Model.Name</strong>? You will lose your spot on the guest list.</p>
+                    <p class="mb-0">Are you sure you want to leave <strong>@Model.Name</strong>? You will lose your spot on
+                        the guest list.</p>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
@@ -277,37 +284,42 @@
                 </div>
                 <form asp-controller="Guest" asp-action="AddManually" method="post">
                     <div class="modal-body">
-                        <input type="hidden" name="EventId" value="@Model.Id"/>
+                        <input type="hidden" name="EventId" value="@Model.Id" />
                         <div class="row g-3 mb-3">
                             <div class="col-6">
                                 <label for="addFirstName" class="form-label small text-muted fw-bold">First Name</label>
-                                <input id="addFirstName" name="FirstName" class="form-control" required placeholder="John" autocomplete="given-name"/>
+                                <input id="addFirstName" name="FirstName" class="form-control" required placeholder="John"
+                                    autocomplete="given-name" />
                             </div>
                             <div class="col-6">
                                 <label for="addLastName" class="form-label small text-muted fw-bold">Last Name</label>
-                                <input id="addLastName" name="LastName" class="form-control" required placeholder="Doe" autocomplete="family-name"/>
+                                <input id="addLastName" name="LastName" class="form-control" required placeholder="Doe"
+                                    autocomplete="family-name" />
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="addEmail" class="form-label small text-muted fw-bold">Email</label>
                             <input id="addEmail" name="Email" type="email" class="form-control" required
-                                   placeholder="guest@example.com" autocomplete="email"/>
+                                placeholder="guest@example.com" autocomplete="email" />
                         </div>
                         <div class="row g-3 mb-3">
                             <div class="col-4">
                                 <label for="addCountryCode" class="form-label small text-muted fw-bold">Code</label>
-                                <select id="addCountryCode" name="CountryCode" class="form-select" autocomplete="tel-country-code">
-                                    @foreach (var country in EventPlanning.Application.Constants.CountryConstants.SupportedCountries)
+                                <select id="addCountryCode" name="CountryCode" class="form-select"
+                                    autocomplete="tel-country-code">
+                                    @foreach (var country in
+                                   EventPlanning.Application.Constants.CountryConstants.SupportedCountries)
                                     {
                                         <option value="@country.Code"
-                                                selected="@(country.Code == EventPlanning.Application.Constants.CountryConstants.DefaultCode)">@country.DisplayValue</option>
+                                            selected="@(country.Code == EventPlanning.Application.Constants.CountryConstants.DefaultCode)">
+                                            @country.DisplayValue</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-8">
                                 <label for="addPhone" class="form-label small text-muted fw-bold">Phone</label>
                                 <input id="addPhone" name="PhoneNumber" class="form-control" placeholder="991234567"
-                                       pattern="\d{7,15}" autocomplete="tel-local"/>
+                                    pattern="\d{7,15}" autocomplete="tel-local" />
                             </div>
                         </div>
                     </div>
@@ -329,28 +341,34 @@
                 </div>
                 <form asp-controller="Guest" asp-action="Edit" method="post">
                     <div class="modal-body">
-                        <input type="hidden" name="EventId" value="@Model.Id"/>
-                        <input type="hidden" name="Id" id="editGuestId"/>
+                        <input type="hidden" name="EventId" value="@Model.Id" />
+                        <input type="hidden" name="Id" id="editGuestId" />
 
                         <div class="row g-3 mb-3">
                             <div class="col-6">
-                                <label for="editGuestFirstName" class="form-label small text-muted fw-bold">First Name</label>
-                                <input name="FirstName" id="editGuestFirstName" class="form-control" required autocomplete="given-name"/>
+                                <label for="editGuestFirstName" class="form-label small text-muted fw-bold">First
+                                    Name</label>
+                                <input name="FirstName" id="editGuestFirstName" class="form-control" required
+                                    autocomplete="given-name" />
                             </div>
                             <div class="col-6">
                                 <label for="editGuestLastName" class="form-label small text-muted fw-bold">Last Name</label>
-                                <input name="LastName" id="editGuestLastName" class="form-control" required autocomplete="family-name"/>
+                                <input name="LastName" id="editGuestLastName" class="form-control" required
+                                    autocomplete="family-name" />
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="editGuestEmail" class="form-label small text-muted fw-bold">Email</label>
-                            <input name="Email" id="editGuestEmail" type="email" class="form-control" required autocomplete="email"/>
+                            <input name="Email" id="editGuestEmail" type="email" class="form-control" required
+                                autocomplete="email" />
                         </div>
                         <div class="row g-3 mb-3">
                             <div class="col-4">
                                 <label for="editGuestCountryCode" class="form-label small text-muted fw-bold">Code</label>
-                                <select name="CountryCode" id="editGuestCountryCode" class="form-select" autocomplete="tel-country-code">
-                                    @foreach (var country in EventPlanning.Application.Constants.CountryConstants.SupportedCountries)
+                                <select name="CountryCode" id="editGuestCountryCode" class="form-select"
+                                    autocomplete="tel-country-code">
+                                    @foreach (var country in
+                                   EventPlanning.Application.Constants.CountryConstants.SupportedCountries)
                                     {
                                         <option value="@country.Code">@country.DisplayValue</option>
                                     }
@@ -358,7 +376,8 @@
                             </div>
                             <div class="col-8">
                                 <label for="editGuestPhone" class="form-label small text-muted fw-bold">Phone</label>
-                                <input name="PhoneNumber" id="editGuestPhone" class="form-control" pattern="\d{7,15}" autocomplete="tel-local"/>
+                                <input name="PhoneNumber" id="editGuestPhone" class="form-control" pattern="\d{7,15}"
+                                    autocomplete="tel-local" />
                             </div>
                         </div>
                     </div>
@@ -385,8 +404,8 @@
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
                     <form asp-controller="Guest" asp-action="Remove" method="post">
-                        <input type="hidden" name="EventId" value="@Model.Id"/>
-                        <input type="hidden" name="GuestId" id="deleteGuestId"/>
+                        <input type="hidden" name="EventId" value="@Model.Id" />
+                        <input type="hidden" name="GuestId" id="deleteGuestId" />
                         <button type="submit" class="btn btn-danger px-4">Remove</button>
                     </form>
                 </div>

@@ -30,7 +30,13 @@ public record EventDetailsDto(
 
     public bool IsFull => VenueCapacity > 0 && SpotsLeft <= 0;
 
-    public int FillPercent => VenueCapacity > 0
-        ? (int)((double)GuestsCount / VenueCapacity * 100)
-        : 0;
+    public int FillPercent
+    {
+        get
+        {
+            if (VenueCapacity <= 0) return 0;
+            var percent = (double)GuestsCount / VenueCapacity * 100;
+            return (int)Math.Min(100, percent);
+        }
+    }
 }
