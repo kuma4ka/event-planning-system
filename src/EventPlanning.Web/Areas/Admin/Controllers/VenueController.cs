@@ -29,6 +29,7 @@ public class VenueController(
     }
 
     [HttpPost("create")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateVenueDto model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid) return View(model);

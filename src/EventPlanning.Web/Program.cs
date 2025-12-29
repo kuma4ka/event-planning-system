@@ -6,14 +6,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
+});
 
 var app = builder.Build();
 
 // SECURE DB SEEDING
 using (var scope = app.Services.CreateScope())
 {
-    try 
+    try
     {
         await EventPlanning.Infrastructure.Persistence.DbInitializer.SeedAsync(scope.ServiceProvider);
     }
