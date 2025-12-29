@@ -31,10 +31,10 @@
     padding: 3rem 2.5rem;
 
     background: linear-gradient(to top,
-    rgba(1, 22, 30, 0.98) 0%,
-    rgba(1, 22, 30, 0.7) 50%,
-    rgba(1, 22, 30, 0.3) 80%,
-    transparent 100%);
+            rgba(1, 22, 30, 0.98) 0%,
+            rgba(1, 22, 30, 0.7) 50%,
+            rgba(1, 22, 30, 0.3) 80%,
+            transparent 100%);
 
     z-index: 2;
     color: var(--color-white);
@@ -48,7 +48,7 @@
     margin-bottom: 0.5rem;
     line-height: 1.1;
     color: var(--color-white);
-    text-shadow: 0 4px 15px rgba(0,0,0,0.9);
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9);
 }
 
 .event-hero-overlay .event-hero-meta {
@@ -59,7 +59,7 @@
     gap: 1.5rem;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.95);
-    text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
 }
 
 /* Гарантуємо, що іконки теж білі */
@@ -146,12 +146,19 @@
 .progress-thin {
     height: 6px;
     border-radius: 3px;
-    background-color: var(--border-light);
+    background-color: var(--color-cool-mist);
     overflow: hidden;
 }
 
 .progress-bar-custom {
     background-color: var(--color-dark-teal);
+    animation: fillProgress 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fillProgress {
+    from {
+        width: 0;
+    }
 }
 
 .progress-bar-custom.full {
