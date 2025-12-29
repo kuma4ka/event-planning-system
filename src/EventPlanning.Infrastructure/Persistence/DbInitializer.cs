@@ -64,7 +64,7 @@ public static class DbInitializer
             new("Rock Legends Live", "A night of classic rock hits under the stars.", DateTime.Now.AddDays(14), EventType.Concert, adminUser.Id, venues[2].Id, false),
             new("Kyiv Startup Day", "Networking and pitch sessions for UA startups.", DateTime.Now.AddDays(5), EventType.Workshop, organizerUser.Id, venues[7].Id, false),
             new("Classic Evening", "Mozart and Bach performed by the Symphony Orchestra.", DateTime.Now.AddMonths(1), EventType.Concert, adminUser.Id, venues[5].Id, false),
-            new("Past Event Example", "This event already happened.", DateTime.Now.AddMonths(-1), EventType.NetworkingEvent, organizerUser.Id, venues[0].Id, false)
+            new("Future Event Example", "This event will happen soon.", DateTime.Now.AddMonths(1), EventType.NetworkingEvent, organizerUser.Id, venues[0].Id, false)
         };
 
         await context.Events.AddRangeAsync(events);
