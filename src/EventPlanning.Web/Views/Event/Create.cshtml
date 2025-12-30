@@ -15,8 +15,8 @@
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
             <div class="mb-4">
-                <a asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted small hover-effect">
-                    <i class="bi bi-arrow-left me-1"></i> Back to Home
+                <a asp-action="MyEvents" class="text-decoration-none text-muted small hover-effect">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
                 </a>
             </div>
 
@@ -49,6 +49,7 @@
                             <div class="st-input-group">
                                 <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
                                 <input asp-for="Date" type="datetime-local" class="form-control"
+                                    min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" step="60"
                                     value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-ddTHH:mm")" />
                             </div>
                             <span asp-validation-for="Date" class="text-danger small mt-1 d-block"></span>
