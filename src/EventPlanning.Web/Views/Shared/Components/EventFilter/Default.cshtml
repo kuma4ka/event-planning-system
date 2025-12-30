@@ -14,10 +14,7 @@
         {
             <input type="hidden" name="viewType" value="@Model.ViewType" />
         }
-        @if (!string.IsNullOrEmpty(Model.SortOrder))
-        {
-            <input type="hidden" name="sortOrder" value="@Model.SortOrder" />
-        }
+
 
         <div class="row g-2 align-items-center">
 
@@ -47,32 +44,50 @@
             }
 
             <!-- Type Select -->
-            <div class="col-12 col-md-@(Model.ShowSearch ? "2" : "3")">
+            <div class="col-12 col-md-2">
                 <select name="type" class="form-select border-0 bg-light fw-medium" asp-items="Model.TypeOptions"
                     style="cursor: pointer;" onchange="this.form.submit()">
                 </select>
             </div>
 
-            <!-- From Date -->
-            <div class="col-6 col-md-3">
+            <!-- Sort Select -->
+            <div class="col-12 col-md-2">
                 <div class="input-group">
-                    <span class="input-group-text bg-white border-0 text-muted ps-3">
+                    <span class="input-group-text bg-white border-0 text-muted ps-2">
+                        <i class="bi bi-sort-down"></i>
+                    </span>
+                    <select name="sortOrder" class="form-select border-0 text-muted ps-1 fw-medium"
+                        style="cursor: pointer; background-color: transparent;" onchange="this.form.submit()">
+                        <!option value="date_desc"
+                            selected="@(Model.SortOrder == "date_desc" || string.IsNullOrEmpty(Model.SortOrder))">Date:
+                            Newest</!option>
+                        <!option value="date_asc" selected="@(Model.SortOrder == "date_asc")">Date: Oldest</!option>
+                        <!option value="name_asc" selected="@(Model.SortOrder == "name_asc")">Name: A-Z</!option>
+                        <!option value="name_desc" selected="@(Model.SortOrder == "name_desc")">Name: Z-A</!option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- From Date -->
+            <div class="col-6 col-md-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-0 text-muted ps-2">
                         <i class="bi bi-calendar-event"></i>
                     </span>
-                    <input type="date" name="from" class="form-control border-0 text-muted"
+                    <input type="date" name="from" class="form-control border-0 text-muted ps-1"
                         value="@Model.From?.ToString("yyyy-MM-dd")" min="@Model.MinDate" title="From Date"
                         onchange="this.form.submit()">
                 </div>
             </div>
 
             <!-- To Date -->
-            <div class="col-6 col-md-3 position-relative">
+            <div class="col-6 col-md-2 position-relative">
                 <div class="input-group">
-                    <span class="input-group-text bg-white border-0 text-muted ps-3">
+                    <span class="input-group-text bg-white border-0 text-muted ps-2">
                         <i class="bi bi-arrow-right"></i>
                     </span>
                     <input type="date" name="to"
-                        class="form-control border-0 text-muted @(hasDateError ? "is-invalid" : "")"
+                        class="form-control border-0 text-muted ps-1 @(hasDateError ? "is-invalid" : "")"
                         value="@Model.To?.ToString("yyyy-MM-dd")" min="@Model.MinDate" title="To Date"
                         onchange="this.form.submit()">
                 </div>
