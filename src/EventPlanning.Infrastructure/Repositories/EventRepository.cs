@@ -2,6 +2,7 @@
 using EventPlanning.Domain.Enums;
 using EventPlanning.Domain.Interfaces;
 using EventPlanning.Domain.Models;
+using EventPlanning.Domain.ValueObjects;
 using EventPlanning.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using EventPlanning.Infrastructure.Extensions;
@@ -49,9 +50,19 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
 
     public async Task<bool> GuestPhoneExistsAsync(int eventId, string phoneNumber, string? excludeGuestId = null, CancellationToken cancellationToken = default)
     {
+        PhoneNumber? phoneVo;
+        try
+        {
+            phoneVo = PhoneNumber.Create(phoneNumber);
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+
         var query = context.Guests
             .AsNoTracking()
-            .Where(g => g.EventId == eventId && (string)g.PhoneNumber! == phoneNumber);
+            .Where(g => g.EventId == eventId && g.PhoneNumber == phoneVo);
 
         if (!string.IsNullOrEmpty(excludeGuestId))
         {
@@ -155,9 +166,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
 
     public async Task<bool> TryJoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
     {
-        // Use a Serializable transaction to prevent race conditions (overbooking)
-        // This ensures that between reading the count and inserting, no other transaction can modify the data.
-        using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
+        await using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
 
         try
         {
@@ -170,24 +179,32 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
 
             if (eventEntity == null) return false;
 
-            // Check capacity
             if (eventEntity.Venue is { Capacity: > 0 })
             {
-                // We must query the count from the DB within this transaction scope
                 var currentCount = await context.Guests.CountAsync(g => g.EventId == eventId, cancellationToken);
                 if (currentCount >= eventEntity.Venue.Capacity)
                 {
                     await transaction.RollbackAsync(cancellationToken);
-                    return false; // Event is full
+                    return false;
                 }
             }
 
-            // Check if already joined
-            var alreadyJoined = await context.Guests.AnyAsync(g => g.EventId == eventId && (string)g.Email == user.Email, cancellationToken);
+            PhoneNumber? userPhoneVo = null;
+            try
+            {
+                if (!string.IsNullOrEmpty(user.PhoneNumber))
+                    userPhoneVo = PhoneNumber.Create(user.PhoneNumber);
+            }
+            catch { /* Ignore validaton error, just won't match phone */ }
+
+            var alreadyJoined = await context.Guests.AnyAsync(g =>
+                g.EventId == eventId &&
+                ((string)g.Email == user.Email || (userPhoneVo != null && g.PhoneNumber == userPhoneVo)),
+                cancellationToken);
             if (alreadyJoined)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                return false; // Already joined
+                return false;
             }
 
             var guest = new Guest(
@@ -196,6 +213,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
                 user.LastName,
                 user.Email,
                 eventId,
+                user.CountryCode,
                 user.PhoneNumber
             );
 

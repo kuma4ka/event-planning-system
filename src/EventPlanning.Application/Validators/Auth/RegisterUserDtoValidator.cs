@@ -23,6 +23,14 @@ public class RegisterUserDtoValidator : AbstractValidator<RegisterUserDto>
             .MaximumLength(50)
             .Matches(@"^\p{Lu}\p{Ll}*$").WithMessage("Last name must start with a capital letter and contain only letters.");
 
+        RuleFor(x => x.CountryCode)
+            .NotEmpty().WithMessage("Country code is required.")
+            .Matches(@"^\+[1-9]\d{0,3}$").WithMessage("Invalid country code format.");
+
+        RuleFor(x => x.PhoneNumber)
+            .NotEmpty().WithMessage("Phone number is required.")
+            .Matches(@"^\d{7,15}$").WithMessage("Phone number must contain 7-15 digits.");
+
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required.")
             .MinimumLength(8).WithMessage("Password must be at least 8 characters long.")

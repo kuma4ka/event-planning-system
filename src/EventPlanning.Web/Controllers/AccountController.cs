@@ -38,7 +38,9 @@ public class AccountController(
             model.LastName,
             UserRole.User,
             model.Email,
-            model.Email
+            model.Email,
+            model.PhoneNumber,
+            model.CountryCode
         );
 
         var result = await userManager.CreateAsync(user, model.Password);

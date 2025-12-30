@@ -124,14 +124,16 @@ public class EventService(
                 );
             }
 
-            var (countryCode, localNumber) = ParsePhoneNumber(g.PhoneNumber);
+            var localNumber = g.PhoneNumber != null && !string.IsNullOrEmpty(g.CountryCode) && g.PhoneNumber.Value.StartsWith(g.CountryCode)
+                ? g.PhoneNumber.Value.Substring(g.CountryCode.Length)
+                : (g.PhoneNumber?.Value ?? "");
 
             return new GuestDto(
                 g.Id,
                 g.FirstName,
                 g.LastName,
                 g.Email,
-                countryCode,
+                g.CountryCode,
                 localNumber
             );
         }).ToList();

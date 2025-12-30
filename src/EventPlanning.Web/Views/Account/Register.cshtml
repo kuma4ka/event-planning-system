@@ -39,6 +39,25 @@
                     </div>
                 </div>
 
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="CountryCode" class="st-form-label">Code</label>
+                        <div class="st-input-group">
+                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                            <input asp-for="CountryCode" class="form-control" placeholder="+1" />
+                        </div>
+                        <span asp-validation-for="CountryCode" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <label asp-for="PhoneNumber" class="st-form-label">Phone Number</label>
+                        <div class="st-input-group">
+                            <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="1234567890" />
+                        </div>
+                        <span asp-validation-for="PhoneNumber" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                </div>
+
                 <div class="mb-4">
                     <label asp-for="Email" class="st-form-label">Email Address</label>
                     <div class="st-input-group">

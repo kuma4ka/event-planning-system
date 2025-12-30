@@ -5,5 +5,7 @@ public record RegisterUserDto(
     string Password,
     string ConfirmPassword,
     string FirstName,
-    string LastName
+    string LastName,
+    string CountryCode,
+    string PhoneNumber
 );
