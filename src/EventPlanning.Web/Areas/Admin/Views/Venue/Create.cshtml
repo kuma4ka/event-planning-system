@@ -8,82 +8,83 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
 
-            <form asp-action="Create" method="post" enctype="multipart/form-data">
-                <div class="card c-admin-card">
-
-                    <div class="c-admin-header">
-                        <div class="d-flex align-items-center">
-                            <i class="bi bi-plus-square fs-4 me-3 text-white"></i>
-                            <h5 class="mb-0 fw-bold text-white">Create New Venue</h5>
-                        </div>
+            <div class="st-card animate-fade-in">
+                <div class="text-center mb-5">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3"
+                        style="width: 60px; height: 60px; color: var(--color-dark-teal);">
+                        <i class="bi bi-building-add fs-3"></i>
                     </div>
-
-                    <div class="card-body p-4">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
-
-                        <div class="mb-4">
-                            <label asp-for="Name" class="c-admin-form-label">Venue Name</label>
-                            <div class="c-admin-input-group">
-                                <i class="bi bi-building c-admin-input-icon"></i>
-                                <input asp-for="Name" class="form-control c-admin-input" placeholder="E.g. Grand Hall" />
-                            </div>
-                            <span asp-validation-for="Name" class="text-danger small mt-1"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-8 mb-4">
-                                <label asp-for="Address" class="c-admin-form-label">Address</label>
-                                <div class="c-admin-input-group">
-                                    <i class="bi bi-geo-alt c-admin-input-icon"></i>
-                                    <input asp-for="Address" class="form-control c-admin-input" placeholder="Full street address" />
-                                </div>
-                                <span asp-validation-for="Address" class="text-danger small mt-1"></span>
-                            </div>
-
-                            <div class="col-md-4 mb-4">
-                                <label asp-for="Capacity" class="c-admin-form-label">Capacity</label>
-                                <div class="c-admin-input-group">
-                                    <i class="bi bi-people c-admin-input-icon"></i>
-                                    <input asp-for="Capacity" class="form-control c-admin-input" type="number" min="1" />
-                                </div>
-                                <span asp-validation-for="Capacity" class="text-danger small mt-1"></span>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label asp-for="ImageFile" class="c-admin-form-label">Venue Image</label>
-                            <div class="c-admin-input-group">
-                                <i class="bi bi-image c-admin-input-icon"></i>
-                                <input asp-for="ImageFile" type="file" class="form-control c-admin-input" accept="image/*" />
-                            </div>
-                            <span asp-validation-for="ImageFile" class="text-danger small mt-1"></span>
-                        </div>
-
-                        <div class="mb-4">
-                            <label asp-for="Description" class="c-admin-form-label">Description (Optional)</label>
-                            <div class="c-admin-input-group">
-                                <i class="bi bi-text-paragraph c-admin-input-icon" style="top: 1.5rem;"></i>
-                                <textarea asp-for="Description" class="form-control c-admin-input" rows="4" placeholder="Describe the venue features..."></textarea>
-                            </div>
-                            <span asp-validation-for="Description" class="text-danger small mt-1"></span>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                            <a asp-action="Index" class="btn btn-link text-decoration-none text-muted ps-0">
-                                <i class="bi bi-arrow-left me-1"></i> Back to List
-                            </a>
-                            <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">
-                                Create Venue
-                            </button>
-                        </div>
-                    </div>
+                    <h2 class="st-form-title">Create Venue</h2>
+                    <p class="text-muted">Add a new location for events</p>
                 </div>
-            </form>
+
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 shadow-sm mb-4 small">
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Name" class="st-form-label">Venue Name</label>
+                        <div class="st-input-group">
+                            <span class="input-group-text"><i class="bi bi-building"></i></span>
+                            <input asp-for="Name" class="form-control" placeholder="E.g. Grand Hall" />
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-8">
+                            <label asp-for="Address" class="st-form-label">Address</label>
+                            <div class="st-input-group">
+                                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                <input asp-for="Address" class="form-control" placeholder="Full street address" />
+                            </div>
+                            <span asp-validation-for="Address" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="Capacity" class="st-form-label">Capacity</label>
+                            <div class="st-input-group">
+                                <span class="input-group-text"><i class="bi bi-people"></i></span>
+                                <input asp-for="Capacity" class="form-control" type="number" min="1" />
+                            </div>
+                            <span asp-validation-for="Capacity" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ImageFile" class="st-form-label">Venue Image</label>
+                        <div class="st-input-group">
+                            <span class="input-group-text"><i class="bi bi-image"></i></span>
+                            <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
+                        </div>
+                        <span asp-validation-for="ImageFile" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Description" class="st-form-label">Description (Optional)</label>
+                        <div class="st-input-group align-top">
+                            <span class="input-group-text pt-3"><i class="bi bi-file-text"></i></span>
+                            <textarea asp-for="Description" class="form-control" rows="4"
+                                placeholder="Describe the venue features..."></textarea>
+                        </div>
+                        <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="st-form-actions">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 shadow-sm">
+                            Create Venue <i class="bi bi-check-lg ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
 
         </div>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

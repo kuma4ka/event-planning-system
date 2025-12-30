@@ -5,59 +5,94 @@
     ViewData["Title"] = "Create Event";
 
     var eventTypes = Enum.GetValues<EventType>().Select(e => new SelectListItem
-    {
-        Value = e.ToString(),
-        Text = e.GetDisplayName()
-    });
+            {
+                Value = e.ToString(),
+                Text = e.GetDisplayName()
+            });
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-sm mt-4">
-            <div class="card-body">
-                <h2 class="card-title text-center mb-4">Create New Event</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="mb-4">
+                <a asp-action="MyEvents" class="text-decoration-none text-muted small hover-effect">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+                </a>
+            </div>
+
+            <div class="st-card animate-fade-in">
+                <div class="text-center mb-5">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3"
+                        style="width: 60px; height: 60px; color: var(--color-dark-teal);">
+                        <i class="bi bi-calendar-plus fs-3"></i>
+                    </div>
+                    <h2 class="st-form-title">Create New Event</h2>
+                    <p class="text-muted">Host your next gathering with us</p>
+                </div>
 
                 <form asp-action="Create" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-                    <div class="mb-3">
-                        <label asp-for="Name" class="form-label">Event Name</label>
-                        <input asp-for="Name" class="form-control" placeholder="Ex: Tech Conference 2025"/>
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 shadow-sm mb-4 small">
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Date" class="form-label">Date & Time</label>
-                        <input asp-for="Date" type="datetime-local" class="form-control"
-                               value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-ddTHH:mm")"/>
-                        <span asp-validation-for="Date" class="text-danger"></span>
+                    <div class="mb-4">
+                        <label asp-for="Name" class="st-form-label">Event Name</label>
+                        <div class="st-input-group">
+                            <span class="input-group-text"><i class="bi bi-card-heading"></i></span>
+                            <input asp-for="Name" class="form-control" placeholder="Ex: Tech Conference 2025" />
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Type" class="form-label">Event Type</label>
-                        <select asp-for="Type" class="form-select" asp-items="eventTypes">
-                            <option value="">-- Select Type --</option>
-                        </select>
-                        <span asp-validation-for="Type" class="text-danger"></span>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="Date" class="st-form-label">Date & Time</label>
+                            <div class="st-input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                                <input asp-for="Date" type="datetime-local" class="form-control"
+                                    min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" step="60"
+                                    value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-ddTHH:mm")"
+                                    asp-format="{0:yyyy-MM-ddTHH:mm}" />
+                            </div>
+                            <span asp-validation-for="Date" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Type" class="st-form-label">Event Type</label>
+                            <div class="st-input-group">
+                                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                                <select asp-for="Type" class="form-select" asp-items="eventTypes">
+                                    <option value="">-- Select Type --</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="Type" class="text-danger small mt-1 d-block"></span>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Description" class="form-label">Description</label>
-                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
+                    <div class="mb-4">
+                        <label asp-for="VenueId" class="st-form-label">Venue (Optional)</label>
+                        <div class="st-input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                            <select asp-for="VenueId" class="form-select" asp-items="@ViewBag.Venues">
+                                <option value="0">-- Select a Venue (TBD) --</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="VenueId" class="text-danger small mt-1 d-block"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="VenueId" class="form-label">Venue (Optional)</label>
-                        <select asp-for="VenueId" class="form-select" asp-items="@ViewBag.Venues">
-                            <option value="0">-- Select a Venue (TBD) --</option>
-                        </select>
-                        <span asp-validation-for="VenueId" class="text-danger"></span>
+                    <div class="mb-4">
+                        <label asp-for="Description" class="st-form-label">Description</label>
+                        <div class="st-input-group align-top">
+                            <span class="input-group-text pt-3"><i class="bi bi-file-text"></i></span>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        </div>
+                        <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
                     </div>
 
-                    <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg">Create Event</button>
-                        <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary">Cancel</a>
+                    <div class="st-form-actions">
+                        <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 shadow-sm">
+                            Create Event <i class="bi bi-check-lg ms-2"></i>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -66,5 +101,7 @@
 </div>
 
 @section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

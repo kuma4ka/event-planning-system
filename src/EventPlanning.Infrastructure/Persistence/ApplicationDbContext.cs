@@ -16,6 +16,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         base.OnModelCreating(builder);
 
+        builder.Entity<User>(entity =>
+        {
+            entity.Property(u => u.PhoneNumber)
+                .IsRequired();
+        });
+
         builder.Entity<Event>(entity =>
         {
             entity.HasKey(e => e.Id);

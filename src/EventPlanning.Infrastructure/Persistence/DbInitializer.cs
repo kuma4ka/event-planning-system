@@ -29,7 +29,7 @@ public static class DbInitializer
                 "Seeding failed: Admin credentials are missing. " +
                 "Use 'dotnet user-secrets set' or Environment Variables to set 'Seed:AdminEmail' and 'Seed:AdminPassword'.");
 
-        var adminUser = await EnsureUserAsync(userManager, adminEmail, adminPassword, "System", "Admin", "Admin");
+        var adminUser = await EnsureUserAsync(userManager, adminEmail, adminPassword, "System", "Admin", "Admin", "+15550000001");
 
         var organizerEmail = configuration["Seed:OrganizerEmail"];
         var organizerPassword = configuration["Seed:OrganizerPassword"];
@@ -40,7 +40,7 @@ public static class DbInitializer
                 "Use 'dotnet user-secrets set' or Environment Variables to set 'Seed:OrganizerEmail' and 'Seed:OrganizerPassword'.");
 
         var organizerUser =
-            await EnsureUserAsync(userManager, organizerEmail, organizerPassword, "John", "Doe", "User");
+            await EnsureUserAsync(userManager, organizerEmail, organizerPassword, "John", "Doe", "User", "+15550000002");
 
         IList<Venue> venues;
         if (!await context.Venues.AnyAsync())
@@ -127,17 +127,27 @@ public static class DbInitializer
     }
 
     private static async Task<User> EnsureUserAsync(UserManager<User> userManager, string email, string password,
-        string fName, string lName, string role)
+        string fName, string lName, string role, string phoneNumber)
     {
         var user = await userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            user = new User(fName, lName, Enum.Parse<UserRole>(role), email, email);
+            user = new User(fName, lName, Enum.Parse<UserRole>(role), email, email, phoneNumber, "+1");
             user.EmailConfirmed = true;
             var result = await userManager.CreateAsync(user, password);
             if (!result.Succeeded)
                 throw new Exception(
                     $"Failed to create user {email}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+        else
+        {
+            // Ensure phone number matches (fix for duplicate seeding issue)
+            if (user.PhoneNumber != phoneNumber || string.IsNullOrEmpty(user.CountryCode))
+            {
+                user.PhoneNumber = phoneNumber;
+                user.SetCountryCode("+1");
+                await userManager.UpdateAsync(user);
+            }
         }
 
         if (!await userManager.IsInRoleAsync(user, role)) await userManager.AddToRoleAsync(user, role);

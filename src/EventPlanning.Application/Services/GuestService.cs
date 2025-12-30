@@ -66,7 +66,7 @@ public class GuestService(
             throw new InvalidOperationException($"Guest with email '{dto.Email}' is already added to this event.");
         }
 
-        var fullPhoneNumber = dto.CountryCode + dto.PhoneNumber;
+        var fullPhoneNumber = dto.CountryCode + dto.PhoneNumber.Replace(" ", "").Replace("-", "");
         if (!string.IsNullOrEmpty(dto.PhoneNumber))
         {
             bool phoneExists = await eventRepository.GuestPhoneExistsAsync(dto.EventId, fullPhoneNumber, null, cancellationToken);
@@ -117,7 +117,7 @@ public class GuestService(
             }
         }
 
-        guest.UpdateDetails(dto.FirstName, dto.LastName, dto.Email, newFullPhone);
+        guest.UpdateDetails(dto.FirstName, dto.LastName, dto.Email, dto.CountryCode, newFullPhone);
 
         await guestRepository.UpdateAsync(guest, cancellationToken);
 
@@ -161,6 +161,7 @@ public class GuestService(
             dto.LastName,
             dto.Email,
             dto.EventId,
+            dto.CountryCode,
             dto.CountryCode + dto.PhoneNumber
         );
     }

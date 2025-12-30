@@ -15,24 +15,25 @@
                 </a>
             </div>
 
-            <div class="event-card animate-fade-in">
+            <div class="st-card animate-fade-in">
                 <div class="text-center mb-5">
                     <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3"
-                         style="width: 60px; height: 60px; color: var(--color-dark-teal);">
+                        style="width: 60px; height: 60px; color: var(--color-dark-teal);">
                         <i class="bi bi-pencil-square fs-3"></i>
                     </div>
-                    <h2 class="event-form-title">Edit Event</h2>
+                    <h2 class="st-form-title">Edit Event</h2>
                     <p class="text-muted">Update the details of your gathering</p>
                 </div>
 
                 <form asp-action="Edit" method="post">
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 shadow-sm mb-4 small"></div>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 shadow-sm mb-4 small">
+                    </div>
 
                     <input type="hidden" asp-for="Id" />
 
                     <div class="mb-4">
-                        <label asp-for="Name" class="event-form-label">Event Name</label>
-                        <div class="event-input-group">
+                        <label asp-for="Name" class="st-form-label">Event Name</label>
+                        <div class="st-input-group">
                             <span class="input-group-text"><i class="bi bi-card-heading"></i></span>
                             <input asp-for="Name" class="form-control" placeholder="e.g. Summer Tech Workshop" />
                         </div>
@@ -41,20 +42,23 @@
 
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
-                            <label asp-for="Date" class="event-form-label">Date & Time</label>
-                            <div class="event-input-group">
+                            <label asp-for="Date" class="st-form-label">Date & Time</label>
+                            <div class="st-input-group">
                                 <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
-                                <input asp-for="Date" type="datetime-local" class="form-control" />
+                                <input asp-for="Date" type="datetime-local" class="form-control"
+                                    min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
+                                    step="60"
+                                    asp-format="{0:yyyy-MM-ddTHH:mm}" />
                             </div>
                             <span asp-validation-for="Date" class="text-danger small mt-1 d-block"></span>
                         </div>
 
                         <div class="col-md-6">
-                            <label asp-for="Type" class="event-form-label">Event Type</label>
-                            <div class="event-input-group">
+                            <label asp-for="Type" class="st-form-label">Event Type</label>
+                            <div class="st-input-group">
                                 <span class="input-group-text"><i class="bi bi-tag"></i></span>
                                 <select asp-for="Type" class="form-select"
-                                        asp-items="Html.GetEnumSelectList<EventType>()">
+                                    asp-items="Html.GetEnumSelectList<EventType>()">
                                 </select>
                             </div>
                             <span asp-validation-for="Type" class="text-danger small mt-1 d-block"></span>
@@ -62,8 +66,8 @@
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="VenueId" class="event-form-label">Venue Location</label>
-                        <div class="event-input-group">
+                        <label asp-for="VenueId" class="st-form-label">Venue Location</label>
+                        <div class="st-input-group">
                             <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
                             <select asp-for="VenueId" class="form-select" asp-items="@ViewBag.Venues">
                                 <option value="">-- Select a Venue --</option>
@@ -73,15 +77,16 @@
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="Description" class="event-form-label">Description</label>
-                        <div class="event-input-group align-top">
+                        <label asp-for="Description" class="st-form-label">Description</label>
+                        <div class="st-input-group align-top">
                             <span class="input-group-text pt-3"><i class="bi bi-file-text"></i></span>
-                            <textarea asp-for="Description" class="form-control" rows="5" placeholder="Tell people what your event is about..."></textarea>
+                            <textarea asp-for="Description" class="form-control" rows="5"
+                                placeholder="Tell people what your event is about..."></textarea>
                         </div>
                         <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
                     </div>
 
-                    <div class="form-actions">
+                    <div class="st-form-actions">
                         <a asp-action="MyEvents" class="btn btn-outline-secondary px-4">Cancel</a>
                         <button type="submit" class="btn btn-primary px-5 shadow-sm">
                             Save Changes <i class="bi bi-check-lg ms-2"></i>
@@ -94,5 +99,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
