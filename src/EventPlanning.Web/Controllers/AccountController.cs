@@ -92,7 +92,6 @@ public class AccountController(
         return View(model);
     }
 
-    [HttpGet]
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
