@@ -6,14 +6,14 @@
 }
 
 <div class="auth-container">
-    <div class="auth-card animate-fade-in">
+    <div class="st-card animate-fade-in">
         <div class="auth-body">
             <div class="text-center mb-5">
                 <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3"
                     style="width: 60px; height: 60px; color: var(--color-dark-teal);">
                     <i class="bi bi-box-arrow-in-right fs-3"></i>
                 </div>
-                <h2 class="event-form-title">Welcome Back</h2>
+                <h2 class="st-form-title">Welcome Back</h2>
                 <p class="text-muted">Sign in to continue your journey</p>
             </div>
 
@@ -21,8 +21,8 @@
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger shadow-sm border-0 mb-4 small"></div>
 
                 <div class="mb-4">
-                    <label asp-for="Email" class="auth-form-label">Email Address</label>
-                    <div class="input-group auth-icon-input">
+                    <label asp-for="Email" class="st-form-label">Email Address</label>
+                    <div class="st-input-group">
                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                         <input asp-for="Email" class="form-control" placeholder="name@example.com" />
                     </div>
@@ -30,8 +30,8 @@
                 </div>
 
                 <div class="mb-4">
-                    <label asp-for="Password" class="auth-form-label">Password</label>
-                    <div class="input-group auth-icon-input">
+                    <label asp-for="Password" class="st-form-label">Password</label>
+                    <div class="st-input-group">
                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
                         <input asp-for="Password" type="password" class="form-control" placeholder="••••••••" />
                     </div>
@@ -63,4 +63,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
- }
+}

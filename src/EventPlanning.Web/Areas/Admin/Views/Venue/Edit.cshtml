@@ -8,13 +8,13 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
 
-            <div class="event-card animate-fade-in">
+            <div class="st-card animate-fade-in">
                 <div class="text-center mb-5">
                     <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3"
                         style="width: 60px; height: 60px; color: var(--color-dark-teal);">
                         <i class="bi bi-pencil-square fs-3"></i>
                     </div>
-                    <h2 class="event-form-title">Edit Venue</h2>
+                    <h2 class="st-form-title">Edit Venue</h2>
                     <p class="text-muted">Update details for @Model.Name</p>
                 </div>
 
@@ -26,8 +26,8 @@
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="Name" class="event-form-label">Venue Name</label>
-                        <div class="event-input-group">
+                        <label asp-for="Name" class="st-form-label">Venue Name</label>
+                        <div class="st-input-group">
                             <span class="input-group-text"><i class="bi bi-building"></i></span>
                             <input asp-for="Name" class="form-control" />
                         </div>
@@ -36,8 +36,8 @@
 
                     <div class="row g-4 mb-4">
                         <div class="col-md-8">
-                            <label asp-for="Address" class="event-form-label">Address</label>
-                            <div class="event-input-group">
+                            <label asp-for="Address" class="st-form-label">Address</label>
+                            <div class="st-input-group">
                                 <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
                                 <input asp-for="Address" class="form-control" />
                             </div>
@@ -45,8 +45,8 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label asp-for="Capacity" class="event-form-label">Capacity</label>
-                            <div class="event-input-group">
+                            <label asp-for="Capacity" class="st-form-label">Capacity</label>
+                            <div class="st-input-group">
                                 <span class="input-group-text"><i class="bi bi-people"></i></span>
                                 <input asp-for="Capacity" class="form-control" type="number" />
                             </div>
@@ -55,7 +55,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="ImageFile" class="event-form-label">Update Image</label>
+                        <label asp-for="ImageFile" class="st-form-label">Update Image</label>
 
                         @if (!string.IsNullOrEmpty(Model.CurrentImageUrl))
                         {
@@ -71,7 +71,7 @@
                             </div>
                         }
 
-                        <div class="event-input-group">
+                        <div class="st-input-group">
                             <span class="input-group-text"><i class="bi bi-image"></i></span>
                             <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
                         </div>
@@ -79,15 +79,15 @@
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="Description" class="event-form-label">Description</label>
-                        <div class="event-input-group align-top">
+                        <label asp-for="Description" class="st-form-label">Description</label>
+                        <div class="st-input-group align-top">
                             <span class="input-group-text pt-3"><i class="bi bi-text-paragraph"></i></span>
                             <textarea asp-for="Description" class="form-control" rows="4"></textarea>
                         </div>
                         <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
                     </div>
 
-                    <div class="form-actions">
+                    <div class="st-form-actions">
                         <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
                         <button type="submit" class="btn btn-primary px-5 shadow-sm">
                             Save Changes <i class="bi bi-check-lg ms-2"></i>

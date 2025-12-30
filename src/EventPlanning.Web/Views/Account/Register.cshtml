@@ -6,14 +6,14 @@
 }
 
 <div class="auth-container">
-    <div class="auth-card wide animate-fade-in">
+    <div class="st-card wide animate-fade-in">
         <div class="auth-body">
             <div class="text-center mb-5">
                 <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3"
                     style="width: 60px; height: 60px; color: var(--color-dark-teal);">
                     <i class="bi bi-person-plus-fill fs-3"></i>
                 </div>
-                <h2 class="event-form-title">Join Stanza</h2>
+                <h2 class="st-form-title">Join Stanza</h2>
                 <p class="text-muted">Create an account to host and join events</p>
             </div>
 
@@ -22,16 +22,16 @@
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label asp-for="FirstName" class="auth-form-label">First Name</label>
-                        <div class="input-group auth-icon-input">
+                        <label asp-for="FirstName" class="st-form-label">First Name</label>
+                        <div class="st-input-group">
                             <span class="input-group-text"><i class="bi bi-person"></i></span>
                             <input asp-for="FirstName" class="form-control" placeholder="John" />
                         </div>
                         <span asp-validation-for="FirstName" class="text-danger small mt-1 d-block"></span>
                     </div>
                     <div class="col-md-6 mt-3 mt-md-0">
-                        <label asp-for="LastName" class="auth-form-label">Last Name</label>
-                        <div class="input-group auth-icon-input">
+                        <label asp-for="LastName" class="st-form-label">Last Name</label>
+                        <div class="st-input-group">
                             <span class="input-group-text"><i class="bi bi-person"></i></span>
                             <input asp-for="LastName" class="form-control" placeholder="Doe" />
                         </div>
@@ -40,8 +40,8 @@
                 </div>
 
                 <div class="mb-4">
-                    <label asp-for="Email" class="auth-form-label">Email Address</label>
-                    <div class="input-group auth-icon-input">
+                    <label asp-for="Email" class="st-form-label">Email Address</label>
+                    <div class="st-input-group">
                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                         <input asp-for="Email" class="form-control" placeholder="name@example.com" />
                     </div>
@@ -50,16 +50,16 @@
 
                 <div class="row mb-4">
                     <div class="col-md-6">
-                        <label asp-for="Password" class="auth-form-label">Password</label>
-                        <div class="input-group auth-icon-input">
+                        <label asp-for="Password" class="st-form-label">Password</label>
+                        <div class="st-input-group">
                             <span class="input-group-text"><i class="bi bi-lock"></i></span>
                             <input asp-for="Password" type="password" class="form-control" placeholder="••••••••" />
                         </div>
                         <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
                     </div>
                     <div class="col-md-6 mt-3 mt-md-0">
-                        <label asp-for="ConfirmPassword" class="auth-form-label">Confirm</label>
-                        <div class="input-group auth-icon-input">
+                        <label asp-for="ConfirmPassword" class="st-form-label">Confirm</label>
+                        <div class="st-input-group">
                             <span class="input-group-text"><i class="bi bi-check-lg"></i></span>
                             <input asp-for="ConfirmPassword" type="password" class="form-control"
                                 placeholder="••••••••" />
@@ -86,4 +86,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
- }
+}
