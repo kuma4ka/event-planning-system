@@ -53,7 +53,8 @@
                 HasFilters = Model.HasFilters,
                 ControllerName = "Home",
                 ActionName = "Index",
-                IsHeroOverlay = true
+                IsHeroOverlay = true,
+                SortOrder = ViewBag.CurrentSort
             };
     }
     <partial name="_EventFilter" model="filterModel" />
@@ -152,7 +153,7 @@
                     <li class="page-item @(Model.Events.PageNumber == 1 ? "disabled" : "")">
                         <a class="page-link" asp-action="Index" asp-route-page="@(Model.Events.PageNumber - 1)"
                             asp-route-searchTerm="@Model.SearchTerm" asp-route-type="@Model.Type"
-                            asp-route-from="@Model.From?.ToString("yyyy-MM-dd")"
+                            asp-route-sortOrder="@ViewBag.CurrentSort" asp-route-from="@Model.From?.ToString("yyyy-MM-dd")"
                             asp-route-to="@Model.To?.ToString("yyyy-MM-dd")" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                             <span class="ms-1">Previous</span>
@@ -165,7 +166,7 @@
                         <li class="page-item @(pageNumber == Model.Events.PageNumber ? "active" : "")">
                             <a class="page-link" asp-action="Index" asp-route-page="@pageNumber"
                                 asp-route-searchTerm="@Model.SearchTerm" asp-route-type="@Model.Type"
-                                asp-route-from="@Model.From?.ToString("yyyy-MM-dd")"
+                                asp-route-sortOrder="@ViewBag.CurrentSort" asp-route-from="@Model.From?.ToString("yyyy-MM-dd")"
                                 asp-route-to="@Model.To?.ToString("yyyy-MM-dd")">@pageNumber</a>
                         </li>
                     }
@@ -173,7 +174,7 @@
                     <li class="page-item @(Model.Events.PageNumber == Model.Events.TotalPages ? "disabled" : "")">
                         <a class="page-link" asp-action="Index" asp-route-page="@(Model.Events.PageNumber + 1)"
                             asp-route-searchTerm="@Model.SearchTerm" asp-route-type="@Model.Type"
-                            asp-route-from="@Model.From?.ToString("yyyy-MM-dd")"
+                            asp-route-sortOrder="@ViewBag.CurrentSort" asp-route-from="@Model.From?.ToString("yyyy-MM-dd")"
                             asp-route-to="@Model.To?.ToString("yyyy-MM-dd")" aria-label="Next">
                             <span class="me-1">Next</span>
                             <span aria-hidden="true">&raquo;</span>

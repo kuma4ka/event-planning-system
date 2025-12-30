@@ -26,6 +26,7 @@ public class HomeController(
         EventType? type,
         DateTime? from,
         DateTime? to,
+        string? sortOrder,
         int page = 1,
         CancellationToken cancellationToken = default)
     {
@@ -51,7 +52,7 @@ public class HomeController(
 
         try
         {
-            result = await eventService.GetEventsAsync(userId, null, searchDto, null, cancellationToken);
+            result = await eventService.GetEventsAsync(userId, null, searchDto, sortOrder, cancellationToken);
         }
         catch (ValidationException ex)
         {
@@ -75,6 +76,9 @@ public class HomeController(
 
             HasFilters = !string.IsNullOrEmpty(searchTerm) || type.HasValue || from.HasValue || to.HasValue
         };
+
+        ViewBag.CurrentSort = sortOrder;
+        ViewBag.DateSortParam = string.IsNullOrEmpty(sortOrder) || sortOrder == "date_asc" ? "date_desc" : "date_asc";
 
         return View(viewModel);
     }
