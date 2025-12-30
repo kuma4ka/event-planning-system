@@ -30,5 +30,5 @@ public record PhoneNumber
 
     public override string ToString() => Value;
 
-    public static implicit operator string(PhoneNumber phone) => phone.Value;
+    public static implicit operator string?(PhoneNumber? phone) => phone?.Value;
 }
