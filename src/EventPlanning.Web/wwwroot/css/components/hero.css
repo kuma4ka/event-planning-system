@@ -93,23 +93,6 @@
     pointer-events: none;
 }
 
-/* --- FILTER FLOATING CARD --- */
-.filter-floating-card {
-    background-color: var(--bg-surface-glass);
-    border-radius: var(--radius-xl);
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-soft);
-    position: relative;
-    z-index: 30;
-    padding: 1rem;
-    backdrop-filter: blur(10px);
-}
-
-.filter-floating-card.hero-overlay {
-    margin-top: -60px;
-    box-shadow: var(--shadow-strong);
-}
-
 /* Responsive adjustments for Hero */
 @media (max-width: 991px) {
     .hero-stanza-container {
@@ -131,9 +114,5 @@
     .hero-subtitle {
         padding-left: 0;
         border-left: none;
-    }
-
-    .filter-floating-card.hero-overlay {
-        margin-top: -30px;
     }
 }

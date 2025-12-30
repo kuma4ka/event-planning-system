@@ -41,24 +41,9 @@
 </div>
 
 <div class="container mb-5" id="events-grid">
-    @{
-        var filterModel = new EventPlanning.Web.Models.Shared.EventFilterViewModel
-            {
-                SearchTerm = Model.SearchTerm,
-                Type = Model.Type,
-                From = Model.From,
-                To = Model.To,
-                TypeOptions = Model.TypeOptions,
-                MinDate = Model.MinDate,
-                HasFilters = Model.HasFilters,
-                ControllerName = "Home",
-                ActionName = "Index",
-                IsHeroOverlay = true,
-                SortOrder = ViewBag.CurrentSort,
-                ShowSearch = false
-            };
-    }
-    <partial name="_EventFilter" model="filterModel" />
+    <vc:event-filter controller-name="Home" action-name="Index" search-term="@Model.SearchTerm" type="@Model.Type"
+        from="@Model.From" to="@Model.To" sort-order="@ViewBag.CurrentSort" is-hero-overlay="true" show-search="false">
+    </vc:event-filter>
 
     @if (!Model.Events.Items.Any())
     {
