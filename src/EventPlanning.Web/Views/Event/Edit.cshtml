@@ -46,7 +46,9 @@
                             <div class="st-input-group">
                                 <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
                                 <input asp-for="Date" type="datetime-local" class="form-control"
-                                    min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" step="60" />
+                                    min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
+                                    step="60"
+                                    asp-format="{0:yyyy-MM-ddTHH:mm}" />
                             </div>
                             <span asp-validation-for="Date" class="text-danger small mt-1 d-block"></span>
                         </div>
