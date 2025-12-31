@@ -11,7 +11,7 @@ namespace EventPlanning.Infrastructure.Repositories;
 
 public class EventRepository(ApplicationDbContext context) : IEventRepository
 {
-    public async Task<Event?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Event?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await context.Events
             .Include(e => e.Venue)
@@ -19,7 +19,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    public async Task<Event?> GetDetailsByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Event?> GetDetailsByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await context.Events
             .Include(e => e.Venue)
@@ -27,20 +27,20 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    public async Task<int> CountGuestsAsync(int eventId, CancellationToken cancellationToken = default)
+    public async Task<int> CountGuestsAsync(Guid eventId, CancellationToken cancellationToken = default)
     {
         return await context.Guests
            .AsNoTracking()
            .CountAsync(g => g.EventId == eventId, cancellationToken);
     }
 
-    public async Task<bool> GuestEmailExistsAsync(int eventId, string email, string? excludeGuestId = null, CancellationToken cancellationToken = default)
+    public async Task<bool> GuestEmailExistsAsync(Guid eventId, string email, Guid? excludeGuestId = null, CancellationToken cancellationToken = default)
     {
         var query = context.Guests
             .AsNoTracking()
             .Where(g => g.EventId == eventId && (string)g.Email == email);
 
-        if (!string.IsNullOrEmpty(excludeGuestId))
+        if (excludeGuestId.HasValue)
         {
             query = query.Where(g => g.Id != excludeGuestId);
         }
@@ -48,7 +48,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
         return await query.AnyAsync(cancellationToken);
     }
 
-    public async Task<bool> GuestPhoneExistsAsync(int eventId, string phoneNumber, string? excludeGuestId = null, CancellationToken cancellationToken = default)
+    public async Task<bool> GuestPhoneExistsAsync(Guid eventId, string phoneNumber, Guid? excludeGuestId = null, CancellationToken cancellationToken = default)
     {
         PhoneNumber? phoneVo;
         try
@@ -64,7 +64,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .AsNoTracking()
             .Where(g => g.EventId == eventId && g.PhoneNumber == phoneVo);
 
-        if (!string.IsNullOrEmpty(excludeGuestId))
+        if (excludeGuestId.HasValue)
         {
             query = query.Where(g => g.Id != excludeGuestId);
         }
@@ -92,7 +92,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<int> AddAsync(Event eventEntity, CancellationToken cancellationToken = default)
+    public async Task<Guid> AddAsync(Event eventEntity, CancellationToken cancellationToken = default)
     {
         await context.Events.AddAsync(eventEntity, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -155,7 +155,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
         return await query.ToPagedListAsync(pageNumber, pageSize, cancellationToken);
     }
 
-    public async Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task<bool> IsUserJoinedAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
     {
         var user = await context.Users.FindAsync([userId], cancellationToken);
         if (user == null || string.IsNullOrEmpty(user.Email)) return false;
@@ -164,7 +164,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .AnyAsync(g => g.EventId == eventId && (string)g.Email == user.Email, cancellationToken);
     }
 
-    public async Task<bool> TryJoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task<bool> TryJoinEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
     {
         await using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
 
@@ -208,7 +208,6 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             }
 
             var guest = new Guest(
-                Guid.NewGuid().ToString(),
                 user.FirstName,
                 user.LastName,
                 user.Email,
@@ -230,7 +229,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
         }
     }
 
-    public async Task RemoveGuestAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task RemoveGuestAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
     {
         var user = await context.Users.FindAsync([userId], cancellationToken);
         if (user == null || string.IsNullOrEmpty(user.Email)) return;
