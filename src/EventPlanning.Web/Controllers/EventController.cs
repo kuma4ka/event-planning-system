@@ -24,7 +24,8 @@ public class EventController(
     [AllowAnonymous]
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
     {
-        var eventDetails = await eventService.GetEventDetailsAsync(id, cancellationToken);
+        var userId = userManager.GetUserId(User);
+        var eventDetails = await eventService.GetEventDetailsAsync(id, userId, cancellationToken);
         if (eventDetails == null) return NotFound();
 
         ViewBag.GoogleMapsApiKey = configuration["GoogleMaps:ApiKey"];
@@ -55,7 +56,7 @@ public class EventController(
         {
             var eventId = await eventService.CreateEventAsync(userId!, model, cancellationToken);
             logger.LogInformation("Event created: {EventId} by {User}", eventId, User.Identity?.Name);
-            return RedirectToAction("MyEvents", "Event");
+            return RedirectToAction(nameof(MyEvents));
         }
         catch (ValidationException ex)
         {
@@ -108,7 +109,7 @@ public class EventController(
         {
             await eventService.UpdateEventAsync(userId!, model, cancellationToken);
             logger.LogInformation("Event updated: {EventId} by {User}", id, User.Identity?.Name);
-            return RedirectToAction("MyEvents", "Event");
+            return RedirectToAction(nameof(MyEvents));
         }
         catch (ValidationException ex)
         {
@@ -141,7 +142,7 @@ public class EventController(
         {
             await eventService.DeleteEventAsync(userId!, id, cancellationToken);
             logger.LogInformation("Event deleted: {EventId} by {User}", id, User.Identity?.Name);
-            return RedirectToAction("MyEvents", "Event");
+            return RedirectToAction(nameof(MyEvents));
         }
         catch (UnauthorizedAccessException)
         {

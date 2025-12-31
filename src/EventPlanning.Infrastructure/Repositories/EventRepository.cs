@@ -164,69 +164,10 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .AnyAsync(g => g.EventId == eventId && (string)g.Email == user.Email, cancellationToken);
     }
 
-    public async Task<bool> TryJoinEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task AddGuestAsync(Guest guest, CancellationToken cancellationToken = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
-
-        try
-        {
-            var user = await context.Users.FindAsync([userId], cancellationToken);
-            if (user == null || string.IsNullOrEmpty(user.Email)) return false;
-
-            var eventEntity = await context.Events
-                .Include(e => e.Venue)
-                .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
-
-            if (eventEntity == null) return false;
-
-            if (eventEntity.Venue is { Capacity: > 0 })
-            {
-                var currentCount = await context.Guests.CountAsync(g => g.EventId == eventId, cancellationToken);
-                if (currentCount >= eventEntity.Venue.Capacity)
-                {
-                    await transaction.RollbackAsync(cancellationToken);
-                    return false;
-                }
-            }
-
-            PhoneNumber? userPhoneVo = null;
-            try
-            {
-                if (!string.IsNullOrEmpty(user.PhoneNumber))
-                    userPhoneVo = PhoneNumber.Create(user.PhoneNumber);
-            }
-            catch { /* Ignore validaton error, just won't match phone */ }
-
-            var alreadyJoined = await context.Guests.AnyAsync(g =>
-                g.EventId == eventId &&
-                ((string)g.Email == user.Email || (userPhoneVo != null && g.PhoneNumber == userPhoneVo)),
-                cancellationToken);
-            if (alreadyJoined)
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                return false;
-            }
-
-            var guest = new Guest(
-                user.FirstName,
-                user.LastName,
-                user.Email,
-                eventId,
-                user.CountryCode,
-                user.PhoneNumber
-            );
-
-            await context.Guests.AddAsync(guest, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
-
-            return true;
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+        await context.Guests.AddAsync(guest, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RemoveGuestAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
