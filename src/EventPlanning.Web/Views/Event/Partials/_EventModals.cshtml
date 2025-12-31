@@ -67,7 +67,7 @@
                 <form asp-controller="Guest" asp-action="AddManually" method="post">
                     <div class="modal-body">
                         <input type="hidden" name="EventId" value="@Model.Id" />
-                        <partial name="_GuestFormFields" model="null"
+                        <partial name="Partials/_GuestFormFields" model="null"
                             view-data='new ViewDataDictionary(ViewData) { { "Prefix", "add" } }' />
                     </div>
                     <div class="modal-footer border-0 pt-0">
@@ -91,7 +91,7 @@
                         <input type="hidden" name="EventId" value="@Model.Id" />
                         <input type="hidden" name="Id" id="editGuestId" />
 
-                        <partial name="_GuestFormFields" model="null"
+                        <partial name="Partials/_GuestFormFields" model="null"
                             view-data='new ViewDataDictionary(ViewData) { { "Prefix", "editGuest" } }' />
                     </div>
                     <div class="modal-footer border-0 pt-0">
