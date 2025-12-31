@@ -8,6 +8,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace EventPlanning.Tests.Services;
@@ -18,6 +19,7 @@ public class EventServiceTests
     private readonly Mock<IValidator<CreateEventDto>> _createValidatorMock;
     private readonly Mock<IUserRepository> _userRepoMock;
     private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock;
+    private readonly Mock<ILogger<EventService>> _loggerMock;
 
     private readonly EventService _service;
 
@@ -29,6 +31,7 @@ public class EventServiceTests
         Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
         Mock<IValidator<EventSearchDto>> searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        _loggerMock = new Mock<ILogger<EventService>>();
         IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
 
         _service = new EventService(
@@ -38,7 +41,8 @@ public class EventServiceTests
             searchValidatorMock.Object,
             _userRepoMock.Object,
             _httpContextAccessorMock.Object,
-            cache
+            cache,
+            _loggerMock.Object
         );
     }
 
