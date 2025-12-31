@@ -111,3 +111,25 @@
     transform: translateY(-2px);
     box-shadow: var(--shadow-soft);
 }
+
+/* --- Profile Dropdown Toggle --- */
+.navbar-meetup .profile-toggle {
+    color: var(--text-main);
+    transition: color 0.2s ease;
+}
+
+.navbar-meetup .profile-toggle:hover {
+    color: var(--color-dark-teal);
+}
+
+.navbar-meetup .profile-avatar {
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    background-color: var(--bs-light);
+    border-radius: 50%;
+}
+
+.navbar-meetup .profile-icon {
+    color: var(--color-dark-teal);
+    font-size: 1.1rem;
+}
