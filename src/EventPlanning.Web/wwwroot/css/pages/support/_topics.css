@@ -1,0 +1,62 @@
+/* --- Topic Cards (Help Center) --- */
+.support-topic-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 100%;
+    text-decoration: none;
+    display: block;
+}
+
+.support-topic-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-soft);
+    border-color: var(--color-dark-teal);
+    background: var(--bg-surface-hover);
+}
+
+.support-topic-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--bg-body);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    color: var(--color-dark-teal);
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.support-topic-card:hover .support-topic-icon {
+    background: var(--color-dark-teal);
+    color: var(--color-static-white);
+}
+
+.support-topic-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}
+
+.support-topic-desc {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 0;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .support-topic-card {
+    background: var(--bg-surface);
+    border-color: var(--border-medium);
+}
+
+[data-theme="dark"] .support-topic-card:hover {
+    background: var(--bg-surface-hover);
+    border-color: var(--color-dark-teal);
+}

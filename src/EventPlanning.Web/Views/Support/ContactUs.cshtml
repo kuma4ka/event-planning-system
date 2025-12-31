@@ -1,0 +1,164 @@
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<div class="support-hero">
+    <div class="container animate-fade-in">
+        <h1>Get in Touch</h1>
+        <p>Values, questions, or just want to say hello? We'd love to hear from you.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-5">
+        <!-- Contact Form -->
+        <div class="col-lg-7">
+            <div class="st-card animate-fade-up" style="animation-delay: 0.1s;">
+                <h3 class="fw-bold mb-4" style="color: var(--text-main);">Send us a Message</h3>
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success border-0 shadow-sm mb-4">
+                        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                    </div>
+                }
+
+                <form asp-action="Contact" method="post">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="st-form-label">First Name</label>
+                            <div class="st-input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" name="firstName" required placeholder="Jane">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="st-form-label">Last Name</label>
+                            <div class="st-input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" name="lastName" required placeholder="Doe">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="st-form-label">Email Address</label>
+                            <div class="st-input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control" name="email" required
+                                    placeholder="jane@example.com">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="st-form-label">Subject</label>
+                            <div class="st-input-group">
+                                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                                <select class="form-select" name="subject">
+                                    <option>General Inquiry</option>
+                                    <option>Technical Support</option>
+                                    <option>Billing Question</option>
+                                    <option>Report a Violation</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="st-form-label">Message</label>
+                            <div class="st-input-group align-top">
+                                <span class="input-group-text pt-3"><i class="bi bi-chat-text"></i></span>
+                                <textarea class="form-control" name="message" rows="5" required
+                                    placeholder="How can we help you?"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                                Send Message <i class="bi bi-send ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="col-lg-5">
+            <div class="contact-info-card animate-fade-up" style="animation-delay: 0.2s;">
+                <h4 class="fw-bold mb-4" style="color: var(--text-main);">Contact Information</h4>
+
+                <div class="contact-method">
+                    <div class="contact-icon">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div>
+                        <span class="contact-label">Our Office</span>
+                        <span class="contact-value d-block">123 Innovation Drive</span>
+                        <span class="contact-value d-block">Tech City, TC 90210</span>
+                    </div>
+                </div>
+
+                <div class="contact-method">
+                    <div class="contact-icon">
+                        <i class="bi bi-envelope-fill"></i>
+                    </div>
+                    <div>
+                        <span class="contact-label">Email Us</span>
+                        <a href="mailto:support@stanza.com" class="contact-value">support@stanza.com</a>
+                    </div>
+                </div>
+
+                <div class="contact-method">
+                    <div class="contact-icon">
+                        <i class="bi bi-telephone-fill"></i>
+                    </div>
+                    <div>
+                        <span class="contact-label">Call Us</span>
+                        <a href="tel:+15550123456" class="contact-value">+1 (555) 012-3456</a>
+                    </div>
+                </div>
+
+                <hr class="my-4" style="border-color: var(--border-light);">
+
+                <h5 class="fw-bold mb-3" style="color: var(--text-main);">Follow Us</h5>
+                <div class="d-flex gap-3">
+                    <a href="#"
+                        class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center"
+                        style="width: 40px; height: 40px;">
+                        <i class="bi bi-twitter-x"></i>
+                    </a>
+                    <a href="#"
+                        class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center"
+                        style="width: 40px; height: 40px;">
+                        <i class="bi bi-linkedin"></i>
+                    </a>
+                    <a href="#"
+                        class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center"
+                        style="width: 40px; height: 40px;">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-4 p-4 rounded-4"
+                style="background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue)); color: white;">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-clock-history fs-2 me-3"></i>
+                    <div>
+                        <h5 class="fw-bold mb-0">Support Hours</h5>
+                        <small class="opacity-75">We're here when you need us</small>
+                    </div>
+                </div>
+                <ul class="list-unstyled mb-0 opacity-90">
+                    <li class="d-flex justify-content-between mb-2">
+                        <span>Monday - Friday</span>
+                        <span class="fw-bold">9:00 AM - 6:00 PM</span>
+                    </li>
+                    <li class="d-flex justify-content-between">
+                        <span>Weekends</span>
+                        <span class="fw-bold">10:00 AM - 4:00 PM</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
