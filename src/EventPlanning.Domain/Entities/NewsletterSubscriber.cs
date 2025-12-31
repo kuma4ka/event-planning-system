@@ -15,4 +15,8 @@ public class NewsletterSubscriber
     public DateTime SubscribedAt { get; set; } = DateTime.UtcNow;
 
     public bool IsActive { get; set; } = true;
+
+    // Double Opt-In
+    public bool IsConfirmed { get; set; } = false;
+    public string? ConfirmationToken { get; set; }
 }

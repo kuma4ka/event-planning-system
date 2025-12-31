@@ -22,6 +22,7 @@ public static class DependencyInjection
             options.UseSqlServer(connectionString));
 
         services.AddMemoryCache();
+        services.AddHttpContextAccessor(); // Required for generating absolute links dynamically
 
         services.AddIdentity<User, IdentityRole>(options =>
             {

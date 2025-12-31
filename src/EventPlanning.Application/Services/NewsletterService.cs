@@ -1,10 +1,11 @@
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace EventPlanning.Application.Services;
 
-public class NewsletterService(INewsletterRepository newsletterRepository, IEmailService emailService) : INewsletterService
+public class NewsletterService(INewsletterRepository newsletterRepository, IEmailService emailService, IHttpContextAccessor httpContextAccessor) : INewsletterService
 {
     public async Task SubscribeAsync(string email, CancellationToken cancellationToken = default)
     {
@@ -15,28 +16,73 @@ public class NewsletterService(INewsletterRepository newsletterRepository, IEmai
         }
 
         // 2. Check if already subscribed
-        if (await newsletterRepository.IsEmailSubscribedAsync(email, cancellationToken))
+        var existing = await newsletterRepository.GetSubscriberByEmailAsync(email, cancellationToken);
+
+        if (existing != null && existing.IsConfirmed)
         {
-            // Already subscribed - technically success for idempotency
+            // Already confirmed - return success (idempotent)
             return;
         }
 
-        // 3. Create entity
-        var subscriber = new NewsletterSubscriber
+        string token;
+        if (existing != null)
         {
-            Email = email,
-            SubscribedAt = DateTime.UtcNow,
-            IsActive = true
-        };
+            // Resend confirmation if not confirmed
+            token = Guid.NewGuid().ToString();
+            existing.ConfirmationToken = token;
+            await newsletterRepository.UpdateSubscriberAsync(existing, cancellationToken);
+        }
+        else
+        {
+            // New subscriber
+            token = Guid.NewGuid().ToString();
+            var subscriber = new NewsletterSubscriber
+            {
+                Email = email,
+                SubscribedAt = DateTime.UtcNow,
+                IsActive = true,
+                IsConfirmed = false,
+                ConfirmationToken = token
+            };
+            await newsletterRepository.AddSubscriberAsync(subscriber, cancellationToken);
+        }
 
-        // 4. Save
-        await newsletterRepository.AddSubscriberAsync(subscriber, cancellationToken);
+        // 3. Send Confirmation Email (Double Opt-In)
+        var request = httpContextAccessor.HttpContext?.Request;
+        var baseUrl = request != null
+            ? $"{request.Scheme}://{request.Host}"
+            : "https://localhost:7073";
 
-        // 5. Send Welcome Email
+        var confirmationLink = $"{baseUrl}/newsletter/confirm?email={Uri.EscapeDataString(email)}&token={token}";
+
+        await emailService.SendEmailAsync(
+            email,
+            "Confirm your Stanza Subscription",
+            $"<h1>Confirmation Required</h1><p>Please click the link below to verify your email:</p><a href='{confirmationLink}'>Confirm Subscription</a>",
+            cancellationToken);
+    }
+
+    public async Task<bool> ConfirmSubscriptionAsync(string email, string token, CancellationToken cancellationToken = default)
+    {
+        var subscriber = await newsletterRepository.GetSubscriberByEmailAsync(email, cancellationToken);
+        if (subscriber == null) return false;
+
+        // Check token
+        if (subscriber.IsConfirmed) return true; // Already confirmed
+        if (subscriber.ConfirmationToken != token) return false; // Invalid token
+
+        // Confirm
+        subscriber.IsConfirmed = true;
+        subscriber.ConfirmationToken = null; // Clear token after use
+        await newsletterRepository.UpdateSubscriberAsync(subscriber, cancellationToken);
+
+        // Send Welcome Email
         await emailService.SendEmailAsync(
             email,
             "Welcome to Stanza!",
-            "<h1>Welcome!</h1><p>Thank you for subscribing to Stanza. We are excited to have you.</p>",
+            "<h1>Welcome!</h1><p>Thank you for subscribing to Stanza. You are now verified!</p>",
             cancellationToken);
+
+        return true;
     }
 }

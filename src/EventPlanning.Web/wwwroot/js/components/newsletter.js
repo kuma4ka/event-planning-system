@@ -29,8 +29,6 @@ export class NewsletterSubscription {
         try {
             const formData = new FormData(this.form);
 
-            // Note: FormData automatically captures the inputs, including hidden anti-forgery token
-
             const response = await fetch('/newsletter/subscribe', {
                 method: 'POST',
                 body: formData
@@ -64,12 +62,9 @@ export class NewsletterSubscription {
     }
 
     showToast(title, message, type) {
-        // Reuse existing toast system if available, or simple alert for now
-        // Checking if we have a global toast function from site.js or UI library
         if (window.showToast) {
-            window.showToast(message, type); // Assuming strict signature matches or similar
+            window.showToast(message, type);
         } else {
-            // Fallback to alert if no system toast
             alert(`${title}: ${message}`);
         }
     }
