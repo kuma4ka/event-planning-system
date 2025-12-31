@@ -1,29 +1,10 @@
 ﻿export function initEventActions() {
-    initDeleteModal();
+    initDeleteModal('deleteModal', '#modalEventName', '#deleteForm', 'data-event-id', 'data-event-name');
     initShareModal();
 }
 
-function initDeleteModal() {
-    const deleteModalEl = document.getElementById('deleteModal');
-    if (!deleteModalEl) return;
+import { initDeleteModal } from '../ui/modal-utils.js';
 
-    deleteModalEl.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-
-        const eventId = button.getAttribute('data-event-id');
-        const eventName = button.getAttribute('data-event-name');
-
-        const modalTitle = deleteModalEl.querySelector('#modalEventName');
-        const deleteForm = deleteModalEl.querySelector('#deleteForm');
-        const urlTemplate = deleteModalEl.getAttribute('data-url-template');
-
-        if (modalTitle) modalTitle.textContent = eventName;
-
-        if (deleteForm && urlTemplate) {
-            deleteForm.action = urlTemplate.replace('/0', '/' + eventId);
-        }
-    });
-}
 
 function initShareModal() {
     const shareModalEl = document.getElementById('shareModal');
