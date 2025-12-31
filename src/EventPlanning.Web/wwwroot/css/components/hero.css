@@ -27,7 +27,6 @@
     letter-spacing: -0.04em;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     color: #ffffff;
-    /* Explicit bright white for contrast */
 }
 
 .hero-title-accent {

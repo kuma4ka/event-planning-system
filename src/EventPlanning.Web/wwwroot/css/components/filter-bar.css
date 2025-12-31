@@ -19,15 +19,14 @@
 [data-theme="dark"] .filter-floating-card select,
 [data-theme="dark"] .filter-floating-card .input-group-text,
 [data-theme="dark"] .filter-floating-card .form-select {
-    background-color: rgba(255, 255, 255, 0.25) !important;
-    /* Bumped to 0.25 for better visibility */
-    color: #ffffff !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
+    background-color: var(--input-bg-dark) !important;
+    color: var(--color-white) !important;
+    border-color: var(--input-border-dark) !important;
     font-weight: 500;
 }
 
 [data-theme="dark"] .filter-floating-card input::placeholder {
-    color: rgba(255, 255, 255, 0.8) !important;
+    color: var(--input-placeholder-dark) !important;
 }
 
 .filter-floating-card.hero-overlay {

@@ -22,8 +22,6 @@
     --bg-body: var(--color-cool-mist);
     --bg-surface: var(--color-white);
     --bg-surface-glass: rgba(255, 255, 255, 0.95);
-
-    /* New: Explicit footer background for theme stability */
     --bg-footer: var(--color-ink-black);
 
 
@@ -58,14 +56,10 @@
 [data-theme="dark"] {
     /* --- OCEAN DEPTHS PALETTE --- */
     --color-ink-black: #e6f1f5;
-    /* Inverted for text */
     --color-dark-teal: #4ea8de;
-    /* Brighter accent */
     --color-air-force-blue: #a8dadc;
     --color-cool-mist: #0b1d26;
-    /* Dark bg */
     --color-white: #162a35;
-    /* Surface bg */
     --color-accent-cyan: #3dccc7;
 
     /* Semantic Theme Overrides */
@@ -73,13 +67,11 @@
     --bg-surface: #162a35;
     --bg-surface-glass: rgba(22, 42, 53, 0.95);
     --bg-footer: #08161c;
-    /* Even darker than body for footer */
-    /* Hero should stay dark/rich in dark mode, not invert to white */
+
     --bg-hero-gradient: radial-gradient(circle at top right, #1a4f63 0%, #051016 60%);
 
     --text-main: #e6f1f5;
     --text-muted: #b8c6d1;
-    /* Brightened from #8899a6 for better contrast */
     --text-on-image: #ffffff;
 
     --border-light: #2c3e50;
@@ -90,10 +82,16 @@
     --bs-body-bg: var(--bg-body);
     --bs-body-color: var(--text-main);
 
-    /* Bootstrap overrides for dark mode specific */
+    /* --- SEMANTIC COLORS FOR DARK MODE --- */
+    --bg-card-dark: #0f242e;
+    --border-dark: #2c3e50;
+    --input-bg-dark: rgba(255, 255, 255, 0.25);
+    --input-border-dark: rgba(255, 255, 255, 0.3);
+    --input-placeholder-dark: rgba(255, 255, 255, 0.8);
+
+    /* Bootstrap overrides */
     --bs-light: #162a35;
     --bs-dark: #f8f9fa;
     --bs-body-color: var(--text-main);
     --bs-secondary-color: var(--text-muted);
-    /* Ensure Bootstrap text-muted uses my variable */
 }
