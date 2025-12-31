@@ -15,14 +15,31 @@
     color: var(--color-white) !important;
 }
 
+[data-theme="dark"] .filter-floating-card .input-group-text {
+    background-color: var(--input-addon-bg-dark) !important;
+    color: #ffffff !important;
+    /* Force white text/icon */
+    border-color: var(--input-border-dark) !important;
+}
+
+[data-theme="dark"] .filter-floating-card .input-group-text i {
+    color: #ffffff !important;
+    /* Explicitly force icon to white */
+}
+
 [data-theme="dark"] .filter-floating-card input,
 [data-theme="dark"] .filter-floating-card select,
-[data-theme="dark"] .filter-floating-card .input-group-text,
 [data-theme="dark"] .filter-floating-card .form-select {
-    background-color: var(--input-bg-dark) !important;
+    background-color: var(--input-field-bg-dark) !important;
     color: var(--color-white) !important;
     border-color: var(--input-border-dark) !important;
     font-weight: 500;
+}
+
+/* Remove redundant native calendar icon in dark mode (since we have one on the left) */
+[data-theme="dark"] .filter-floating-card input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0;
 }
 
 [data-theme="dark"] .filter-floating-card input::placeholder {
