@@ -13,7 +13,8 @@ namespace EventPlanning.Web.Areas.Admin.Controllers;
 [Authorize(Roles = "Admin")]
 public class VenueController(
     IVenueService venueService,
-    UserManager<User> userManager) : Controller
+    UserManager<User> userManager,
+    ILogger<VenueController> logger) : Controller
 {
     [HttpGet("")]
     public async Task<IActionResult> Index(int page = 1, CancellationToken cancellationToken = default)

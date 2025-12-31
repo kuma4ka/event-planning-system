@@ -12,7 +12,8 @@ namespace EventPlanning.Web.Controllers;
 [Route("guests")]
 public class GuestController(
     IGuestService guestService,
-    UserManager<User> userManager) : Controller
+    UserManager<User> userManager,
+    ILogger<GuestController> logger) : Controller
 {
 
 
@@ -28,18 +29,22 @@ public class GuestController(
         }
         catch (ValidationException ex)
         {
+            logger.LogWarning("Validation failed when manually adding guest: {Errors}", string.Join(", ", ex.Errors.Select(e => e.ErrorMessage)));
             TempData["ErrorMessage"] = ex.Errors.FirstOrDefault()?.ErrorMessage ?? "Validation failed.";
         }
         catch (UnauthorizedAccessException)
         {
+            logger.LogWarning("User {UserId} unauthorized to add guest to event {EventId}", userId, model.EventId);
             return Forbid();
         }
         catch (InvalidOperationException ex)
         {
+            logger.LogWarning("Invalid operation adding guest: {Message}", ex.Message);
             TempData["ErrorMessage"] = ex.Message;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            logger.LogError(ex, "Unexpected error adding guest manually to event {EventId}", model.EventId);
             TempData["ErrorMessage"] = "An unexpected error occurred.";
         }
 
@@ -64,6 +69,7 @@ public class GuestController(
         }
         catch (ValidationException ex)
         {
+            logger.LogWarning("Validation failed when updating guest {GuestId}: {Errors}", model.Id, string.Join(", ", ex.Errors.Select(e => e.ErrorMessage)));
             TempData["ErrorMessage"] = ex.Errors.FirstOrDefault()?.ErrorMessage ?? "Validation failed.";
         }
         catch (UnauthorizedAccessException)
@@ -72,6 +78,7 @@ public class GuestController(
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error updating guest {GuestId}", model.Id);
             TempData["ErrorMessage"] = ex.Message;
         }
 
@@ -93,6 +100,7 @@ public class GuestController(
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error removing guest {GuestId} from event {EventId}", guestId, eventId);
             TempData["ErrorMessage"] = ex.Message;
         }
 

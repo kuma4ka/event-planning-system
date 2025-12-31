@@ -2,10 +2,15 @@ using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace EventPlanning.Application.Services;
 
-public class NewsletterService(INewsletterRepository newsletterRepository, IEmailService emailService, IHttpContextAccessor httpContextAccessor) : INewsletterService
+public class NewsletterService(
+    INewsletterRepository newsletterRepository,
+    IEmailService emailService,
+    IHttpContextAccessor httpContextAccessor,
+    ILogger<NewsletterService> logger) : INewsletterService
 {
     public async Task SubscribeAsync(string email, CancellationToken cancellationToken = default)
     {
@@ -69,7 +74,11 @@ public class NewsletterService(INewsletterRepository newsletterRepository, IEmai
 
         // Check token
         if (subscriber.IsConfirmed) return true; // Already confirmed
-        if (subscriber.ConfirmationToken != token) return false; // Invalid token
+        if (subscriber.ConfirmationToken != token)
+        {
+            logger.LogWarning("Invalid confirmation token provided for {Email}", email);
+            return false;
+        }
 
         // Confirm
         subscriber.IsConfirmed = true;

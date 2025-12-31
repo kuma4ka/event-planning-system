@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace EventPlanning.Web.Controllers;
 
 [Route("newsletter")]
-public class NewsletterController(INewsletterService newsletterService) : Controller
+public class NewsletterController(INewsletterService newsletterService, ILogger<NewsletterController> logger) : Controller
 {
     [HttpPost("subscribe")]
     [ValidateAntiForgeryToken]
@@ -16,6 +16,7 @@ public class NewsletterController(INewsletterService newsletterService) : Contro
         // Honeypot check
         if (!string.IsNullOrEmpty(website))
         {
+            logger.LogWarning("Honeypot triggered for newsletter by {Email}", email);
             return Json(new { success = true, message = "Please check your email to confirm your subscription." });
         }
 
@@ -26,10 +27,12 @@ public class NewsletterController(INewsletterService newsletterService) : Contro
         }
         catch (ArgumentException ex)
         {
+            logger.LogWarning("Invalid newsletter subscription attempt: {Message}", ex.Message);
             return Json(new { success = false, message = ex.Message });
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            logger.LogError(ex, "Error subscribing to newsletter: {Email}", email);
             return Json(new { success = false, message = "An error occurred. Please try again later." });
         }
     }
@@ -50,6 +53,7 @@ public class NewsletterController(INewsletterService newsletterService) : Contro
         }
         else
         {
+            logger.LogWarning("Failed newsletter confirmation for {Email}", email);
             return BadRequest("Invalid or expired confirmation token.");
         }
     }

@@ -49,8 +49,6 @@ public class AccountController(
 
         if (result.Succeeded)
         {
-            logger.LogInformation("New user registered: {Email}", model.Email);
-
             var userId = await userManager.GetUserIdAsync(user);
             var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
             
@@ -115,7 +113,6 @@ public class AccountController(
 
         if (result.Succeeded)
         {
-            logger.LogInformation("User {Email} logged in.", model.Email);
             return LocalRedirect(returnUrl);
         }
 
@@ -140,7 +137,6 @@ public class AccountController(
     {
         var email = User.Identity?.Name;
         await signInManager.SignOutAsync();
-        logger.LogInformation("User {Email} logged out.", email);
         return RedirectToAction("Index", "Home");
     }
 
@@ -172,7 +168,6 @@ public class AccountController(
             return RedirectToAction("Index", "Home");
         }
 
-        logger.LogInformation("User {UserId} confirmed email.", userId);
         TempData["SuccessMessage"] = "Thank you for confirming your email.";
         return View();
     }

@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
+using Microsoft.Extensions.Logging;
+
 namespace EventPlanning.Infrastructure.Services;
 
-public class ImageService(IWebHostEnvironment webHostEnvironment) : IImageService
+public class ImageService(IWebHostEnvironment webHostEnvironment, ILogger<ImageService> logger) : IImageService
 {
     private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
 
@@ -15,11 +17,13 @@ public class ImageService(IWebHostEnvironment webHostEnvironment) : IImageServic
 
         if (string.IsNullOrEmpty(extension) || !_allowedExtensions.Contains(extension))
         {
+            logger.LogWarning("Invalid file upload attempt. Extension: {Extension}", extension);
             throw new ArgumentException($"Invalid file type. Allowed types: {string.Join(", ", _allowedExtensions)}");
         }
 
         if (!file.ContentType.StartsWith("image/"))
         {
+            logger.LogWarning("Invalid file content type upload attempt. ContentType: {ContentType}", file.ContentType);
             throw new ArgumentException("Invalid file content type. Only images are allowed.");
         }
 
@@ -50,6 +54,10 @@ public class ImageService(IWebHostEnvironment webHostEnvironment) : IImageServic
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
+        }
+        else
+        {
+             logger.LogWarning("Attempted to delete non-existent image: {FilePath}", filePath);
         }
     }
 }

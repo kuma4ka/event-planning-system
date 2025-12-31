@@ -8,6 +8,7 @@ using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace EventPlanning.Application.Services;
 
@@ -18,7 +19,8 @@ public class EventService(
     IValidator<EventSearchDto> searchValidator,
     IUserRepository userRepository,
     IHttpContextAccessor httpContextAccessor,
-    IMemoryCache cache) : IEventService
+    IMemoryCache cache,
+    ILogger<EventService> logger) : IEventService
 {
     private const string EventCacheKeyPrefix = "event_details_";
 
@@ -192,7 +194,11 @@ public class EventService(
         CancellationToken cancellationToken = default)
     {
         var validationResult = await createValidator.ValidateAsync(dto, cancellationToken);
-        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+        if (!validationResult.IsValid)
+        {
+            logger.LogWarning("Event creation failed validation: {Errors}", string.Join(", ", validationResult.Errors));
+            throw new ValidationException(validationResult.Errors);
+        }
 
         var eventEntity = new Event(
             dto.Name,
@@ -214,7 +220,11 @@ public class EventService(
         var eventEntity = await eventRepository.GetByIdAsync(dto.Id, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException($"Event {dto.Id} not found");
 
-        if (eventEntity.OrganizerId != userId) throw new UnauthorizedAccessException("Not your event");
+        if (eventEntity.OrganizerId != userId)
+        {
+             logger.LogWarning("Unauthorized event update attempt by {UserId} on event {EventId}", userId, dto.Id);
+             throw new UnauthorizedAccessException("Not your event");
+        }
 
         if (eventEntity.Date < DateTime.UtcNow)
             throw new InvalidOperationException("Cannot edit an event that has already ended.");
@@ -238,7 +248,10 @@ public class EventService(
         if (eventEntity == null) return;
 
         if (eventEntity.OrganizerId != userId)
+        {
+            logger.LogWarning("Unauthorized event delete attempt by {UserId} on event {EventId}", userId, eventId);
             throw new UnauthorizedAccessException("Not your event");
+        }
 
         await eventRepository.DeleteAsync(eventEntity, cancellationToken);
 
@@ -265,6 +278,7 @@ public class EventService(
         var success = await eventRepository.TryJoinEventAsync(eventId, userId, cancellationToken);
         if (!success)
         {
+            logger.LogWarning("Join failed: Event {EventId} is full.", eventId);
             throw new InvalidOperationException("Sorry, this event is fully booked or unavailable.");
         }
 

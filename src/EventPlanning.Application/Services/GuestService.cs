@@ -4,6 +4,7 @@ using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace EventPlanning.Application.Services;
 
@@ -13,7 +14,8 @@ public class GuestService(
     IValidator<CreateGuestDto> createValidator,
     IValidator<AddGuestManuallyDto> manualAddValidator,
     IValidator<UpdateGuestDto> updateValidator,
-    IMemoryCache cache) : IGuestService
+    IMemoryCache cache,
+    ILogger<GuestService> logger) : IGuestService
 {
     private const string EventCacheKeyPrefix = "event_details_";
 
@@ -25,7 +27,11 @@ public class GuestService(
         var eventEntity = await eventRepository.GetByIdAsync(dto.EventId, cancellationToken);
 
         if (eventEntity == null) throw new KeyNotFoundException("Event not found");
-        if (eventEntity.OrganizerId != userId) throw new UnauthorizedAccessException("Not your event");
+        if (eventEntity.OrganizerId != userId)
+        {
+            logger.LogWarning("Unauthorized guest add attempt by {UserId} for event {EventId}", userId, dto.EventId);
+            throw new UnauthorizedAccessException("Not your event");
+        }
 
         if (await eventRepository.GuestEmailExistsAsync(dto.EventId, dto.Email, null, cancellationToken))
         {

@@ -6,6 +6,7 @@ using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace EventPlanning.Application.Services;
 
@@ -14,7 +15,8 @@ public class ProfileService(
     IEventRepository eventRepository,
     IUserRepository userRepository,
     IValidator<EditProfileDto> profileValidator,
-    IValidator<ChangePasswordDto> passwordValidator) : IProfileService
+    IValidator<ChangePasswordDto> passwordValidator,
+    ILogger<ProfileService> logger) : IProfileService
 {
     public async Task<EditProfileDto> GetProfileAsync(string userId, CancellationToken cancellationToken = default)
     {
@@ -60,6 +62,7 @@ public class ProfileService(
 
             if (isPhoneTaken)
             {
+                logger.LogWarning("Profile update failed: Phone number {PhoneNumber} taken", newFullPhoneNumber);
                 throw new ValidationException([
                     new ValidationFailure("PhoneNumber", "This phone number is already linked to another account.")
                 ]);
@@ -73,6 +76,7 @@ public class ProfileService(
 
         if (!result.Succeeded)
         {
+            logger.LogWarning("Profile update failed for user {UserId}: {Errors}", userId, string.Join(", ", result.Errors.Select(e => e.Description)));
             var errors = result.Errors.Select(e =>
                 new ValidationFailure(string.Empty, e.Description));
             throw new ValidationException(errors);
@@ -93,6 +97,7 @@ public class ProfileService(
 
         if (!result.Succeeded)
         {
+            logger.LogWarning("Password change failed for user {UserId}: {Errors}", userId, string.Join(", ", result.Errors.Select(e => e.Description)));
             var errors = result.Errors.Select(e =>
                 new ValidationFailure(string.Empty, e.Description));
             throw new ValidationException(errors);
