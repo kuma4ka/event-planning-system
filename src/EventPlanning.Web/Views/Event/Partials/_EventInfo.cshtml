@@ -1,0 +1,61 @@
+@using EventPlanning.Application.DTOs.Event
+@model EventDetailsDto
+
+<div class="mb-5">
+    <h5 class="event-section-title">About this event</h5>
+    <div class="event-description">@Model.Description</div>
+</div>
+
+<div class="mb-5">
+    <h5 class="event-section-title">Location & Venue</h5>
+    <div class="d-flex align-items-start gap-3 mt-3 mb-3">
+        <div class="bg-light rounded-circle p-3 text-danger">
+            <i class="bi bi-geo-alt-fill fs-4"></i>
+        </div>
+        <div>
+            <h5 class="fw-bold mb-1">@Model.VenueName</h5>
+            @if (!string.IsNullOrEmpty(Model.VenueAddress))
+            {
+                <p class="text-muted mb-0">@Model.VenueAddress</p>
+            }
+            else
+            {
+                <p class="text-muted mb-0 fst-italic">Address not specified</p>
+            }
+        </div>
+    </div>
+
+    @* --- GOOGLE MAPS EMBED --- *@
+    @if (!string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string) &&
+    !string.IsNullOrEmpty(Model.VenueAddress))
+    {
+        var addressQuery = $"{Model.VenueName}, {Model.VenueAddress}";
+        var encodedQuery = System.Net.WebUtility.UrlEncode(addressQuery);
+        var apiKey = ViewBag.GoogleMapsApiKey;
+        var mapUrl = $"https://www.google.com/maps/embed/v1/place?key={apiKey}&q={encodedQuery}";
+
+        <div class="ratio ratio-21x9 event-map-container">
+            <iframe class="event-map-frame" loading="lazy" allowfullscreen
+                referrerpolicy="no-referrer-when-downgrade" src="@mapUrl">
+            </iframe>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-secondary border-0 d-flex align-items-center rounded-3 shadow-sm" role="alert"
+            style="background-color: var(--color-cool-mist); color: var(--color-ink-black);">
+            <i class="bi bi-map-fill me-2 fs-5"></i>
+            <div>
+                Map is currently unavailable.
+                @if (string.IsNullOrEmpty(Model.VenueAddress))
+                {
+                    <span>(Address missing)</span>
+                }
+                @if (string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string))
+                {
+                    <span>(API Key missing)</span>
+                }
+            </div>
+        </div>
+    }
+</div>

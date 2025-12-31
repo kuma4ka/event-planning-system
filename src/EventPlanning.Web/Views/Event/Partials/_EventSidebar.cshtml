@@ -1,0 +1,109 @@
+@using EventPlanning.Application.DTOs.Event
+@model EventDetailsDto
+
+@{
+    var guestItemViewData = new ViewDataDictionary(ViewData)
+{
+{ "IsOrganizer", Model.IsOrganizer },
+{ "IsPast", Model.IsPast }
+};
+}
+
+<div class="event-sidebar-card">
+    @if (Model.VenueCapacity > 0)
+    {
+        <div class="d-flex justify-content-between mb-2 small">
+            <span class="text-muted fw-bold text-uppercase">Availability</span>
+            <span class="fw-bold text-dark">@Model.GuestsCount / @Model.VenueCapacity</span>
+        </div>
+        <div class="progress progress-thin mb-4">
+            <div class="progress-bar progress-bar-custom @(Model.IsFull ? "full" : "")" role="progressbar"
+                style="width: @Model.FillPercent%"></div>
+        </div>
+    }
+
+    <div class="action-buttons-grid">
+        @if (Model.IsPast)
+        {
+            <button class="btn btn-secondary w-100" disabled>Event Completed</button>
+        }
+        else if (Model.IsOrganizer)
+        {
+            <div class="d-grid gap-2">
+                <button class="btn btn-secondary w-100" disabled>You are the Organizer</button>
+                <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal"
+                    data-bs-target="#addGuestModal">
+                    <i class="bi bi-person-plus"></i> Add Guest
+                </button>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning w-100">
+                    <i class="bi bi-pencil-square"></i> Edit Event
+                </a>
+            </div>
+        }
+        else if (Model.IsJoined)
+        {
+            <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal"
+                data-bs-target="#leaveEventModal">
+                <i class="bi bi-box-arrow-right me-2"></i> Leave Event
+            </button>
+        }
+        else if (Model.IsFull)
+        {
+            <button class="btn btn-danger w-100" disabled>Sold Out</button>
+        }
+        else
+        {
+            <form asp-action="Join" asp-route-id="@Model.Id" method="post">
+                <button type="submit" class="btn btn-primary w-100 py-2 shadow-sm">Join Event</button>
+            </form>
+        }
+    </div>
+</div>
+
+<div class="event-sidebar-card">
+    <h6 class="event-section-title mb-3">Organizer</h6>
+    <div class="organizer-info">
+        <div class="organizer-avatar">
+            @(!string.IsNullOrEmpty(ViewBag.OrganizerName as string) ? (ViewBag.OrganizerName as
+                string)!.Substring(0, 1).ToUpper() : "U")
+        </div>
+        <div class="overflow-hidden">
+            <h6 class="fw-bold mb-0 text-truncate">@ViewBag.OrganizerName</h6>
+            <a href="mailto:@ViewBag.OrganizerEmail"
+                class="text-decoration-none text-muted small text-truncate d-block">
+                @ViewBag.OrganizerEmail
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="event-sidebar-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="event-section-title mb-0">Guest List</h6>
+        <span class="badge bg-light text-dark border">@Model.GuestsCount</span>
+    </div>
+
+    @if (Model.Guests is { Count: > 0 })
+    {
+        <div class="mb-2">
+            @foreach (var guest in Model.Guests.Take(5))
+            {
+                <partial name="Partials/_GuestListItem" model="guest" view-data="guestItemViewData" />
+            }
+        </div>
+
+        @if (Model.GuestsCount > 5)
+        {
+            <div class="text-center border-top pt-2">
+                <button class="btn btn-link btn-sm text-decoration-none text-muted fw-bold" data-bs-toggle="modal"
+                    data-bs-target="#viewAllGuestsModal">
+                    + @(Model.GuestsCount - 5) more guests
+                </button>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-muted small text-center py-3">Be the first to join!</p>
+    }
+</div>

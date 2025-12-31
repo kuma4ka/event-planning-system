@@ -1,0 +1,37 @@
+@using EventPlanning.Application.DTOs.Event
+@model EventDetailsDto
+
+<div class="event-hero">
+    @if (!string.IsNullOrEmpty(Model.VenueImageUrl))
+    {
+        <img src="@Model.VenueImageUrl" class="event-hero-img" alt="Venue Image">
+    }
+    else
+    {
+        <div class="event-hero-img"
+            style="background: linear-gradient(135deg, var(--color-air-force-blue), var(--color-dark-teal));"></div>
+    }
+
+    <div class="event-hero-overlay">
+        <div class="container px-0">
+            <div class="mb-2">
+                @if (Model.IsPrivate)
+                {
+                    <span class="badge bg-warning text-dark me-2"><i class="bi bi-lock-fill"></i> Private</span>
+                }
+                else
+                {
+                    <span class="badge bg-success me-2"><i class="bi bi-globe"></i> Public</span>
+                }
+                <span class="badge bg-light text-dark bg-opacity-75">@Model.Type.ToString()</span>
+            </div>
+
+            <h1 class="event-title">@Model.Name</h1>
+
+            <div class="event-hero-meta">
+                <span><i class="bi bi-calendar-event me-2"></i> @Model.Date.ToString("dd MMMM yyyy")</span>
+                <span><i class="bi bi-clock me-2"></i> @Model.Date.ToString("HH:mm")</span>
+            </div>
+        </div>
+    </div>
+</div>

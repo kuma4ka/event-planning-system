@@ -1,0 +1,82 @@
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true"
+    data-url-template="@Url.Content("~/events/delete/0")">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 overflow-hidden rounded-4" style="background-color: var(--bg-surface);">
+
+            <div class="c-danger-header py-4"
+                style="background-color: rgba(220, 53, 69, 0.1); text-align: center; border-bottom: 1px solid rgba(220, 53, 69, 0.1);">
+                <i class="bi bi-exclamation-triangle fs-1 mb-2 d-block text-danger"></i>
+                <h5 class="fw-bold mb-0 text-danger">Delete Event?</h5>
+                <p class="mb-0 opacity-75 small text-danger">This action cannot be undone.</p>
+            </div>
+
+            <div class="modal-body p-4 text-center">
+                <p class="mb-4" style="color: var(--text-muted);">
+                    Are you sure you want to permanently delete <br />
+                    <strong style="color: var(--text-main);" class="fs-5" id="modalEventName">Event Name</strong>?
+                </p>
+
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-light flex-grow-1 py-2 text-muted fw-bold border"
+                        data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <form id="deleteForm" method="post" class="flex-grow-1">
+                        <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">
+                            Yes, Delete It
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="shareModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 overflow-hidden rounded-4" style="background-color: var(--bg-surface);">
+
+            <div class="py-4 text-center text-white"
+                style="background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));">
+                <div class="bg-white bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                    style="width: 60px; height: 60px; backdrop-filter: blur(5px);">
+                    <i class="bi bi-share-fill fs-3"></i>
+                </div>
+                <h5 class="fw-bold mb-0 text-white">Share Event</h5>
+                <p class="mb-0 opacity-75 small">Invite friends to your gathering</p>
+            </div>
+
+            <div class="modal-body p-4">
+                <p class="text-center mb-4" style="color: var(--text-muted);">
+                    Copy the link below and share it with your guests.
+                </p>
+
+                <div class="position-relative mb-4">
+                    <label class="form-label small text-muted fw-bold">Event Link</label>
+                    <div class="input-group">
+                        <span class="input-group-text border-end-0 bg-light" style="border-color: var(--border-light);">
+                            <i class="bi bi-link-45deg"></i>
+                        </span>
+                        <input type="text" id="shareInput" class="form-control border-start-0 border-end-0 bg-light"
+                            readonly style="border-color: var(--border-light); color: var(--text-main);">
+                        <button class="btn btn-primary px-3 fw-bold" type="button" id="btnCopyShare">
+                            Copy
+                        </button>
+                    </div>
+                    <div id="copySuccessMsg"
+                        class="position-absolute w-100 text-center mt-2 small text-success fw-bold opacity-0 transition-opacity">
+                        <i class="bi bi-check-circle-fill me-1"></i> Copied to clipboard!
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="button" class="btn btn-light py-2 text-muted fw-bold border" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
