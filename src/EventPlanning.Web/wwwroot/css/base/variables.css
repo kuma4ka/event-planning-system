@@ -43,6 +43,7 @@
     --bg-footer: var(--color-ink-black);
     --bg-surface-hover: #f8f9fa;
     --bg-surface-active: #e9ecef;
+    --bg-surface-secondary: #f8f9fa;
 
 
     --text-main: var(--color-ink-black);
@@ -95,6 +96,7 @@
     --bg-footer: #08161c;
     --bg-surface-hover: #1e3a47;
     --bg-surface-active: #254552;
+    --bg-surface-secondary: #0f242e;
 
     --bg-hero-gradient: radial-gradient(circle at top right, #1a4f63 0%, #051016 60%);
 

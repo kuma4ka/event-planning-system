@@ -94,7 +94,7 @@
     background: var(--bg-surface-hover);
 }
 
-.guidelines-content h2 {
+.guidelines-content h2:not(.accordion-header) {
     font-size: 1.75rem;
     font-weight: 700;
     color: var(--text-main);
@@ -172,6 +172,24 @@
     border: 1px solid var(--border-light);
     border-radius: 16px;
     padding: 3rem;
+}
+
+/* Guide Card (Account Guide) */
+.guide-card {
+    background: var(--bg-surface-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+}
+
+/* Compact Accordion for Guides */
+.guide-accordion .accordion-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+}
+
+.guide-accordion .accordion-item {
+    margin-bottom: 0.5rem !important;
+    border-radius: 8px !important;
 }
 
 /* Dark Mode Overrides */

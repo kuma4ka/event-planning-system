@@ -1,0 +1,172 @@
+@{
+    ViewData["Title"] = "Account & Profile Guide";
+}
+
+<div class="support-hero">
+    <div class="container animate-fade-in">
+        <h1>Account & Profile Guide</h1>
+        <p>Everything you need to know about managing your Stanza account.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-5">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3">
+            <div class="guidelines-nav sticky-top" style="top: 100px;">
+                <nav id="guide-scrollspy" class="h-100 flex-column align-items-stretch">
+                    <nav class="nav nav-pills flex-column">
+                        <a class="nav-link" href="#getting-started">Getting Started</a>
+                        <nav class="nav nav-pills flex-column">
+                            <a class="nav-link ms-3 my-1" href="#registration">Registration</a>
+                            <a class="nav-link ms-3 my-1" href="#login">Logging In</a>
+                        </nav>
+                        <a class="nav-link" href="#managing-profile">Managing Profile</a>
+                        <nav class="nav nav-pills flex-column">
+                            <a class="nav-link ms-3 my-1" href="#update-info">Update Info</a>
+                            <a class="nav-link ms-3 my-1" href="#security">Security</a>
+                        </nav>
+                        <a class="nav-link" href="#troubleshooting">Troubleshooting</a>
+                    </nav>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="col-lg-9">
+            <div class="guidelines-content animate-fade-up" data-bs-spy="scroll" data-bs-target="#guide-scrollspy"
+                data-bs-smooth-scroll="true" tabindex="0">
+
+                <!-- Getting Started -->
+                <section id="getting-started" class="mb-5">
+                    <h2 class="fw-bold mb-4" style="color: var(--text-main);">Getting Started</h2>
+                    <p class="text-muted">
+                        Welcome to Stanza! Creating an account is your first step to discovering and hosting amazing
+                        events.
+                    </p>
+
+                    <div id="registration" class="mt-5">
+                        <h4 class="fw-bold mb-3">Registration</h4>
+                        <p class="text-muted">
+                            To create a new account, click the <strong>Sign Up</strong> button in the top right corner
+                            provided.
+                            You will need to provide:
+                        </p>
+                        <ul class="text-muted">
+                            <li>A valid email address</li>
+                            <li>A strong password (at least 8 characters, including upper/lowercase, numbers, and
+                                symbols)</li>
+                            <li>Your first and last name</li>
+                        </ul>
+                        <div class="alert alert-info border-0 shadow-sm mt-3">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <strong>Tip:</strong> Use an email you check regularly to receive event tickets and updates.
+                        </div>
+                    </div>
+
+                    <div id="login" class="mt-5">
+                        <h4 class="fw-bold mb-3">Logging In</h4>
+                        <p class="text-muted">
+                            Already have an account? Click <strong>Log In</strong> and enter your credentials.
+                            You can choose to have your browser remember your login for faster access next time.
+                        </p>
+                    </div>
+                </section>
+
+                <hr class="my-5" style="border-color: var(--border-light);">
+
+                <!-- Managing Profile -->
+                <section id="managing-profile" class="mb-5">
+                    <h2 class="fw-bold mb-4" style="color: var(--text-main);">Managing Your Profile</h2>
+
+                    <div id="update-info" class="mt-5">
+                        <h4 class="fw-bold mb-3">Updating Personal Information</h4>
+                        <p class="text-muted">
+                            Navigate to your <strong>Profile</strong> by clicking your avatar in the navigation bar.
+                            Here you can update your:
+                        </p>
+                        <ul class="text-muted mb-4">
+                            <li><strong>Profile Picture:</strong> Upload a new image (JPG/PNG, max 2MB).</li>
+                            <li><strong>Display Name:</strong> How you appear to other users.</li>
+                            <li><strong>Bio:</strong> A short description about yourself.</li>
+                        </ul>
+                    </div>
+
+                    <div id="security" class="mt-5">
+                        <h4 class="fw-bold mb-3">Security Settings</h4>
+                        <p class="text-muted">
+                            We take security seriously. In your Profile settings, you can:
+                        </p>
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <div class="guide-card h-100 p-3">
+                                    <h6 class="fw-bold"><i class="bi bi-key-fill me-2"></i>Change Password</h6>
+                                    <p class="small text-muted mb-0">Update your password regularly to keep your account
+                                        safe.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="guide-card h-100 p-3">
+                                    <h6 class="fw-bold"><i class="bi bi-envelope-check-fill me-2"></i>Email Preferences
+                                    </h6>
+                                    <p class="small text-muted mb-0">Manage what notifications you receive from us.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <hr class="my-5" style="border-color: var(--border-light);">
+
+                <!-- Troubleshooting -->
+                <section id="troubleshooting" class="mb-5">
+                    <h2 class="fw-bold mb-4" style="color: var(--text-main);">Troubleshooting</h2>
+                    <div class="row">
+                        <div class="col-lg-7">
+                            <div class="accordion guide-accordion" id="guideAccordion">
+                                <div class="accordion-item border shadow-sm overflow-hidden">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed fw-bold" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#gh1">
+                                            I forgot my password
+                                        </button>
+                                    </h2>
+                                    <div id="gh1" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+                                        <div class="accordion-body text-muted small">
+                                            Don't worry! On the Login page, click "Forgot Password?" and follow the
+                                            instructions
+                                            to reset it via email.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item border shadow-sm overflow-hidden">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed fw-bold" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#gh2">
+                                            I can't upload my profile picture
+                                        </button>
+                                    </h2>
+                                    <div id="gh2" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+                                        <div class="accordion-body text-muted small">
+                                            Ensure your image is in JPG or PNG format and does not exceed 2MB in size.
+                                            If the
+                                            issue persists, try clearing your browser cache.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="mt-5 p-4 rounded-3 text-center" style="background-color: var(--bg-surface-secondary);">
+                    <h4 class="fw-bold">Still need help?</h4>
+                    <p class="text-muted mb-3">Our support team is just a click away.</p>
+                    <a asp-controller="Support" asp-action="Contact" class="btn btn-primary px-4 fw-bold">Contact
+                        Support</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

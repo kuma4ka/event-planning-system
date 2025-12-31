@@ -10,6 +10,12 @@ public class SupportController : Controller
         return View("HelpCenter");
     }
 
+    [HttpGet("support/account-guide")]
+    public IActionResult AccountGuide()
+    {
+        return View();
+    }
+
     [HttpGet("support/guidelines")]
     public IActionResult Guidelines()
     {
