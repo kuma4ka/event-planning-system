@@ -16,6 +16,12 @@ public class SupportController : Controller
         return View();
     }
 
+    [HttpGet("support/events-help")]
+    public IActionResult EventsHelp()
+    {
+        return View();
+    }
+
     [HttpGet("support/guidelines")]
     public IActionResult Guidelines()
     {
