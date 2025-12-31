@@ -59,6 +59,10 @@ public static class DependencyInjection
 
         services.AddScoped<IIdentityService, IdentityService>();
 
+        // Email
+        services.Configure<Application.Models.EmailSettings>(configuration.GetSection(Application.Models.EmailSettings.SectionName));
+        services.AddTransient<IEmailService, SmtpEmailService>();
+
         return services;
     }
 }

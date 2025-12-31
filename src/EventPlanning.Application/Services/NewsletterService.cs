@@ -4,7 +4,7 @@ using EventPlanning.Domain.Interfaces;
 
 namespace EventPlanning.Application.Services;
 
-public class NewsletterService(INewsletterRepository newsletterRepository) : INewsletterService
+public class NewsletterService(INewsletterRepository newsletterRepository, IEmailService emailService) : INewsletterService
 {
     public async Task SubscribeAsync(string email, CancellationToken cancellationToken = default)
     {
@@ -17,8 +17,7 @@ public class NewsletterService(INewsletterRepository newsletterRepository) : INe
         // 2. Check if already subscribed
         if (await newsletterRepository.IsEmailSubscribedAsync(email, cancellationToken))
         {
-            // Already subscribed - technically success for idempotency, or throw explicit error
-            // Taking friendly approach: just return, maybe logic elsewhere handles "already exists" UI
+            // Already subscribed - technically success for idempotency
             return;
         }
 
@@ -32,5 +31,12 @@ public class NewsletterService(INewsletterRepository newsletterRepository) : INe
 
         // 4. Save
         await newsletterRepository.AddSubscriberAsync(subscriber, cancellationToken);
+
+        // 5. Send Welcome Email
+        await emailService.SendEmailAsync(
+            email,
+            "Welcome to Stanza!",
+            "<h1>Welcome!</h1><p>Thank you for subscribing to Stanza. We are excited to have you.</p>",
+            cancellationToken);
     }
 }
