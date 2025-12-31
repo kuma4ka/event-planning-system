@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "Billing & Payments Guide";
+}
+
+<div class="support-hero">
+    <div class="container animate-fade-in">
+        <h1>Billing & Payments</h1>
+        <p>Manage your invoices, payment methods, and refunds.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="guidelines-content animate-fade-up">
+
+                <section id="billing-status" class="mb-5">
+                    <div class="d-flex align-items-center justify-content-center mb-4">
+                        <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Coming Soon</span>
+                    </div>
+
+                    <div class="guide-card p-5 text-center">
+                        <div class="display-1 text-muted mb-4 opacity-25"><i class="bi bi-credit-card"></i></div>
+                        <h2 class="fw-bold mb-3">Payments are under construction</h2>
+                        <p class="text-muted lead max-w-md mx-auto mb-4">
+                            We do not currently process payments on the platform.
+                            Our team is working on integrating secure payment gateways to allow for seamless ticket
+                            purchases and organizer payouts.
+                        </p>
+                        <div class="planned-features-card border shadow-sm d-inline-block text-start">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-cone-striped me-2"></i>Planned Features:</h6>
+                            <ul class="mb-0 text-muted small">
+                                <li>Secure Credit Card Processing</li>
+                                <li>Organizer Payout Dashboard</li>
+                                <li>Automated Invoicing & Refunds</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="mt-5 p-4 rounded-3 text-center" style="background-color: var(--bg-surface-secondary);">
+                    <h4 class="fw-bold">Questions about payments?</h4>
+                    <p class="text-muted mb-3">If you have specific questions about how future payments will work, feel
+                        free to reach out.</p>
+                    <a asp-controller="Support" asp-action="Contact" class="btn btn-primary px-4 fw-bold">Contact Us</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

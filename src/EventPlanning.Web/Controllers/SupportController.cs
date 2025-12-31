@@ -22,6 +22,12 @@ public class SupportController : Controller
         return View();
     }
 
+    [HttpGet("support/billing-help")]
+    public IActionResult BillingHelp()
+    {
+        return View();
+    }
+
     [HttpGet("support/guidelines")]
     public IActionResult Guidelines()
     {
