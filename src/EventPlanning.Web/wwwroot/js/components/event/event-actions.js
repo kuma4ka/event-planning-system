@@ -1,6 +1,6 @@
 ﻿export function initEventActions() {
     initDeleteModal();
-    initCopyLinks();
+    initShareModal();
 }
 
 function initDeleteModal() {
@@ -25,24 +25,42 @@ function initDeleteModal() {
     });
 }
 
-function initCopyLinks() {
-    document.addEventListener('click', function (e) {
-        const target = e.target.closest('.js-copy-link');
-        if (!target) return;
+function initShareModal() {
+    const shareModalEl = document.getElementById('shareModal');
+    if (!shareModalEl) return;
 
-        e.preventDefault();
-        const url = target.getAttribute('data-url');
+    const shareInput = shareModalEl.querySelector('#shareInput');
+    const copyBtn = shareModalEl.querySelector('#btnCopyShare');
+    const successMsg = shareModalEl.querySelector('#copySuccessMsg');
 
-        if (url) {
-            navigator.clipboard.writeText(url).then(() => {
-                showToast('Link copied to clipboard!');
+    shareModalEl.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const url = button.getAttribute('data-event-url');
+
+        if (shareInput) {
+            shareInput.value = url;
+            // Reset state
+            successMsg.classList.remove('opacity-100');
+            successMsg.classList.add('opacity-0');
+        }
+    });
+
+    if (copyBtn && shareInput) {
+        copyBtn.addEventListener('click', function () {
+            shareInput.select();
+            shareInput.setSelectionRange(0, 99999); // For mobile devices
+
+            navigator.clipboard.writeText(shareInput.value).then(() => {
+                successMsg.classList.remove('opacity-0');
+                successMsg.classList.add('opacity-100');
+
+                setTimeout(() => {
+                    successMsg.classList.remove('opacity-100');
+                    successMsg.classList.add('opacity-0');
+                }, 2000);
             }).catch(err => {
                 console.error('Failed to copy: ', err);
             });
-        }
-    });
-}
-
-function showToast(message) {
-    alert(message);
+        });
+    }
 }
