@@ -12,7 +12,8 @@ public class AccountController(
     UserManager<User> userManager,
     SignInManager<User> signInManager,
     IValidator<RegisterUserDto> registerValidator,
-    IValidator<LoginUserDto> loginValidator) : Controller
+    IValidator<LoginUserDto> loginValidator,
+    IEmailSender<User> emailSender) : Controller
 {
     [HttpGet]
     public IActionResult Register()
@@ -47,8 +48,33 @@ public class AccountController(
 
         if (result.Succeeded)
         {
-            await signInManager.SignInAsync(user, false);
-            return RedirectToAction("Index", "Home");
+            var userId = await userManager.GetUserIdAsync(user);
+            var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+            
+            var callbackUrl = Url.Action(
+                "ConfirmEmail",
+                "Account",
+                new { userId, code },
+                protocol: Request.Scheme);
+
+            if (string.IsNullOrEmpty(callbackUrl))
+            {
+                ModelState.AddModelError(string.Empty, "Error generating confirmation email.");
+                return View(model);
+            }
+
+            await emailSender.SendConfirmationLinkAsync(user, model.Email, callbackUrl);
+
+            if (userManager.Options.SignIn.RequireConfirmedAccount)
+            {
+                ViewBag.Email = model.Email;
+                return View("RegisterConfirmation");
+            }
+            else
+            {
+                await signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         foreach (var error in result.Errors)
@@ -106,6 +132,31 @@ public class AccountController(
     [HttpGet]
     public IActionResult AccessDenied()
     {
+        return View();
+    }
+
+    [HttpGet("ConfirmEmail")]
+    public async Task<IActionResult> ConfirmEmail(string? userId, string? code)
+    {
+        if (userId == null || code == null)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        var user = await userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound($"Unable to load user with ID '{userId}'.");
+        }
+
+        var result = await userManager.ConfirmEmailAsync(user, code);
+        if (!result.Succeeded)
+        {
+            TempData["ErrorMessage"] = "Error confirming your email.";
+            return RedirectToAction("Index", "Home");
+        }
+
+        TempData["SuccessMessage"] = "Thank you for confirming your email.";
         return View();
     }
 }
