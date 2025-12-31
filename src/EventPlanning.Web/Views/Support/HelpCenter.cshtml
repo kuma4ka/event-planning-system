@@ -1,0 +1,145 @@
+@{
+    ViewData["Title"] = "Help Center";
+}
+
+<link rel="stylesheet" href="~/css/pages/support.css" asp-append-version="true" />
+
+<div class="support-hero">
+    <div class="container animate-fade-in">
+        <h1>How can we help?</h1>
+        <p>Search for help topics, browse guides, or contact our support team.</p>
+
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-8 col-lg-6">
+                <div class="st-input-group shadow-sm">
+                    <span class="input-group-text ps-3">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control border-0" placeholder="Search Help Center..."
+                        aria-label="Search">
+                    <button class="btn btn-primary rounded-end px-4">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <a asp-controller="Support" asp-action="Guidelines" class="support-topic-card animate-fade-up"
+                style="animation-delay: 0.1s;">
+                <div class="support-topic-icon">
+                    <i class="bi bi-journal-bookmark"></i>
+                </div>
+                <h3 class="support-topic-title">Community Guidelines</h3>
+                <p class="support-topic-desc">Understand the rules that keep our community safe and welcoming.</p>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="#" class="support-topic-card animate-fade-up" style="animation-delay: 0.2s;">
+                <div class="support-topic-icon">
+                    <i class="bi bi-person-gear"></i>
+                </div>
+                <h3 class="support-topic-title">Account & Profile</h3>
+                <p class="support-topic-desc">Managing your account settings, security, and preferences.</p>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="#" class="support-topic-card animate-fade-up" style="animation-delay: 0.3s;">
+                <div class="support-topic-icon">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+                <h3 class="support-topic-title">Events & Ticketing</h3>
+                <p class="support-topic-desc">Creating events, managing attendees, and booking tickets.</p>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="#" class="support-topic-card animate-fade-up" style="animation-delay: 0.4s;">
+                <div class="support-topic-icon">
+                    <i class="bi bi-credit-card"></i>
+                </div>
+                <h3 class="support-topic-title">Billing & Payments</h3>
+                <p class="support-topic-desc">Invoices, refunds, and payment method management.</p>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Support" asp-action="Privacy" class="support-topic-card animate-fade-up"
+                style="animation-delay: 0.5s;">
+                <div class="support-topic-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h3 class="support-topic-title">Privacy & Security</h3>
+                <p class="support-topic-desc">How we protect your data and privacy rights.</p>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-controller="Support" asp-action="Contact" class="support-topic-card animate-fade-up"
+                style="animation-delay: 0.6s;">
+                <div class="support-topic-icon">
+                    <i class="bi bi-chat-heart"></i>
+                </div>
+                <h3 class="support-topic-title">Contact Support</h3>
+                <p class="support-topic-desc">Can't find what you need? Get in touch with our team.</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="text-center mb-4 fw-bold">Frequently Asked Questions</h2>
+            <div class="accordion custom-accordion" id="faqAccordion">
+                <div class="accordion-item border mb-3 rounded-3 overflow-hidden shadow-sm">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq1">
+                            How do I create an event?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-muted">
+                            To create an event, navigate to your dashboard and click the "Create Event" button. Follow
+                            the step-by-step wizard to add details, location, and ticket types.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border mb-3 rounded-3 overflow-hidden shadow-sm">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq2">
+                            Can I refund a ticket?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-muted">
+                            Refund policies are set by event organizers. Check the event page for specific refund
+                            details or contact the organizer directly through the event page.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border mb-3 rounded-3 overflow-hidden shadow-sm">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq3">
+                            Is my data safe?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-muted">
+                            Yes, we prioritize data security. We use industry-standard encryption and never share your
+                            personal information with third parties without your consent.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

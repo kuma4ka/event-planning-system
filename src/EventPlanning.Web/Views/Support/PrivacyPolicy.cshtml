@@ -1,0 +1,66 @@
+@{
+    ViewData["Title"] = "Privacy Policy";
+    var lastUpdated = "December 31, 2025";
+}
+
+<link rel="stylesheet" href="~/css/pages/support.css" asp-append-version="true" />
+
+<div class="support-hero">
+    <div class="container">
+        <h1>Privacy Policy</h1>
+        <p>We are committed to protecting your personal information and your right to privacy.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="policy-content animate-fade-in">
+                <p class="text-muted mb-4">Last Updated: <span class="fw-bold">@lastUpdated</span></p>
+
+                <h2 class="mb-3 fw-bold" style="color: var(--text-main);">1. Introduction</h2>
+                <p class="mb-4 text-muted">
+                    Welcome to Stanza ("Company", "we", "our", "us"). This Privacy Policy explains how your information is collected, used, and disclosed by Stanza when you use our website and services.
+                    By accessing or using our Service, you signify that you have read, understood, and agree to our collection, storage, use, and disclosure of your personal information as described in this Privacy Policy.
+                </p>
+
+                <h2 class="mb-3 fw-bold mt-5" style="color: var(--text-main);">2. Information We Collect</h2>
+                <p class="mb-3 text-muted">We collect information that you strictly provide to us, including:</p>
+                <ul class="text-muted mb-4">
+                    <li class="mb-2"><strong>Personal Data:</strong> Name, email address, phone number, and payment information provided during registration or event booking.</li>
+                    <li class="mb-2"><strong>Usage Data:</strong> Information on how you interact with our services, such as pages visited, time spent, and button clicks.</li>
+                    <li class="mb-2"><strong>Device Data:</strong> IP address, browser type, and operating system updates.</li>
+                </ul>
+
+                <h2 class="mb-3 fw-bold mt-5" style="color: var(--text-main);">3. How We Use Your Information</h2>
+                <p class="mb-3 text-muted">We use the information we collect to:</p>
+                 <ul class="text-muted mb-4">
+                    <li class="mb-2">Provide, operate, and maintain our website.</li>
+                    <li class="mb-2">Improve, personalize, and expand our website.</li>
+                    <li class="mb-2">Process transactions and send related information (invoices, confirmations).</li>
+                    <li class="mb-2">Send you updates, security alerts, and support messages.</li>
+                </ul>
+
+                <h2 class="mb-3 fw-bold mt-5" style="color: var(--text-main);">4. Data Security</h2>
+                <p class="mb-4 text-muted">
+                    We use administrative, technical, and physical security measures to help protect your personal information. 
+                    While we have taken reasonable steps to secure the personal information you provide to us, please be aware that despite our efforts, no security measures are perfect or impenetrable, and no method of data transmission can be guaranteed against any interception or other type of misuse.
+                </p>
+
+                <h2 class="mb-3 fw-bold mt-5" style="color: var(--text-main);">5. Your Data Rights</h2>
+                <p class="mb-3 text-muted">Depending on your location, you may have the following rights:</p>
+                 <ul class="text-muted mb-4">
+                    <li class="mb-2"><strong>Access:</strong> Request a copy of the personal data we hold about you.</li>
+                    <li class="mb-2"><strong>Correction:</strong> Request that we correct any information needed to be accurate.</li>
+                    <li class="mb-2"><strong>Deletion:</strong> Request that we delete your personal data ("Right to be Forgotten").</li>
+                </ul>
+
+                <h2 class="mb-3 fw-bold mt-5" style="color: var(--text-main);">6. Contact Us</h2>
+                <p class="text-muted">
+                    If you have any questions about this Privacy Policy, please contact us at: <br />
+                    <a asp-action="Contact" class="fw-bold text-decoration-none" style="color: var(--color-dark-teal);">Contact Page</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

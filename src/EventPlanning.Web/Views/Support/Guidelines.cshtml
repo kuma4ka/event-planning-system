@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Community Guidelines";
+}
+
+<link rel="stylesheet" href="~/css/pages/support.css" asp-append-version="true" />
+
+<div class="support-hero">
+    <div class="container">
+        <h1>Community Guidelines</h1>
+        <p>Building a safe, respectful, and inclusive community together.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <nav class="guidelines-nav">
+                <div class="nav flex-column" id="guidelines-scrollspy">
+                    <a class="nav-link active" href="#introduction">Introduction</a>
+                    <a class="nav-link" href="#respect">Respect & Safety</a>
+                    <a class="nav-link" href="#authenticity">Authenticity</a>
+                    <a class="nav-link" href="#events">Event Standards</a>
+                    <a class="nav-link" href="#enforcement">Enforcement</a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Content -->
+        <div class="col-lg-9 guidelines-content">
+            <div id="introduction">
+                <p class="lead mb-4">
+                    Our platform is dedicated to bringing people together through meaningful events. 
+                    To ensure a positive experience for everyone, we ask all members to adhere to these guidelines.
+                </p>
+            </div>
+
+            <section id="respect">
+                <h2>1. Respect & Safety</h2>
+                <p>We have zero tolerance for harassment, hate speech, or discrimination.</p>
+                <ul>
+                    <li><strong>No Harassment:</strong> Bullying, stalking, or intimidation of any kind is prohibited.</li>
+                    <li><strong>No Hate Speech:</strong> Content that attacks or degrades a group based on race, religion, gender, or sexual orientation is not allowed.</li>
+                    <li><strong>Physical Safety:</strong> Events specifically designed to harm or endanger participants will be removed immediately.</li>
+                </ul>
+            </section>
+
+            <section id="authenticity">
+                <h2>2. Authenticity</h2>
+                <p>Be yourself and represent your events accurately.</p>
+                <ul>
+                    <li><strong>Real Profiles:</strong> Use your real name and an accurate photo. Impersonation is forbidden.</li>
+                    <li><strong>Honest representation:</strong> Event descriptions must accurately reflect the actual event experience.</li>
+                    <li><strong>No Spam:</strong> Posting repetitive content or unsolicited promotional messages is not allowed.</li>
+                </ul>
+            </section>
+
+             <section id="events">
+                <h2>3. Event Standards</h2>
+                <p>Events hosted on our platform must meet quality and legality standards.</p>
+                <h3>Prohibited Events</h3>
+                <p>You may not host events that involve:</p>
+                <ul>
+                    <li>Illegal activities or goods.</li>
+                    <li>Explicit sexual content or services.</li>
+                    <li>Gambling or pyramid schemes.</li>
+                </ul>
+                <h3>Event Quality</h3>
+                <p>Ensure your event has clear details (time, location, agenda) so attendees know what to expect.</p>
+            </section>
+
+            <section id="enforcement">
+                <h2>4. Enforcement</h2>
+                <p>
+                    We review reports of violations and may take action ranging from warnings to permanent account suspension. 
+                    If you see something that violates these guidelines, please report it via our 
+                    <a asp-action="Contact" class="text-decoration-none fw-bold">Contact Us</a> page.
+                </p>
+                <div class="alert alert-info border-0 shadow-sm mt-4">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    These guidelines were last updated on December 31, 2025.
+                </div>
+            </section>
+
+        </div>
+    </div>
+</div>
