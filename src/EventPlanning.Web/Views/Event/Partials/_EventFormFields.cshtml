@@ -1,0 +1,65 @@
+@using EventPlanning.Application.DTOs.Event
+@using EventPlanning.Domain.Enums
+@model EventBaseDto
+
+@{
+    // Determine if we are creating or editing based on Model type or just use dynamic binding
+    var eventTypes = Enum.GetValues<EventType>().Select(e => new SelectListItem
+            {
+                Value = e.ToString(),
+                Text = e.GetDisplayName()
+            });
+}
+
+<div class="mb-4">
+    <label asp-for="Name" class="st-form-label">Event Name</label>
+    <div class="st-input-group">
+        <span class="input-group-text"><i class="bi bi-card-heading"></i></span>
+        <input asp-for="Name" class="form-control" placeholder="Ex: Tech Conference 2025" />
+    </div>
+    <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <label asp-for="Date" class="st-form-label">Date & Time</label>
+        <div class="st-input-group">
+            <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+            <input asp-for="Date" type="datetime-local" class="form-control"
+                min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" step="60" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+        </div>
+        <span asp-validation-for="Date" class="text-danger small mt-1 d-block"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Type" class="st-form-label">Event Type</label>
+        <div class="st-input-group">
+            <span class="input-group-text"><i class="bi bi-tag"></i></span>
+            <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<EventType>()">
+                <option value="">-- Select Type --</option>
+            </select>
+        </div>
+        <span asp-validation-for="Type" class="text-danger small mt-1 d-block"></span>
+    </div>
+</div>
+
+<div class="mb-4">
+    <label asp-for="VenueId" class="st-form-label">Venue (Optional)</label>
+    <div class="st-input-group">
+        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+        <select asp-for="VenueId" class="form-select" asp-items="@ViewBag.Venues">
+            <option value="">-- Select a Venue (TBD) --</option>
+        </select>
+    </div>
+    <span asp-validation-for="VenueId" class="text-danger small mt-1 d-block"></span>
+</div>
+
+<div class="mb-4">
+    <label asp-for="Description" class="st-form-label">Description</label>
+    <div class="st-input-group align-top">
+        <span class="input-group-text pt-3"><i class="bi bi-file-text"></i></span>
+        <textarea asp-for="Description" class="form-control" rows="4"
+            placeholder="Tell people what your event is about..."></textarea>
+    </div>
+    <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+</div>

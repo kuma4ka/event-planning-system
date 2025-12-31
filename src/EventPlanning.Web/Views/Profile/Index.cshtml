@@ -11,7 +11,7 @@
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4 border-0"
-             style="background-color: #d1e7dd; color: #0f5132;">
+            style="background-color: #d1e7dd; color: #0f5132;">
             <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -20,28 +20,7 @@
     <div class="row g-4">
 
         <div class="col-lg-4">
-            <div class="profile-card shadow-sm">
-                <div class="profile-avatar-container">
-                    <div class="profile-avatar">
-                        @Model.Initials
-                    </div>
-                </div>
-
-                <h2 class="profile-name">@Model.FirstName @Model.LastName</h2>
-                <p class="profile-email">@Model.Email</p>
-
-                <div class="profile-stats">
-                    <div class="stat-item">
-                        <span class="stat-value">@Model.OrganizedCount</span>
-                        <span class="stat-label">Organized</span>
-                    </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-item">
-                        <span class="stat-value">@Model.JoinedCount</span>
-                        <span class="stat-label">Joined</span>
-                    </div>
-                </div>
-            </div>
+            <partial name="Partials/_ProfileCard" model="Model" />
         </div>
 
         <div class="col-lg-8">
@@ -49,14 +28,14 @@
 
                 <ul class="nav nav-tabs-stanza" id="profileTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link @(activeTab == "profile" ? "active" : "")"
-                                id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+                        <button class="nav-link @(activeTab == "profile" ? "active" : "")" id="info-tab"
+                            data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
                             <i class="bi bi-person-gear me-2"></i> Edit Details
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link @(activeTab == "security" ? "active" : "")"
-                                id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
+                        <button class="nav-link @(activeTab == "security" ? "active" : "")" id="security-tab"
+                            data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
                             <i class="bi bi-shield-lock me-2"></i> Security
                         </button>
                     </li>
@@ -65,105 +44,12 @@
                 <div class="tab-content" id="profileTabsContent">
 
                     <div class="tab-pane fade @(activeTab == "profile" ? "show active" : "")" id="info" role="tabpanel">
-                        <form asp-action="UpdateInfo" method="post">
-                            <div class="row g-4">
-                                <div class="col-md-6">
-                                    <label asp-for="FirstName" class="form-label-profile">First Name</label>
-                                    <div class="profile-input-group">
-                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <input asp-for="FirstName" class="form-control" placeholder="Enter first name"/>
-                                    </div>
-                                    <span asp-validation-for="FirstName" class="text-danger small mt-1 d-block"></span>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label asp-for="LastName" class="form-label-profile">Last Name</label>
-                                    <div class="profile-input-group">
-                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <input asp-for="LastName" class="form-control" placeholder="Enter last name"/>
-                                    </div>
-                                    <span asp-validation-for="LastName" class="text-danger small mt-1 d-block"></span>
-                                </div>
-
-                                <div class="col-12">
-                                    <label asp-for="PhoneNumber" class="form-label-profile">Phone Number</label>
-
-                                    <div class="profile-input-group">
-
-                                        <select asp-for="CountryCode"
-                                                asp-items="ViewBag.Countries"
-                                                class="form-select">
-                                        </select>
-
-                                        <input asp-for="PhoneNumber" class="form-control" placeholder="XX XXX XX XX"/>
-                                    </div>
-
-                                    <span asp-validation-for="CountryCode" class="text-danger small mt-1 d-block"></span>
-                                    <span asp-validation-for="PhoneNumber" class="text-danger small mt-1 d-block"></span>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label-profile">Email Address</label>
-                                    <div class="profile-input-group">
-                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                        <input asp-for="Email" class="form-control bg-transparent text-muted" readonly disabled/>
-                                    </div>
-                                    <div class="form-text small mt-2">
-                                        <i class="bi bi-info-circle me-1"></i> Email cannot be changed directly for security reasons.
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="profile-footer">
-                                <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                                    Save Changes
-                                </button>
-                            </div>
-                        </form>
+                        <partial name="Partials/_EditProfileForm" model="Model" />
                     </div>
 
-                    <div class="tab-pane fade @(activeTab == "security" ? "show active" : "")" id="security" role="tabpanel">
-                        <form asp-action="ChangePassword" method="post">
-
-                            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("PasswordError"))
-                            {
-                                <div class="alert alert-danger border-0 shadow-sm mb-4">
-                                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @Html.ValidationMessage("PasswordError")
-                                </div>
-                            }
-
-                            <div class="mb-4">
-                                <label class="form-label-profile">Current Password</label>
-                                <div class="profile-input-group">
-                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                    <input name="CurrentPassword" type="password" class="form-control" required/>
-                                </div>
-                            </div>
-
-                            <div class="row g-4 mb-4">
-                                <div class="col-md-6">
-                                    <label class="form-label-profile">New Password</label>
-                                    <div class="profile-input-group">
-                                        <span class="input-group-text"><i class="bi bi-key"></i></span>
-                                        <input name="NewPassword" type="password" class="form-control" required/>
-                                    </div>
-                                    <div class="form-text small mt-1">Must be at least 6 characters long.</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label-profile">Confirm New Password</label>
-                                    <div class="profile-input-group">
-                                        <span class="input-group-text"><i class="bi bi-check-lg"></i></span>
-                                        <input name="ConfirmPassword" type="password" class="form-control" required/>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="profile-footer">
-                                <button type="submit" class="btn btn-outline-danger px-4">
-                                    Update Password
-                                </button>
-                            </div>
-                        </form>
+                    <div class="tab-pane fade @(activeTab == "security" ? "show active" : "")" id="security"
+                        role="tabpanel">
+                        <partial name="Partials/_SecurityForm" />
                     </div>
 
                 </div>
@@ -173,5 +59,5 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial"/>
+    <partial name="_ValidationScriptsPartial" />
 }

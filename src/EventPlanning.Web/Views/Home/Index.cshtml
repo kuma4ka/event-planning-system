@@ -4,41 +4,7 @@
     ViewData["Title"] = "Find Events";
 }
 
-<div class="container">
-    <div class="hero-stanza-container">
-        <div class="hero-visual-right">
-            <div class="position-absolute w-100 h-100"
-                style="background-image: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.1;">
-            </div>
-
-            <img src="/images/stanza-mark.svg" alt="Abstract Stanza Mark" class="stanza-giant-mark">
-
-            <div class="position-absolute top-0 end-0 bg-info rounded-circle opacity-25"
-                style="width: 300px; height: 300px; filter: blur(100px); transform: translate(30%, -30%);"></div>
-        </div>
-
-        <div class="hero-content-left">
-            <h1 class="hero-title-poetic">
-                Find your space.<br>
-                Write your <span class="hero-title-accent">verse.</span>
-            </h1>
-
-            <p class="hero-subtitle">
-                Discover curated events where intelligent structure meets <br class="d-none d-lg-block">
-                serendipitous connection.
-            </p>
-
-            <div class="d-flex gap-3 align-items-center">
-                <a href="#events-grid" class="btn btn-light px-4 py-2 fw-bold border-0 shadow-sm hero-action-btn">
-                    Start Exploring
-                </a>
-                <span class="small ms-2 d-none d-md-inline hero-scroll-hint">
-                    <i class="bi bi-arrow-down me-1"></i> Scroll for events
-                </span>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="Partials/_HomeHero" />
 
 <div class="container mb-5" id="events-grid">
     <vc:event-filter controller-name="Home" action-name="Index" search-term="@Model.SearchTerm" type="@Model.Type"
@@ -81,54 +47,7 @@
         <div id="itemsContainer" class="row g-4 mb-5">
             @foreach (var item in Model.Events.Items)
             {
-                var currentItem = item;
-                <div class="col-md-6 col-lg-4 col-xl-4 d-flex">
-                    <div class="card h-100 w-100 shadow-sm hover-effect transition-transform border-0 bg-white">
-                        <div class="position-relative" style="overflow: hidden; background-color: #f0f2f5;">
-                            @if (!string.IsNullOrEmpty(currentItem.VenueImageUrl))
-                            {
-                                <img src="@currentItem.VenueImageUrl" class="card-img-top" style="height: 220px; object-fit: cover;"
-                                    alt="@currentItem.Name">
-                            }
-                            else
-                            {
-                                <div class="card-img-top w-100 d-flex align-items-center justify-content-center text-white"
-                                    style="height: 220px; background: linear-gradient(135deg, var(--color-dark-teal), var(--color-air-force-blue));">
-                                    <i class="bi bi-calendar-event fs-1 opacity-50"></i>
-                                </div>
-                            }
-
-                            <span class="position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm">
-                                @currentItem.Type
-                            </span>
-                        </div>
-
-                        <div class="card-body d-flex flex-column p-4">
-                            <div class="text-uppercase fw-bold small mb-2"
-                                style="color: var(--color-air-force-blue); letter-spacing: 1px;">
-                                <i class="bi bi-calendar3 me-1"></i> @currentItem.Date.ToString("MMM dd, yyyy • HH:mm")
-                            </div>
-
-                            <h5 class="card-title fw-bold mb-2 fs-5">
-                                <a asp-controller="Event" asp-action="Details" asp-route-id="@currentItem.Id"
-                                    class="text-decoration-none text-dark stretched-link">
-                                    @currentItem.Name
-                                </a>
-                            </h5>
-
-                            <p class="card-text text-muted small mb-3 flex-grow-1" style="line-height: 1.6;">
-                                @(currentItem.Description.Length > 100 ? currentItem.Description.Substring(0, 97) + "..." :
-                                    currentItem.Description)
-                            </p>
-
-                            <div class="d-flex align-items-center text-muted small pt-3 border-top mt-auto"
-                                style="border-color: #f0f2f5 !important;">
-                                <i class="bi bi-geo-alt-fill me-2 text-danger"></i>
-                                <span class="text-truncate">@currentItem.VenueName</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <partial name="Partials/_PublicEventCard" model="item" />
             }
         </div>
 

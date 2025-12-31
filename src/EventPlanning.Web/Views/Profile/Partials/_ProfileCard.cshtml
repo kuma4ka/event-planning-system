@@ -1,0 +1,25 @@
+@using EventPlanning.Application.DTOs.Profile
+@model EditProfileDto
+
+<div class="profile-card shadow-sm">
+    <div class="profile-avatar-container">
+        <div class="profile-avatar">
+            @Model.Initials
+        </div>
+    </div>
+
+    <h2 class="profile-name">@Model.FirstName @Model.LastName</h2>
+    <p class="profile-email">@Model.Email</p>
+
+    <div class="profile-stats">
+        <div class="stat-item">
+            <span class="stat-value">@Model.OrganizedCount</span>
+            <span class="stat-label">Organized</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+            <span class="stat-value">@Model.JoinedCount</span>
+            <span class="stat-label">Joined</span>
+        </div>
+    </div>
+</div>

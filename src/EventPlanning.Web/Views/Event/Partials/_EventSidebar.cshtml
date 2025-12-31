@@ -3,10 +3,10 @@
 
 @{
     var guestItemViewData = new ViewDataDictionary(ViewData)
-    {
-        { "IsOrganizer", Model.IsOrganizer },
-        { "IsPast", Model.IsPast }
-    };
+{
+{ "IsOrganizer", Model.IsOrganizer },
+{ "IsPast", Model.IsPast }
+};
 }
 
 <div class="event-sidebar-card">
@@ -88,7 +88,7 @@
         <div class="mb-2">
             @foreach (var guest in Model.Guests.Take(5))
             {
-                <partial name="_GuestListItem" model="guest" view-data="guestItemViewData" />
+                <partial name="Partials/_GuestListItem" model="guest" view-data="guestItemViewData" />
             }
         </div>
 
