@@ -68,7 +68,7 @@ public class EventController(
         try
         {
             await eventService.CreateEventAsync(userId!, model, cancellationToken);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("MyEvents", "Event");
         }
         catch (ValidationException ex)
         {
@@ -152,7 +152,7 @@ public class EventController(
         try
         {
             await eventService.DeleteEventAsync(userId!, id, cancellationToken);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("MyEvents", "Event");
         }
         catch (UnauthorizedAccessException)
         {
