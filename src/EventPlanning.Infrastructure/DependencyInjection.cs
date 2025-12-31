@@ -23,7 +23,7 @@ public static class DependencyInjection
 
         services.AddMemoryCache();
 
-        services.AddIdentity<User, IdentityRole>(options => 
+        services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
                 options.Password.RequireDigit = true;
@@ -40,7 +40,7 @@ public static class DependencyInjection
             options.LoginPath = "/Account/Login";
             options.LogoutPath = "/Account/Logout";
             options.AccessDeniedPath = "/Account/AccessDenied";
-            
+
             options.Cookie.HttpOnly = true;
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Lax;
@@ -48,16 +48,17 @@ public static class DependencyInjection
             options.ExpireTimeSpan = TimeSpan.FromDays(30);
             options.SlidingExpiration = true;
         });
-        
+
         services.AddScoped<IEventRepository, EventRepository>();
         services.AddScoped<IVenueRepository, VenueRepository>();
         services.AddScoped<IGuestRepository, GuestRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
-        
+        services.AddScoped<INewsletterRepository, NewsletterRepository>();
+
         services.AddScoped<IImageService, ImageService>();
-        
+
         services.AddScoped<IIdentityService, IdentityService>();
-        
+
         return services;
     }
 }

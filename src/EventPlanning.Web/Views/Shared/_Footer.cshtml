@@ -41,9 +41,11 @@
                 <h5 class="footer-heading">Stay in the loop</h5>
                 <p class="text-white-50 mb-3 small">Join our newsletter to get top events curated for you every
                     week.</p>
-                <form class="d-flex gap-2">
-                    <input type="email" class="form-control footer-subscribe-input" placeholder="Enter your email">
-                    <button type="button" class="btn btn-primary px-3">Subscribe</button>
+                <form class="d-flex gap-2" id="newsletter-form">
+                    @Html.AntiForgeryToken()
+                    <input type="email" id="newsletter-email" name="email" class="form-control footer-subscribe-input"
+                        placeholder="Enter your email" required>
+                    <button type="submit" id="newsletter-submit" class="btn btn-primary px-3">Subscribe</button>
                 </form>
             </div>
         </div>
