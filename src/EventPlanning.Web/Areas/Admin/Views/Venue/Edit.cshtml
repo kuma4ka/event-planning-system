@@ -25,67 +25,7 @@
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 shadow-sm mb-4 small">
                     </div>
 
-                    <div class="mb-4">
-                        <label asp-for="Name" class="st-form-label">Venue Name</label>
-                        <div class="st-input-group">
-                            <span class="input-group-text"><i class="bi bi-building"></i></span>
-                            <input asp-for="Name" class="form-control" />
-                        </div>
-                        <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
-                    </div>
-
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-8">
-                            <label asp-for="Address" class="st-form-label">Address</label>
-                            <div class="st-input-group">
-                                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                <input asp-for="Address" class="form-control" />
-                            </div>
-                            <span asp-validation-for="Address" class="text-danger small mt-1 d-block"></span>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label asp-for="Capacity" class="st-form-label">Capacity</label>
-                            <div class="st-input-group">
-                                <span class="input-group-text"><i class="bi bi-people"></i></span>
-                                <input asp-for="Capacity" class="form-control" type="number" />
-                            </div>
-                            <span asp-validation-for="Capacity" class="text-danger small mt-1 d-block"></span>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label asp-for="ImageFile" class="st-form-label">Update Image</label>
-
-                        @if (!string.IsNullOrEmpty(Model.CurrentImageUrl))
-                        {
-                            <div class="mb-3 p-3 bg-light rounded-3 border">
-                                <div class="d-flex align-items-center">
-                                    <img src="@Model.CurrentImageUrl" alt="Current Venue Image" class="img-thumbnail me-3"
-                                        style="width: 80px; height: 80px; object-fit: cover;" />
-                                    <div>
-                                        <div class="small fw-bold text-dark">Current Image</div>
-                                        <div class="small text-muted">Upload a new file to replace it</div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-
-                        <div class="st-input-group">
-                            <span class="input-group-text"><i class="bi bi-image"></i></span>
-                            <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
-                        </div>
-                        <span asp-validation-for="ImageFile" class="text-danger small mt-1 d-block"></span>
-                    </div>
-
-                    <div class="mb-4">
-                        <label asp-for="Description" class="st-form-label">Description</label>
-                        <div class="st-input-group align-top">
-                            <span class="input-group-text pt-3"><i class="bi bi-text-paragraph"></i></span>
-                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                        </div>
-                        <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
-                    </div>
+                    <partial name="Partials/_VenueFormFields" model="Model" />
 
                     <div class="st-form-actions">
                         <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>

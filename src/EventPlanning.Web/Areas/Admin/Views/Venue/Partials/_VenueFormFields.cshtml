@@ -1,0 +1,70 @@
+@using EventPlanning.Application.DTOs.Venue
+@model VenueBaseDto
+
+@{
+    var updateModel = Model as UpdateVenueDto;
+    var imageLabel = updateModel != null ? "Update Image" : "Venue Image";
+}
+
+<div class="mb-4">
+    <label asp-for="Name" class="st-form-label">Venue Name</label>
+    <div class="st-input-group">
+        <span class="input-group-text"><i class="bi bi-building"></i></span>
+        <input asp-for="Name" class="form-control" placeholder="E.g. Grand Hall" />
+    </div>
+    <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-8">
+        <label asp-for="Address" class="st-form-label">Address</label>
+        <div class="st-input-group">
+            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+            <input asp-for="Address" class="form-control" placeholder="Full street address" />
+        </div>
+        <span asp-validation-for="Address" class="text-danger small mt-1 d-block"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Capacity" class="st-form-label">Capacity</label>
+        <div class="st-input-group">
+            <span class="input-group-text"><i class="bi bi-people"></i></span>
+            <input asp-for="Capacity" class="form-control" type="number" min="1" />
+        </div>
+        <span asp-validation-for="Capacity" class="text-danger small mt-1 d-block"></span>
+    </div>
+</div>
+
+<div class="mb-4">
+    <label asp-for="ImageFile" class="st-form-label">@imageLabel</label>
+
+    @if (!string.IsNullOrEmpty(updateModel?.CurrentImageUrl))
+    {
+            <div class="mb-3 p-3 bg-light rounded-3 border">
+                <div class="d-flex align-items-center">
+                    <img src="@updateModel.CurrentImageUrl" alt="Current Venue Image" class="img-thumbnail me-3"
+                        style="width: 80px; height: 80px; object-fit: cover;" />
+                    <div>
+                        <div class="small fw-bold text-dark">Current Image</div>
+                        <div class="small text-muted">Upload a new file to replace it</div>
+                    </div>
+                </div>
+            </div>
+    }
+
+    <div class="st-input-group">
+        <span class="input-group-text"><i class="bi bi-image"></i></span>
+        <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
+    </div>
+    <span asp-validation-for="ImageFile" class="text-danger small mt-1 d-block"></span>
+</div>
+
+<div class="mb-4">
+    <label asp-for="Description" class="st-form-label">Description (Optional)</label>
+    <div class="st-input-group align-top">
+        <span class="input-group-text pt-3"><i class="bi bi-file-text"></i></span>
+        <textarea asp-for="Description" class="form-control" rows="4"
+            placeholder="Describe the venue features..."></textarea>
+    </div>
+    <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+</div>
