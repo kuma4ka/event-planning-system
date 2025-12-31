@@ -12,19 +12,19 @@ public interface IEventService
         string? sortOrder,
         CancellationToken cancellationToken = default);
 
-    Task<EventDto?> GetEventByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<EventDto?> GetEventByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
-    Task<EventDetailsDto?> GetEventDetailsAsync(int id, CancellationToken cancellationToken = default);
+    Task<EventDetailsDto?> GetEventDetailsAsync(Guid id, CancellationToken cancellationToken = default);
 
-    Task<int> CreateEventAsync(string userId, CreateEventDto dto, CancellationToken cancellationToken = default);
+    Task<Guid> CreateEventAsync(string userId, CreateEventDto dto, CancellationToken cancellationToken = default);
 
     Task UpdateEventAsync(string userId, UpdateEventDto dto, CancellationToken cancellationToken = default);
 
-    Task DeleteEventAsync(string userId, int eventId, CancellationToken cancellationToken = default);
+    Task DeleteEventAsync(string userId, Guid eventId, CancellationToken cancellationToken = default);
 
-    Task JoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default);
+    Task JoinEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default);
 
-    Task LeaveEventAsync(int eventId, string userId, CancellationToken cancellationToken = default);
+    Task LeaveEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default);
 
-    Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default);
+    Task<bool> IsUserJoinedAsync(Guid eventId, string userId, CancellationToken cancellationToken = default);
 }

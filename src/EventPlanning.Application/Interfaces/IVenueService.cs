@@ -7,8 +7,8 @@ public interface IVenueService
 {
     Task<List<VenueDto>> GetVenuesAsync(CancellationToken cancellationToken = default);
     Task<PagedResult<VenueDto>> GetVenuesPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
-    Task<VenueDto?> GetVenueByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<VenueDto?> GetVenueByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task CreateVenueAsync(string adminId, CreateVenueDto dto, CancellationToken cancellationToken = default);
     Task UpdateVenueAsync(UpdateVenueDto dto, CancellationToken cancellationToken = default);
-    Task DeleteVenueAsync(int id, CancellationToken cancellationToken = default);
+    Task DeleteVenueAsync(Guid id, CancellationToken cancellationToken = default);
 }

@@ -2,7 +2,7 @@
 
 public sealed class Venue
 {
-    public int Id { get; private set; }
+    public Guid Id { get; private set; } = Guid.CreateVersion7();
 
     public string Name { get; private set; }
     public string Address { get; private set; }

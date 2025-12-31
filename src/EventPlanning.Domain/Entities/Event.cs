@@ -4,7 +4,7 @@ namespace EventPlanning.Domain.Entities;
 
 public class Event
 {
-    public int Id { get; private set; }
+    public Guid Id { get; private set; } = Guid.CreateVersion7();
     public string Name { get; private set; }
     public string? Description { get; private set; }
     public DateTime Date { get; private set; }
@@ -14,7 +14,7 @@ public class Event
 
     public EventType Type { get; private set; }
 
-    public int? VenueId { get; private set; }
+    public Guid? VenueId { get; private set; }
     public Venue? Venue { get; private set; }
 
     public string OrganizerId { get; private set; }
@@ -28,7 +28,7 @@ public class Event
         OrganizerId = null!;
     }
 
-    public Event(string name, string? description, DateTime date, EventType type, string organizerId, int? venueId = null, bool isPrivate = false)
+    public Event(string name, string? description, DateTime date, EventType type, string organizerId, Guid? venueId = null, bool isPrivate = false)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name cannot be empty.", nameof(name));
         if (date < DateTime.UtcNow) throw new ArgumentException("Date must be in the future.", nameof(date));
@@ -48,7 +48,7 @@ public class Event
         Guests.Add(guest);
     }
 
-    public void UpdateDetails(string name, string? description, DateTime date, EventType type, int? venueId)
+    public void UpdateDetails(string name, string? description, DateTime date, EventType type, Guid? venueId)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name cannot be empty.", nameof(name));
         if (date < DateTime.UtcNow) throw new ArgumentException("Cannot move event to the past.", nameof(date));
