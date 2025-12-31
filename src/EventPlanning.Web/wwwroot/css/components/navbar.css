@@ -133,3 +133,33 @@
     color: var(--color-dark-teal);
     font-size: 1.1rem;
 }
+
+/* --- Dropdown Styling --- */
+.navbar-meetup .dropdown-menu {
+    background-color: var(--bg-surface);
+    border-color: var(--border-light);
+}
+
+.navbar-meetup .dropdown-item {
+    color: var(--text-main);
+    transition: all 0.2s ease;
+}
+
+.navbar-meetup .dropdown-item:hover,
+.navbar-meetup .dropdown-item:focus {
+    background-color: var(--bg-surface-hover);
+    color: var(--color-dark-teal);
+}
+
+.navbar-meetup .dropdown-header {
+    color: var(--text-muted);
+}
+
+.navbar-meetup .dropdown-divider {
+    border-top-color: var(--border-light);
+}
+
+[data-theme="dark"] .navbar-meetup .dropdown-menu {
+    border-color: var(--border-medium);
+    box-shadow: var(--shadow-strong);
+}
