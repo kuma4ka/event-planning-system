@@ -17,7 +17,8 @@ public class EventController(
     IEventService eventService,
     IVenueService venueService,
     UserManager<User> userManager,
-    IConfiguration configuration) : Controller
+    IConfiguration configuration,
+    ILogger<EventController> logger) : Controller
 {
     [HttpGet("details/{id:guid}")]
     [AllowAnonymous]
@@ -52,7 +53,8 @@ public class EventController(
 
         try
         {
-            await eventService.CreateEventAsync(userId!, model, cancellationToken);
+            var eventId = await eventService.CreateEventAsync(userId!, model, cancellationToken);
+            logger.LogInformation("Event created: {EventId} by {User}", eventId, User.Identity?.Name);
             return RedirectToAction("MyEvents", "Event");
         }
         catch (ValidationException ex)
@@ -105,6 +107,7 @@ public class EventController(
         try
         {
             await eventService.UpdateEventAsync(userId!, model, cancellationToken);
+            logger.LogInformation("Event updated: {EventId} by {User}", id, User.Identity?.Name);
             return RedirectToAction("MyEvents", "Event");
         }
         catch (ValidationException ex)
@@ -137,10 +140,12 @@ public class EventController(
         try
         {
             await eventService.DeleteEventAsync(userId!, id, cancellationToken);
+            logger.LogInformation("Event deleted: {EventId} by {User}", id, User.Identity?.Name);
             return RedirectToAction("MyEvents", "Event");
         }
         catch (UnauthorizedAccessException)
         {
+            logger.LogWarning("Unauthorized delete attempt: Event {EventId} by {User}", id, User.Identity?.Name);
             return Forbid();
         }
     }
@@ -155,10 +160,12 @@ public class EventController(
         try
         {
             await eventService.JoinEventAsync(id, userId, cancellationToken);
+            logger.LogInformation("User {User} joined event {EventId}", User.Identity?.Name, id);
             TempData["SuccessMessage"] = "You have successfully joined the event!";
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error joining event: {EventId} by {User}", id, User.Identity?.Name);
             TempData["ErrorMessage"] = ex.Message;
         }
 
@@ -175,10 +182,12 @@ public class EventController(
         try
         {
             await eventService.LeaveEventAsync(id, userId, cancellationToken);
+            logger.LogInformation("User {User} left event {EventId}", User.Identity?.Name, id);
             TempData["SuccessMessage"] = "You have left the event.";
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error leaving event: {EventId} by {User}", id, User.Identity?.Name);
             TempData["ErrorMessage"] = ex.Message;
         }
 

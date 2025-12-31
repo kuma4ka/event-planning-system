@@ -13,7 +13,8 @@ public class AccountController(
     SignInManager<User> signInManager,
     IValidator<RegisterUserDto> registerValidator,
     IValidator<LoginUserDto> loginValidator,
-    IEmailSender<User> emailSender) : Controller
+    IEmailSender<User> emailSender,
+    ILogger<AccountController> logger) : Controller
 {
     [HttpGet]
     public IActionResult Register()
@@ -48,6 +49,8 @@ public class AccountController(
 
         if (result.Succeeded)
         {
+            logger.LogInformation("New user registered: {Email}", model.Email);
+
             var userId = await userManager.GetUserIdAsync(user);
             var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
             
@@ -59,6 +62,7 @@ public class AccountController(
 
             if (string.IsNullOrEmpty(callbackUrl))
             {
+                logger.LogError("Error generating confirmation email link for {Email}", model.Email);
                 ModelState.AddModelError(string.Empty, "Error generating confirmation email.");
                 return View(model);
             }
@@ -79,6 +83,9 @@ public class AccountController(
 
         foreach (var error in result.Errors)
             ModelState.AddModelError(string.Empty, error.Description);
+
+        // Don't log validation errors as warnings, maybe just info or debug if highly verbose, but per specs "Login Fail" is Warn. Register failure often validation.
+        logger.LogWarning("Registration failed for {Email}: {Errors}", model.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
 
         return View(model);
     }
@@ -106,14 +113,20 @@ public class AccountController(
 
         var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
 
-        if (result.Succeeded) return LocalRedirect(returnUrl);
+        if (result.Succeeded)
+        {
+            logger.LogInformation("User {Email} logged in.", model.Email);
+            return LocalRedirect(returnUrl);
+        }
 
         if (result.IsLockedOut)
         {
+            logger.LogWarning("User {Email} locked out.", model.Email);
             ModelState.AddModelError(string.Empty, "Account is locked out.");
         }
         else
         {
+            logger.LogWarning("Failed login attempt for {Email}.", model.Email);
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
         }
 
@@ -125,7 +138,9 @@ public class AccountController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
+        var email = User.Identity?.Name;
         await signInManager.SignOutAsync();
+        logger.LogInformation("User {Email} logged out.", email);
         return RedirectToAction("Index", "Home");
     }
 
@@ -152,10 +167,12 @@ public class AccountController(
         var result = await userManager.ConfirmEmailAsync(user, code);
         if (!result.Succeeded)
         {
+            logger.LogError("Error confirming email for user {UserId}", userId);
             TempData["ErrorMessage"] = "Error confirming your email.";
             return RedirectToAction("Index", "Home");
         }
 
+        logger.LogInformation("User {UserId} confirmed email.", userId);
         TempData["SuccessMessage"] = "Thank you for confirming your email.";
         return View();
     }

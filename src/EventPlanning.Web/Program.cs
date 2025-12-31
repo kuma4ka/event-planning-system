@@ -2,7 +2,15 @@ using EventPlanning.Application;
 using EventPlanning.Infrastructure;
 using Microsoft.AspNetCore.RateLimiting;
 
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// SERILOG CONFIGURATION
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext());
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
@@ -24,44 +32,58 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-var app = builder.Build();
-
-// SECURE DB SEEDING
-using (var scope = app.Services.CreateScope())
+try
 {
-    try
-    {
-        await EventPlanning.Infrastructure.Persistence.DbInitializer.SeedAsync(scope.ServiceProvider);
-    }
-    catch (Exception ex)
-    {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database. Ensure User Secrets are configured.");
-    }
-}
+    var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+    // SECURE DB SEEDING
+    using (var scope = app.Services.CreateScope())
+    {
+        try
+        {
+            await EventPlanning.Infrastructure.Persistence.DbInitializer.SeedAsync(scope.ServiceProvider);
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "An error occurred while seeding the database.");
+            // Also log to fallback logger if needed, but Serilog Fatal covers it
+        }
+    }
+
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Home/Error");
+        app.UseHsts();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseStaticFiles();
+
+    app.UseSerilogRequestLogging(); // Request logging middleware
+    
+    app.UseRouting();
+    app.UseRateLimiter();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapControllerRoute(
+        name: "areas",
+        pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+    // default route
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    Log.Information("Application Starting Up");
+    app.Run();
+}
+catch (Exception ex)
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    Log.Fatal(ex, "Application start-up failed");
 }
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-app.UseRateLimiter();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "areas",
-    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
-// default route
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.Run();
+finally
+{
+    Log.CloseAndFlush();
+}
