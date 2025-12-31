@@ -31,25 +31,19 @@ public class HomeController(
         CancellationToken cancellationToken = default)
     {
         var userId = userManager.GetUserId(User) ?? string.Empty;
-
         var now = DateTime.Now;
-
-        var effectiveFromDate = CalculateEffectiveFromDate(from, now);
-
-        var adjustedToDate = to?.Date.AddDays(1).AddTicks(-1);
 
         var searchDto = new EventSearchDto
         {
             SearchTerm = searchTerm,
             Type = type,
-            FromDate = effectiveFromDate,
-            ToDate = adjustedToDate,
+            FromDate = CalculateEffectiveFromDate(from, now),
+            ToDate = to?.Date.AddDays(1).AddTicks(-1),
             PageNumber = page,
             PageSize = 9
         };
 
         PagedResult<EventDto> result;
-
         try
         {
             result = await eventService.GetEventsAsync(userId, null, searchDto, sortOrder, cancellationToken);
@@ -57,23 +51,18 @@ public class HomeController(
         catch (ValidationException ex)
         {
             foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-
-            result = new PagedResult<EventDto>(new List<EventDto>(), 0, 1, 9);
+            result = new PagedResult<EventDto>([], 0, 1, 9);
         }
 
         var viewModel = new HomeIndexViewModel
         {
             Events = result,
-
             SearchTerm = searchTerm,
             Type = type,
             From = from,
             To = to,
-
             TypeOptions = type.ToSelectList("All Categories"),
-
             MinDate = now.ToString("yyyy-MM-dd"),
-
             HasFilters = !string.IsNullOrEmpty(searchTerm) || type.HasValue || from.HasValue || to.HasValue
         };
 
