@@ -44,7 +44,7 @@ public class VenueService(
         return new PagedResult<VenueDto>(dtos, totalCount, pageNumber, pageSize);
     }
 
-    public async Task<VenueDto?> GetVenueByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<VenueDto?> GetVenueByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var venue = await venueRepository.GetByIdAsync(id, cancellationToken);
         if (venue == null) return null;
@@ -110,7 +110,7 @@ public class VenueService(
         await venueRepository.UpdateAsync(venue, cancellationToken);
     }
 
-    public async Task DeleteVenueAsync(int id, CancellationToken cancellationToken = default)
+    public async Task DeleteVenueAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var venue = await venueRepository.GetByIdAsync(id, cancellationToken);
         if (venue == null) return;
