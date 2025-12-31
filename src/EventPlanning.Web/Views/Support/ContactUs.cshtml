@@ -16,12 +16,7 @@
             <div class="st-card animate-fade-up" style="animation-delay: 0.1s;">
                 <h3 class="fw-bold mb-4" style="color: var(--text-main);">Send us a Message</h3>
 
-                @if (TempData["SuccessMessage"] != null)
-                {
-                    <div class="alert alert-success border-0 shadow-sm mb-4">
-                        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-                    </div>
-                }
+                <h3 class="fw-bold mb-4" style="color: var(--text-main);">Send us a Message</h3>
 
                 <form asp-action="Contact" method="post">
                     <div class="row g-3">

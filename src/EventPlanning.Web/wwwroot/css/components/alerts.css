@@ -1,0 +1,126 @@
+/* --- GLOBAL ALERTS --- */
+.stanza-alert-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1050;
+    width: 100%;
+    max-width: 400px;
+    pointer-events: none;
+    /* Let clicks pass through container */
+}
+
+.stanza-alert {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-strong);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    pointer-events: auto;
+    /* Re-enable clicks for the alert itself */
+    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stanza-alert::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background-color: var(--color-dark-teal);
+}
+
+.stanza-alert-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(18, 69, 89, 0.1);
+    color: var(--color-dark-teal);
+    font-size: 1.1rem;
+}
+
+.stanza-alert-content {
+    flex: 1;
+}
+
+.stanza-alert-title {
+    font-family: var(--font-heading, serif);
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+    color: var(--text-main);
+}
+
+.stanza-alert-message {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    margin-bottom: 0;
+}
+
+.stanza-alert-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    opacity: 0.5;
+    padding: 0;
+    margin-left: 0.5rem;
+    transition: opacity 0.2s;
+}
+
+.stanza-alert-close:hover {
+    opacity: 1;
+    color: var(--text-main);
+}
+
+/* --- VARIANTS --- */
+
+/* SUCCESS */
+.stanza-alert.stanza-alert-success::before {
+    background-color: var(--color-success);
+}
+
+.stanza-alert.stanza-alert-success .stanza-alert-icon {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: var(--color-success);
+}
+
+/* ERROR */
+.stanza-alert.stanza-alert-error::before {
+    background-color: var(--color-danger);
+}
+
+.stanza-alert.stanza-alert-error .stanza-alert-icon {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--color-danger);
+}
+
+/* DARK MODE OVERRIDES */
+[data-theme="dark"] .stanza-alert {
+    background: var(--bg-surface);
+    border-color: var(--border-light);
+}
+
+/* ANIMATIONS */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}

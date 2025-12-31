@@ -1,0 +1,36 @@
+@if (TempData["SuccessMessage"] != null || TempData["ErrorMessage"] != null)
+{
+    <div class="stanza-alert-container">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="stanza-alert stanza-alert-success alert-dismissible fade show" role="alert">
+                <div class="stanza-alert-icon">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+                <div class="stanza-alert-content">
+                    <h5 class="stanza-alert-title">Success</h5>
+                    <p class="stanza-alert-message">@TempData["SuccessMessage"]</p>
+                </div>
+                <button type="button" class="stanza-alert-close" data-bs-dismiss="alert" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="stanza-alert stanza-alert-error alert-dismissible fade show" role="alert">
+                <div class="stanza-alert-icon">
+                    <i class="bi bi-exclamation-lg"></i>
+                </div>
+                <div class="stanza-alert-content">
+                    <h5 class="stanza-alert-title">Error</h5>
+                    <p class="stanza-alert-message">@TempData["ErrorMessage"]</p>
+                </div>
+                <button type="button" class="stanza-alert-close" data-bs-dismiss="alert" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        }
+    </div>
+}
