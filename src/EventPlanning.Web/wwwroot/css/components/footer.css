@@ -1,6 +1,6 @@
 ﻿/* --- FOOTER --- */
 .footer-stanza {
-    background-color: var(--color-ink-black);
+    background-color: var(--bg-footer);
     color: rgba(255, 255, 255, 0.7);
     padding-top: 5rem;
     padding-bottom: 2rem;
@@ -20,7 +20,7 @@
 }
 
 .footer-heading {
-    color: var(--color-white);
+    color: #ffffff;
     font-family: var(--font-heading, serif), serif;
     font-weight: 700;
     margin-bottom: 1.5rem;
@@ -48,7 +48,7 @@
     height: 40px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.1);
-    color: var(--color-white);
+    color: var(--text-on-image);
     margin-right: 0.5rem;
     transition: all 0.3s ease;
     text-decoration: none;

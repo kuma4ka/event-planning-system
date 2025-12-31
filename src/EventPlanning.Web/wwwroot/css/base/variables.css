@@ -7,27 +7,50 @@
     --color-cool-mist: #f4f6f8;
     --color-white: #ffffff;
     --color-accent-cyan: #81f7e5;
+    --color-static-white: #ffffff;
 
     /* Semantic Status Colors */
     --color-danger: #dc3545;
     --color-success: #198754;
     --color-warning: #ffc107;
+    --color-red-light: #fff5f5;
+
+    /* --- SPACING & SIZING --- */
+    --spacing-sm: 0.5rem;
+    --spacing-md: 0.75rem;
+    --spacing-lg: 1rem;
+    --spacing-xl: 1.5rem;
+
+    --separator-size: 32px;
+    --avatar-size: 35px;
+    --hero-offset-lg: -60px;
+    --hero-offset-sm: -30px;
 
     /* --- TYPOGRAPHY --- */
     --font-heading: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    --font-size-sm: 0.875rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.2rem;
+    --font-size-input: 0.95rem;
 
     /* --- SEMANTIC THEME VARIABLES --- */
 
     --bg-body: var(--color-cool-mist);
     --bg-surface: var(--color-white);
     --bg-surface-glass: rgba(255, 255, 255, 0.95);
+    --bg-footer: var(--color-ink-black);
+    --bg-surface-hover: #f8f9fa;
+    --bg-surface-active: #e9ecef;
+
 
     --text-main: var(--color-ink-black);
     --text-muted: var(--color-air-force-blue);
     --text-on-image: var(--color-white);
 
     --border-light: var(--color-ash-grey);
+    --border-medium: #dee2e6;
 
     /* --- SHAPE & MOTION --- */
     --radius-md: 8px;
@@ -35,12 +58,18 @@
     --radius-xl: 16px;
     --transition-base: all 0.3s ease;
 
+    --blur-amount: 10px;
+    --opacity-icon: 0.7;
+    --opacity-icon-dark: 0.9;
+
     /* --- SHADOWS & EFFECTS --- */
+    --shadow-xs: 0 2px 4px rgba(0, 0, 0, 0.05);
     --shadow-soft: 0 4px 20px rgba(1, 22, 30, 0.05);
     --shadow-strong: 0 10px 30px rgba(1, 22, 30, 0.15);
     --shadow-text: 0 2px 10px rgba(0, 0, 0, 0.3);
 
     --gradient-hero-overlay: linear-gradient(to top, rgba(1, 22, 30, 0.9), transparent);
+    --bg-hero-gradient: radial-gradient(circle at top right, var(--color-dark-teal) 0%, var(--color-ink-black) 60%);
 
     /* --- BOOTSTRAP OVERRIDES --- */
     --bs-primary: var(--color-dark-teal);
@@ -50,4 +79,54 @@
 }
 
 /* --- DARK THEME --- */
-/* [data-theme="dark"] will be populated later */
+[data-theme="dark"] {
+    /* --- OCEAN DEPTHS PALETTE --- */
+    --color-ink-black: #e6f1f5;
+    --color-dark-teal: #4ea8de;
+    --color-air-force-blue: #a8dadc;
+    --color-cool-mist: #0b1d26;
+    --color-white: #162a35;
+    --color-accent-cyan: #3dccc7;
+
+    /* Semantic Theme Overrides */
+    --bg-body: #0b1d26;
+    --bg-surface: #162a35;
+    --bg-surface-glass: rgba(22, 42, 53, 0.95);
+    --bg-footer: #08161c;
+    --bg-surface-hover: #1e3a47;
+    --bg-surface-active: #254552;
+
+    --bg-hero-gradient: radial-gradient(circle at top right, #1a4f63 0%, #051016 60%);
+
+    --text-main: #e6f1f5;
+    --text-muted: #b8c6d1;
+    --text-on-image: #ffffff;
+
+    --border-light: #2c3e50;
+    --border-medium: #374c5d;
+
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+    --bs-body-bg: var(--bg-body);
+    --bs-body-color: var(--text-main);
+
+    /* --- SEMANTIC COLORS FOR DARK MODE --- */
+    --bg-card-dark: #0f242e;
+    --border-dark: #2c3e50;
+    --color-red-light: #3a0b0b;
+
+    /* Split input bg for granular control */
+    --input-addon-bg-dark: rgba(1, 22, 30, 0.5);
+    /* Dark background for icon */
+    --input-field-bg-dark: rgba(255, 255, 255, 0.8);
+    /* Input part gets even brighter */
+
+    --input-border-dark: rgba(255, 255, 255, 0.5);
+    --input-placeholder-dark: rgba(255, 255, 255, 0.8);
+
+    /* Bootstrap overrides */
+    --bs-light: #162a35;
+    --bs-dark: #f8f9fa;
+    --bs-secondary-color: var(--text-muted);
+}

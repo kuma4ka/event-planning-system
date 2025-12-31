@@ -40,16 +40,16 @@
 
     @if (!string.IsNullOrEmpty(updateModel?.CurrentImageUrl))
     {
-            <div class="mb-3 p-3 bg-light rounded-3 border">
-                <div class="d-flex align-items-center">
-                    <img src="@updateModel.CurrentImageUrl" alt="Current Venue Image" class="img-thumbnail me-3"
-                        style="width: 80px; height: 80px; object-fit: cover;" />
-                    <div>
-                        <div class="small fw-bold text-dark">Current Image</div>
-                        <div class="small text-muted">Upload a new file to replace it</div>
-                    </div>
+        <div class="mb-3 p-3 venue-image-preview rounded-3 border">
+            <div class="d-flex align-items-center">
+                <img src="@updateModel.CurrentImageUrl" alt="Current Venue Image" class="img-thumbnail me-3"
+                    style="width: 80px; height: 80px; object-fit: cover;" />
+                <div>
+                    <div class="small fw-bold">Current Image</div>
+                    <div class="small text-muted">Upload a new file to replace it</div>
                 </div>
             </div>
+        </div>
     }
 
     <div class="st-input-group">

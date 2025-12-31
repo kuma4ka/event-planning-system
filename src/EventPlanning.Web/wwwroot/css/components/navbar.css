@@ -111,3 +111,55 @@
     transform: translateY(-2px);
     box-shadow: var(--shadow-soft);
 }
+
+/* --- Profile Dropdown Toggle --- */
+.navbar-meetup .profile-toggle {
+    color: var(--text-main);
+    transition: color 0.2s ease;
+}
+
+.navbar-meetup .profile-toggle:hover {
+    color: var(--color-dark-teal);
+}
+
+.navbar-meetup .profile-avatar {
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    background-color: var(--bs-light);
+    border-radius: 50%;
+}
+
+.navbar-meetup .profile-icon {
+    color: var(--color-dark-teal);
+    font-size: 1.1rem;
+}
+
+/* --- Dropdown Styling --- */
+.navbar-meetup .dropdown-menu {
+    background-color: var(--bg-surface);
+    border-color: var(--border-light);
+}
+
+.navbar-meetup .dropdown-item {
+    color: var(--text-main);
+    transition: all 0.2s ease;
+}
+
+.navbar-meetup .dropdown-item:hover,
+.navbar-meetup .dropdown-item:focus {
+    background-color: var(--bg-surface-hover);
+    color: var(--color-dark-teal);
+}
+
+.navbar-meetup .dropdown-header {
+    color: var(--text-muted);
+}
+
+.navbar-meetup .dropdown-divider {
+    border-top-color: var(--border-light);
+}
+
+[data-theme="dark"] .navbar-meetup .dropdown-menu {
+    border-color: var(--border-medium);
+    box-shadow: var(--shadow-strong);
+}

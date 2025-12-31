@@ -6,6 +6,11 @@
     overflow: hidden;
 }
 
+[data-theme="dark"] .card {
+    background-color: var(--bg-card-dark);
+    border-color: var(--border-dark);
+}
+
 .badge {
     border-radius: 6px;
     font-weight: 600;
