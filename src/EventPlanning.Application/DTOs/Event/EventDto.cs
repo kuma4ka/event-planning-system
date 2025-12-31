@@ -3,13 +3,13 @@
 namespace EventPlanning.Application.DTOs.Event;
 
 public record EventDto(
-    int Id,
+    Guid Id,
     string Name,
     string Description,
     DateTime Date,
     EventType Type,
     string OrganizerId,
     string VenueName,
-    int? VenueId,
+    Guid? VenueId,
     string? VenueImageUrl
 );

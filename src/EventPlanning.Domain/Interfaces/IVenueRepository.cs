@@ -4,7 +4,7 @@ namespace EventPlanning.Domain.Interfaces;
 
 public interface IVenueRepository
 {
-    Task<Venue?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<Venue?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<List<Venue>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<(List<Venue> Items, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task AddAsync(Venue venue, CancellationToken cancellationToken = default);

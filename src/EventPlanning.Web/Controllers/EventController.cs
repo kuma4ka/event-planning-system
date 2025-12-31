@@ -19,9 +19,9 @@ public class EventController(
     UserManager<User> userManager,
     IConfiguration configuration) : Controller
 {
-    [HttpGet("details/{id:int}")]
+    [HttpGet("details/{id:guid}")]
     [AllowAnonymous]
-    public async Task<IActionResult> Details(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
     {
         var sourceDetails = await eventService.GetEventDetailsAsync(id, cancellationToken);
         if (sourceDetails == null) return NotFound();
@@ -77,8 +77,8 @@ public class EventController(
         }
     }
 
-    [HttpGet("edit/{id:int}")]
-    public async Task<IActionResult> Edit(int id, CancellationToken cancellationToken)
+    [HttpGet("edit/{id:guid}")]
+    public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         var eventDto = await eventService.GetEventByIdAsync(id, cancellationToken);
@@ -94,15 +94,15 @@ public class EventController(
             eventDto.Description,
             eventDto.Date,
             eventDto.Type,
-            eventDto.VenueId ?? 0
+            eventDto.VenueId ?? Guid.Empty
         );
 
         return View(updateModel);
     }
 
-    [HttpPost("edit/{id:int}")]
+    [HttpPost("edit/{id:guid}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, UpdateEventDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(Guid id, UpdateEventDto model, CancellationToken cancellationToken)
     {
         if (id != model.Id) return BadRequest("ID mismatch");
 
@@ -141,9 +141,9 @@ public class EventController(
         }
     }
 
-    [HttpPost("delete/{id:int}")]
+    [HttpPost("delete/{id:guid}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         try
@@ -157,9 +157,9 @@ public class EventController(
         }
     }
 
-    [HttpPost("join/{id:int}")]
+    [HttpPost("join/{id:guid}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Join(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Join(Guid id, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         if (userId == null) return RedirectToAction("Login", "Account");
@@ -177,9 +177,9 @@ public class EventController(
         return RedirectToAction(nameof(Details), new { id });
     }
 
-    [HttpPost("leave/{id:int}")]
+    [HttpPost("leave/{id:guid}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Leave(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Leave(Guid id, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         if (userId == null) return RedirectToAction("Login", "Account");

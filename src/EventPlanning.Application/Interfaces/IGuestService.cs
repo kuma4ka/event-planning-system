@@ -10,5 +10,5 @@ public interface IGuestService
         CancellationToken cancellationToken = default);
 
     Task UpdateGuestAsync(string currentUserId, UpdateGuestDto dto, CancellationToken cancellationToken = default);
-    Task RemoveGuestAsync(string userId, string guestId, CancellationToken cancellationToken = default);
+    Task RemoveGuestAsync(string userId, Guid guestId, CancellationToken cancellationToken = default);
 }

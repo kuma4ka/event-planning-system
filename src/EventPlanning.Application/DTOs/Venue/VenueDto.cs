@@ -1,7 +1,7 @@
 ﻿namespace EventPlanning.Application.DTOs.Venue;
 
 public record VenueDto(
-    int Id,
+    Guid Id,
     string Name,
     string Address,
     int Capacity,

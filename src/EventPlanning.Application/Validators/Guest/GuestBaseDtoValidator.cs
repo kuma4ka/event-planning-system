@@ -9,7 +9,7 @@ public abstract class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : 
     protected GuestBaseDtoValidator()
     {
         RuleFor(x => x.EventId)
-            .GreaterThan(0).WithMessage("Event ID is required.");
+            .NotEmpty().WithMessage("Event ID is required.");
 
         var nameRegex = @"^\p{Lu}\p{Ll}*(?:[\s-']\p{Lu}\p{Ll}*)*$";
         var nameErrorMessage =

@@ -7,7 +7,7 @@ namespace EventPlanning.Infrastructure.Repositories;
 
 public class VenueRepository(ApplicationDbContext context) : IVenueRepository
 {
-    public async Task<Venue?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Venue?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await context.Venues
             .Include(v => v.Events)

@@ -124,12 +124,12 @@ public class GuestService(
         InvalidateEventCache(guest.EventId);
     }
 
-    public async Task RemoveGuestAsync(string userId, string guestId, CancellationToken cancellationToken = default)
+    public async Task RemoveGuestAsync(string userId, Guid guestId, CancellationToken cancellationToken = default)
     {
         var guest = await guestRepository.GetByIdAsync(guestId, cancellationToken);
         if (guest == null) return;
 
-        int eventId = guest.EventId;
+        Guid eventId = guest.EventId;
 
         if (guest.Event == null)
         {
@@ -147,7 +147,7 @@ public class GuestService(
         InvalidateEventCache(eventId);
     }
 
-    private void InvalidateEventCache(int eventId)
+    private void InvalidateEventCache(Guid eventId)
     {
         cache.Remove($"{EventCacheKeyPrefix}{eventId}_public");
         cache.Remove($"{EventCacheKeyPrefix}{eventId}_organizer");
@@ -156,7 +156,6 @@ public class GuestService(
     private static Guest CreateGuestEntity(GuestBaseDto dto)
     {
         return new Guest(
-            Guid.NewGuid().ToString(),
             dto.FirstName,
             dto.LastName,
             dto.Email,

@@ -7,7 +7,7 @@ namespace EventPlanning.Infrastructure.Repositories;
 
 public class GuestRepository(ApplicationDbContext context) : IGuestRepository
 {
-    public async Task<Guest?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
+    public async Task<Guest?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await context.Guests
             .Include(g => g.Event)

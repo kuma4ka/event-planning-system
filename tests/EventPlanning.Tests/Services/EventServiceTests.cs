@@ -44,14 +44,14 @@ public class EventServiceTests
     {
         // Arrange
         var userId = "user-1";
-        var expectedEventId = 123;
+        var expectedEventId = Guid.NewGuid();
 
         var dto = new CreateEventDto(
             "Test Event",
             "Description",
             DateTime.UtcNow.AddDays(5),
             EventType.Conference,
-            1
+            Guid.NewGuid()
         );
 
         _createValidatorMock
@@ -82,7 +82,7 @@ public class EventServiceTests
     {
         // Arrange
         var userId = "user-1";
-        var dto = new CreateEventDto("", "", DateTime.UtcNow, EventType.Conference, 0);
+        var dto = new CreateEventDto("", "", DateTime.UtcNow, EventType.Conference, Guid.Empty);
 
         var validationFailure = new ValidationResult([new ValidationFailure("Name", "Required")]);
 
@@ -103,7 +103,7 @@ public class EventServiceTests
     public async Task JoinEventAsync_ShouldThrowInvalidOperation_WhenUserAlreadyJoined()
     {
         // Arrange
-        var eventId = 1;
+        var eventId = Guid.NewGuid();
         var userId = "user-123";
 
         var eventEntity = new Event(
@@ -131,18 +131,18 @@ public class EventServiceTests
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("You are already registered for this event.");
 
-        _eventRepoMock.Verify(x => x.TryJoinEventAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _eventRepoMock.Verify(x => x.TryJoinEventAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
     public async Task GetEventDetailsAsync_ShouldMaskData_WhenUserIsNotOrganizer()
     {
         // Arrange
-        var eventId = 1;
+        var eventId = Guid.NewGuid();
         var organizerId = "user-1";
         var currentUserId = "user-2";
 
-        var guest = new Guest("g1", "Test", "Guest", "guest@test.com", eventId, "+1", "+1234567890");
+        var guest = new Guest("Test", "Guest", "guest@test.com", eventId, "+1", "+1234567890");
 
 
 
@@ -179,11 +179,11 @@ public class EventServiceTests
     public async Task GetEventDetailsAsync_ShouldShowData_WhenUserIsOrganizer()
     {
         // Arrange
-        var eventId = 1;
+        var eventId = Guid.NewGuid();
         var organizerId = "user-1";
         var currentUserId = "user-1"; // Is Organizer
 
-        var guest = new Guest("g1", "Test", "Guest", "guest@test.com", eventId, "+1", "+1234567890");
+        var guest = new Guest("Test", "Guest", "guest@test.com", eventId, "+1", "+1234567890");
 
         var eventEntity = new Event(
             "Test Event",

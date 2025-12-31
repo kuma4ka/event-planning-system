@@ -63,7 +63,7 @@ public class EventService(
         );
     }
 
-    public async Task<EventDto?> GetEventByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<EventDto?> GetEventByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var e = await eventRepository.GetByIdAsync(id, cancellationToken);
         if (e == null) return null;
@@ -81,7 +81,7 @@ public class EventService(
         );
     }
 
-    public async Task<EventDetailsDto?> GetEventDetailsAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<EventDetailsDto?> GetEventDetailsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var userId = httpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
@@ -176,7 +176,7 @@ public class EventService(
         return eventDetails;
     }
 
-    public async Task<int> CreateEventAsync(string userId, CreateEventDto dto,
+    public async Task<Guid> CreateEventAsync(string userId, CreateEventDto dto,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await createValidator.ValidateAsync(dto, cancellationToken);
@@ -188,7 +188,7 @@ public class EventService(
             dto.Date,
             dto.Type,
             userId,
-            dto.VenueId == 0 ? null : dto.VenueId
+            dto.VenueId == Guid.Empty ? null : dto.VenueId
         );
 
         return await eventRepository.AddAsync(eventEntity, cancellationToken);
@@ -212,7 +212,7 @@ public class EventService(
             dto.Description,
             dto.Date,
             dto.Type,
-            dto.VenueId == 0 ? null : dto.VenueId
+            dto.VenueId == Guid.Empty ? null : dto.VenueId
         );
 
         await eventRepository.UpdateAsync(eventEntity, cancellationToken);
@@ -220,7 +220,7 @@ public class EventService(
         InvalidateEventCache(dto.Id);
     }
 
-    public async Task DeleteEventAsync(string userId, int eventId, CancellationToken cancellationToken = default)
+    public async Task DeleteEventAsync(string userId, Guid eventId, CancellationToken cancellationToken = default)
     {
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
         if (eventEntity == null) return;
@@ -233,7 +233,7 @@ public class EventService(
         InvalidateEventCache(eventId);
     }
 
-    public async Task JoinEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task JoinEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
     {
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException($"Event {eventId} not found");
@@ -259,19 +259,19 @@ public class EventService(
         InvalidateEventCache(eventId);
     }
 
-    public async Task LeaveEventAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task LeaveEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
     {
         await eventRepository.RemoveGuestAsync(eventId, userId, cancellationToken);
 
         InvalidateEventCache(eventId);
     }
 
-    public async Task<bool> IsUserJoinedAsync(int eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task<bool> IsUserJoinedAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
     {
         return await eventRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);
     }
 
-    private void InvalidateEventCache(int eventId)
+    private void InvalidateEventCache(Guid eventId)
     {
         cache.Remove($"{EventCacheKeyPrefix}{eventId}_public");
         cache.Remove($"{EventCacheKeyPrefix}{eventId}_organizer");
