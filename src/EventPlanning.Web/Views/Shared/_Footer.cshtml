@@ -1,0 +1,62 @@
+<footer class="footer-stanza">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-4 col-md-6">
+                <a href="/" class="footer-brand">Stanza</a>
+                <p class="mb-4" style="line-height: 1.6; max-width: 300px;">
+                    Curating intelligent gatherings and memorable experiences. Find your space, write your verse.
+                </p>
+                <div class="d-flex">
+                    <a href="#" class="social-icon-link"><i class="bi bi-twitter-x"></i></a>
+                    <a href="https://www.instagram.com/kuma4ka/" class="social-icon-link"><i
+                            class="bi bi-instagram"></i></a>
+                    <a href="https://www.linkedin.com/in/dmytro-prokopenko-dev" class="social-icon-link"><i
+                            class="bi bi-linkedin"></i></a>
+                    <a href="https://github.com/kuma4ka/event-planning-system" class="social-icon-link"><i
+                            class="bi bi-github"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-3 col-6">
+                <h5 class="footer-heading">Platform</h5>
+                <ul class="list-unstyled">
+                    <li><a asp-controller="Home" asp-action="Index" class="footer-link">Browse Events</a></li>
+                    <li><a asp-controller="Event" asp-action="Create" class="footer-link">Create Event</a></li>
+                    <li><a asp-controller="Event" asp-action="MyEvents" class="footer-link">My Dashboard</a></li>
+                    <li><a asp-controller="Profile" asp-action="Index" class="footer-link">Profile</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-2 col-md-3 col-6">
+                <h5 class="footer-heading">Support</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="footer-link">Help Center</a></li>
+                    <li><a href="#" class="footer-link">Guidelines</a></li>
+                    <li><a href="#" class="footer-link">Contact Us</a></li>
+                    <li><a asp-controller="Home" asp-action="Privacy" class="footer-link">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <h5 class="footer-heading">Stay in the loop</h5>
+                <p class="text-white-50 mb-3 small">Join our newsletter to get top events curated for you every
+                    week.</p>
+                <form class="d-flex gap-2">
+                    <input type="email" class="form-control footer-subscribe-input" placeholder="Enter your email">
+                    <button type="button" class="btn btn-primary px-3">Subscribe</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <div class="mb-2 mb-md-0 text-white-50">
+                &copy; @DateTime.Now.Year Stanza. All rights reserved.
+            </div>
+            <div class="d-flex gap-4">
+                <a href="#" class="text-white-50 text-decoration-none small">Terms</a>
+                <a href="#" class="text-white-50 text-decoration-none small">Privacy</a>
+                <a href="#" class="text-white-50 text-decoration-none small">Cookies</a>
+            </div>
+        </div>
+    </div>
+</footer>

@@ -1,0 +1,128 @@
+@using EventPlanning.Application.DTOs.Event
+@model EventDetailsDto
+
+@{
+    var guestItemViewData = new ViewDataDictionary(ViewData)
+{
+{ "IsOrganizer", Model.IsOrganizer },
+{ "IsPast", Model.IsPast }
+};
+}
+
+<div class="modal fade" id="viewAllGuestsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Guest List (@Model.GuestsCount)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @if (Model.Guests is { Count: > 0 })
+                {
+                    foreach (var guest in Model.Guests)
+                    {
+                        <partial name="_GuestListItem" model="guest" view-data="guestItemViewData" />
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@* --- LEAVE EVENT MODAL --- *@
+@if (Model.IsJoined && !Model.IsPast)
+{
+    <div class="modal fade" id="leaveEventModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-danger">Leave Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to leave <strong>@Model.Name</strong>? You will lose your spot on
+                        the guest list.</p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <form asp-action="Leave" asp-route-id="@Model.Id" method="post">
+                        <button type="submit" class="btn btn-danger px-4">Leave Event</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* --- ORGANIZER MODALS --- *@
+@if (Model is { IsOrganizer: true, IsPast: false })
+{
+    <div class="modal fade" id="addGuestModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Add Guest Manually</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form asp-controller="Guest" asp-action="AddManually" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="EventId" value="@Model.Id" />
+                        <partial name="_GuestFormFields" model="null"
+                            view-data='new ViewDataDictionary(ViewData) { { "Prefix", "add" } }' />
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-4">Add Guest</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editGuestModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Edit Guest</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form asp-controller="Guest" asp-action="Edit" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="EventId" value="@Model.Id" />
+                        <input type="hidden" name="Id" id="editGuestId" />
+
+                        <partial name="_GuestFormFields" model="null"
+                            view-data='new ViewDataDictionary(ViewData) { { "Prefix", "editGuest" } }' />
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteGuestModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-danger">Remove Guest</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to remove this guest from the list? This action cannot be
+                        undone.</p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <form asp-controller="Guest" asp-action="Remove" method="post">
+                        <input type="hidden" name="EventId" value="@Model.Id" />
+                        <input type="hidden" name="GuestId" id="deleteGuestId" />
+                        <button type="submit" class="btn btn-danger px-4">Remove</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
