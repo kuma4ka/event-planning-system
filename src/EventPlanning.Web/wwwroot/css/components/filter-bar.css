@@ -6,53 +6,220 @@
     box-shadow: var(--shadow-soft);
     position: relative;
     z-index: 30;
-    padding: 1rem;
-    backdrop-filter: blur(10px);
+    padding: var(--spacing-sm);
+    backdrop-filter: blur(var(--blur-amount));
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Dark Mode Input Fixes for Filter Bar */
-[data-theme="dark"] .filter-floating-card {
-    color: var(--color-white) !important;
+/* Unified Bar Container */
+.filter-bar-unified {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    background-color: var(--color-static-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-light);
+    position: relative;
 }
 
-[data-theme="dark"] .filter-floating-card .input-group-text {
-    background-color: var(--input-addon-bg-dark) !important;
-    color: #ffffff !important;
-    /* Force white text/icon */
-    border-color: var(--input-border-dark) !important;
+/* Individual Filter Segments */
+.filter-segment {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    position: relative;
+    border-right: 1px solid var(--border-light);
+    transition: background-color 0.2s ease;
 }
 
-[data-theme="dark"] .filter-floating-card .input-group-text i {
-    color: #ffffff !important;
-    /* Explicitly force icon to white */
+.filter-segment:last-child {
+    border-right: none;
 }
 
-[data-theme="dark"] .filter-floating-card input,
-[data-theme="dark"] .filter-floating-card select,
-[data-theme="dark"] .filter-floating-card .form-select {
-    background-color: var(--input-field-bg-dark) !important;
-    color: var(--color-white) !important;
-    border-color: var(--input-border-dark) !important;
+.filter-segment:hover {
+    background-color: var(--bg-surface-hover);
+}
+
+.filter-segment:first-child {
+    border-top-left-radius: var(--radius-lg);
+    border-bottom-left-radius: var(--radius-lg);
+}
+
+.filter-segment:last-child {
+    border-right: none;
+    border-top-right-radius: var(--radius-lg);
+    border-bottom-right-radius: var(--radius-lg);
+}
+
+/* Clear Filter Segment */
+.filter-segment-clear {
+    flex: 0 0 auto;
+    background-color: var(--color-red-light);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.filter-segment-clear:hover {
+    background-color: #fee2e2;
+    /* Light red hover, or map to a var if desired */
+}
+
+/* Date Separator */
+.filter-segment-date-separator {
+    position: absolute;
+    z-index: 10;
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-static-white);
+    border: 1px solid var(--border-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-ink-black);
+    font-size: var(--font-size-md);
+    right: calc(var(--separator-size) / -2);
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: var(--shadow-xs);
+}
+
+/* Icon Styling within Segment */
+.filter-segment-icon {
+    font-size: var(--font-size-lg);
+    color: var(--color-ink-black);
+    margin-right: var(--spacing-md);
+    opacity: var(--opacity-icon);
+}
+
+/* Input/Select Styling within Segment */
+.filter-segment input {
+    border: none;
+    background: transparent;
+    width: 100%;
     font-weight: 500;
+    color: var(--color-ink-black);
+    padding: 0;
+    margin: 0;
+    outline: none;
+    box-shadow: none;
+    cursor: pointer;
+    font-size: var(--font-size-input);
 }
 
-/* Remove redundant native calendar icon in dark mode (since we have one on the left) */
-[data-theme="dark"] .filter-floating-card input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
+.filter-segment select {
+    border: none;
+    background-color: transparent;
+    width: 100%;
+    font-weight: 500;
+    color: var(--color-ink-black);
+    padding: 0;
+    margin: 0;
+    outline: none;
+    box-shadow: none;
+    cursor: pointer;
+    font-size: var(--font-size-input);
+}
+
+/* Extra padding for segment following the separator */
+.filter-segment-padded-left {
+    padding-left: calc(var(--spacing-lg) + var(--spacing-md));
+}
+
+/* Dropdown Option Styling */
+.filter-segment select option {
+    background-color: var(--color-static-white);
+    color: var(--color-ink-black);
+    padding: var(--spacing-md);
+}
+
+.filter-segment input:focus,
+.filter-segment select:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .filter-bar-unified {
+    background-color: var(--bg-surface);
+    border-color: var(--border-medium);
+}
+
+[data-theme="dark"] .filter-segment {
+    border-right-color: var(--border-medium);
+}
+
+[data-theme="dark"] .filter-segment:hover {
+    background-color: var(--bg-surface-active);
+}
+
+[data-theme="dark"] .filter-segment-date-separator {
+    background-color: var(--bg-surface);
+    border-color: var(--border-medium);
+    color: var(--color-static-white);
+}
+
+[data-theme="dark"] .filter-segment-icon {
+    color: var(--color-static-white);
+    opacity: var(--opacity-icon-dark);
+}
+
+[data-theme="dark"] .filter-segment input,
+[data-theme="dark"] .filter-segment select {
+    border-color: transparent;
+}
+
+/* Dark Mode Dropdown Options */
+[data-theme="dark"] .filter-segment select option {
+    background-color: var(--bg-surface);
+    color: var(--text-main);
+    padding: var(--spacing-md);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background: transparent;
     opacity: 0;
-}
-
-[data-theme="dark"] .filter-floating-card input::placeholder {
-    color: var(--input-placeholder-dark) !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
 }
 
 .filter-floating-card.hero-overlay {
-    margin-top: -60px;
+    margin-top: var(--hero-offset-lg);
     box-shadow: var(--shadow-strong);
 }
 
 @media (max-width: 991px) {
     .filter-floating-card.hero-overlay {
-        margin-top: -30px;
+        margin-top: var(--hero-offset-sm);
+    }
+
+    .filter-bar-unified {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .filter-segment {
+        border-right: none;
+        border-bottom: 1px solid var(--border-light);
+        width: 100%;
+    }
+
+    .filter-segment-date-separator {
+        transform: translate(-50%, -50%) rotate(90deg);
+        top: auto;
+        bottom: -16px;
+        left: 50%;
+        right: auto;
+    }
+
+    .filter-segment:last-child {
+        border-bottom: none;
     }
 }
