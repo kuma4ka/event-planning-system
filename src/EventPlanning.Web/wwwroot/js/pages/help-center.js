@@ -7,7 +7,7 @@ export function initHelpCenter() {
     const searchInput = document.getElementById('helpSearchInput');
     const topicCards = document.querySelectorAll('.support-topic-card'); // Parent is col-md-4
     const faqItems = document.querySelectorAll('.accordion-item');
-    const noResultsMsg = document.getElementById('noResultsMsg');
+
 
     if (!searchInput) return;
 
@@ -48,15 +48,16 @@ export function initHelpCenter() {
         });
 
         // 4. Show No Results Message
+        const existingMsg = document.getElementById('noResultsMsg');
+
         if (!hasVisibleContent) {
-            if (!noResultsMsg) {
+            if (!existingMsg) {
                 createNoResultsMessage();
             } else {
-                document.getElementById('noResultsMsg').style.display = 'block';
+                existingMsg.style.display = 'block';
             }
         } else {
-            const msg = document.getElementById('noResultsMsg');
-            if (msg) msg.style.display = 'none';
+            if (existingMsg) existingMsg.style.display = 'none';
         }
     });
 
