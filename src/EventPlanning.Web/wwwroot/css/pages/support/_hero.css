@@ -1,0 +1,27 @@
+/* --- Support Pages Layout (Hero) --- */
+.support-hero {
+    background: linear-gradient(135deg, var(--bg-surface), var(--bg-body));
+    padding: 5rem 0 4rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.support-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+    letter-spacing: -1px;
+}
+
+.support-hero p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .support-hero {
+    background: linear-gradient(135deg, var(--bg-surface-active), var(--bg-surface));
+}

@@ -1,0 +1,50 @@
+/* --- Guidelines Layout --- */
+.guidelines-nav {
+    position: sticky;
+    top: 100px;
+}
+
+.guidelines-nav .nav-link {
+    color: var(--text-muted);
+    padding: 0.5rem 1rem;
+    border-left: 2px solid transparent;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.guidelines-nav .nav-link:hover,
+.guidelines-nav .nav-link.active {
+    color: var(--color-dark-teal);
+    border-left-color: var(--color-dark-teal);
+    background: var(--bg-surface-hover);
+}
+
+.guidelines-content h2:not(.accordion-header) {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.guidelines-content h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.guidelines-content p,
+.guidelines-content li {
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .guidelines-nav .nav-link.active {
+    background: var(--bg-surface-active);
+}

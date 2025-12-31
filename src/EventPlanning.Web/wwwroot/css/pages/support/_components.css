@@ -1,0 +1,79 @@
+/* --- Contact Form --- */
+.contact-info-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+.contact-method {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.contact-method:last-child {
+    margin-bottom: 0;
+}
+
+.contact-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--bg-surface-hover);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-dark-teal);
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.contact-label {
+    font-weight: 700;
+    color: var(--text-main);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.contact-value {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+.contact-value:hover {
+    color: var(--color-dark-teal);
+}
+
+/* --- Privacy Policy --- */
+.policy-content {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    padding: 3rem;
+}
+
+/* --- Guide Cards (Account Guide) --- */
+.guide-card {
+    background: var(--bg-surface-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+}
+
+/* --- Compact Accordion for Guides --- */
+.guide-accordion .accordion-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+}
+
+.guide-accordion .accordion-item {
+    margin-bottom: 0.5rem !important;
+    border-radius: 8px !important;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .contact-info-card,
+[data-theme="dark"] .policy-content {
+    background: var(--bg-surface);
+    border-color: var(--border-medium);
+}
