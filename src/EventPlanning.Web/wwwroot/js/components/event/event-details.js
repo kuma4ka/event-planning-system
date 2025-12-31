@@ -1,4 +1,5 @@
 ﻿export function initEventDetails() {
+    if (!document.getElementById('editGuestModal') && !document.getElementById('deleteGuestModal')) return;
 
     window.openEditGuestModal = (id, firstName, lastName, email, countryCode, phone) => {
         const modalElement = document.getElementById('editGuestModal');

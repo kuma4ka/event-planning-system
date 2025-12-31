@@ -14,35 +14,7 @@ public class GuestController(
     IGuestService guestService,
     UserManager<User> userManager) : Controller
 {
-    [HttpGet("create/{eventId:guid}")]
-    public IActionResult Create(Guid eventId)
-    {
-        return View(new CreateGuestDto(eventId));
-    }
 
-    [HttpPost("create")]
-    public async Task<IActionResult> Create(CreateGuestDto model, CancellationToken cancellationToken)
-    {
-        if (!ModelState.IsValid) return View(model);
-
-        var userId = userManager.GetUserId(User);
-
-        try
-        {
-            await guestService.AddGuestAsync(userId!, model, cancellationToken);
-            return RedirectToAction("Details", "Event", new { id = model.EventId });
-        }
-        catch (ValidationException ex)
-        {
-            foreach (var error in ex.Errors)
-                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            return View(model);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Forbid();
-        }
-    }
 
     [HttpPost("add-manually")]
     public async Task<IActionResult> AddManually(AddGuestManuallyDto model, CancellationToken cancellationToken)

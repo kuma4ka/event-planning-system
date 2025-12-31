@@ -16,6 +16,7 @@ public class EventService(
     IValidator<CreateEventDto> createValidator,
     IValidator<UpdateEventDto> updateValidator,
     IValidator<EventSearchDto> searchValidator,
+    IUserRepository userRepository,
     IHttpContextAccessor httpContextAccessor,
     IMemoryCache cache) : IEventService
 {
@@ -138,6 +139,8 @@ public class EventService(
             );
         }).ToList();
 
+        var isJoined = !string.IsNullOrEmpty(userId) && await eventRepository.IsUserJoinedAsync(eventEntity.Id, userId, cancellationToken);
+
         var eventDetails = new EventDetailsDto(
             eventEntity.Venue?.Capacity ?? 0,
             eventEntity.IsPrivate,
@@ -155,8 +158,17 @@ public class EventService(
         )
         {
             IsOrganizer = isOrganizer,
-            IsJoined = false
+            IsJoined = isJoined
         };
+        var organizer = await userRepository.GetByIdAsync(eventEntity.OrganizerId, cancellationToken);
+        if (organizer != null)
+        {
+            eventDetails = eventDetails with
+            {
+                OrganizerName = $"{organizer.FirstName} {organizer.LastName}",
+                OrganizerEmail = organizer.Email ?? ""
+            };
+        }
 
 
 
