@@ -37,7 +37,7 @@
             transparent 100%);
 
     z-index: 2;
-    color: var(--color-white);
+    color: var(--color-static-white);
 }
 
 /* Typography in Hero */
@@ -47,7 +47,7 @@
     font-size: 3rem;
     margin-bottom: 0.5rem;
     line-height: 1.1;
-    color: var(--color-white);
+    color: var(--color-static-white);
     text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9);
 }
 
@@ -58,13 +58,12 @@
     align-items: center;
     gap: 1.5rem;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.95);
+    color: var(--color-static-white);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
 }
 
-/* Гарантуємо, що іконки теж білі */
 .event-hero-overlay .event-hero-meta i {
-    color: var(--color-white);
+    color: var(--color-static-white);
 }
 
 /* Content Area */
@@ -197,4 +196,61 @@
 
 .event-map-container:hover .event-map-frame {
     filter: saturate(100%);
+}
+
+/* --- POLISH & DARK MODE ADDITIONS --- */
+
+/* Custom Icon Box (Map/Location) */
+.icon-box-rounded {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-surface-hover);
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+/* Availability Text */
+.text-availability {
+    color: var(--color-ink-black);
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .icon-box-rounded {
+    background-color: transparent;
+    border: 1px solid var(--border-light);
+}
+
+[data-theme="dark"] .text-availability {
+    color: var(--color-static-white);
+}
+
+[data-theme="dark"] .event-hero-overlay {
+    background: linear-gradient(to top,
+            rgba(0, 0, 0, 0.95) 0%,
+            rgba(0, 0, 0, 0.6) 50%,
+            transparent 100%);
+}
+
+[data-theme="dark"] .event-title,
+[data-theme="dark"] .event-hero-meta,
+[data-theme="dark"] .event-hero-meta i {
+    color: var(--color-static-white);
+}
+
+[data-theme="dark"] .organizer-avatar {
+    color: var(--color-static-white);
+    background-color: var(--bg-surface-active);
+}
+
+[data-theme="dark"] .guest-avatar {
+    background-color: var(--bg-surface-active);
+    color: var(--color-static-white);
+}
+
+[data-theme="dark"] .progress-thin {
+    background-color: var(--bg-surface-active);
 }

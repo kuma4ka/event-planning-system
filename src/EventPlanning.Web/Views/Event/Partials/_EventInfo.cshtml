@@ -1,4 +1,3 @@
-@using EventPlanning.Application.DTOs.Event
 @model EventDetailsDto
 
 <div class="mb-5">
@@ -9,7 +8,7 @@
 <div class="mb-5">
     <h5 class="event-section-title">Location & Venue</h5>
     <div class="d-flex align-items-start gap-3 mt-3 mb-3">
-        <div class="bg-light rounded-circle p-3 text-danger">
+        <div class="icon-box-rounded rounded-circle text-danger">
             <i class="bi bi-geo-alt-fill fs-4"></i>
         </div>
         <div>
@@ -35,8 +34,8 @@
         var mapUrl = $"https://www.google.com/maps/embed/v1/place?key={apiKey}&q={encodedQuery}";
 
         <div class="ratio ratio-21x9 event-map-container">
-            <iframe class="event-map-frame" loading="lazy" allowfullscreen
-                referrerpolicy="no-referrer-when-downgrade" src="@mapUrl">
+            <iframe class="event-map-frame" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
+                src="@mapUrl">
             </iframe>
         </div>
     }
