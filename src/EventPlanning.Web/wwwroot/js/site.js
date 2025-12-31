@@ -5,6 +5,7 @@ import { initEventActions } from "./components/event/event-actions.js";
 import { initViewToggle } from "./components/ui/view-toggle.js";
 import { initThemeToggle } from "./components/ui/theme-toggle.js";
 import { initHelpCenter } from "./pages/help-center.js";
+import { NewsletterSubscription } from './components/newsletter.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initThemeToggle();
@@ -16,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initEventActions();
     initViewToggle();
     initHelpCenter();
+    new NewsletterSubscription();
 
     console.log('Stanza JS loaded modules successfully.');
 });

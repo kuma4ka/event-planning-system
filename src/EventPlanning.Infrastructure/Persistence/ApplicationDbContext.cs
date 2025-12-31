@@ -10,6 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<Event> Events => Set<Event>();
     public DbSet<Venue> Venues => Set<Venue>();
+    public DbSet<NewsletterSubscriber> NewsletterSubscribers => Set<NewsletterSubscriber>();
     public DbSet<Guest> Guests => Set<Guest>();
 
     protected override void OnModelCreating(ModelBuilder builder)
