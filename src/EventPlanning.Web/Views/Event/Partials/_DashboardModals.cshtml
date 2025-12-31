@@ -1,5 +1,5 @@
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true"
-    data-url-template="@Url.Content("~/events/delete/0")">
+    data-url-template="@Url.Action("Delete", "Event", new { id = "0" })">
 
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 overflow-hidden rounded-4" style="background-color: var(--bg-surface);">
@@ -55,12 +55,13 @@
 
                 <div class="position-relative mb-4">
                     <label class="form-label small text-muted fw-bold">Event Link</label>
-                    <div class="input-group">
-                        <span class="input-group-text border-end-0 bg-light" style="border-color: var(--border-light);">
+                    <div class="input-group rounded-3 overflow-hidden"
+                        style="border: 1px solid var(--border-light); background-color: var(--bg-body);">
+                        <span class="input-group-text border-0 bg-transparent text-muted">
                             <i class="bi bi-link-45deg"></i>
                         </span>
-                        <input type="text" id="shareInput" class="form-control border-start-0 border-end-0 bg-light"
-                            readonly style="border-color: var(--border-light); color: var(--text-main);">
+                        <input type="text" id="shareInput" class="form-control border-0 bg-transparent shadow-none"
+                            readonly style="color: var(--text-main); font-family: var(--font-body);">
                         <button class="btn btn-primary px-3 fw-bold" type="button" id="btnCopyShare">
                             Copy
                         </button>
@@ -72,7 +73,7 @@
                 </div>
 
                 <div class="d-grid">
-                    <button type="button" class="btn btn-light py-2 text-muted fw-bold border" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-outline-secondary py-2 fw-bold" data-bs-dismiss="modal">
                         Close
                     </button>
                 </div>
