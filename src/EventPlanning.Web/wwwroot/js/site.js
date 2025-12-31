@@ -3,8 +3,11 @@ import { initVenueManagement } from './components/admin/venues.js';
 import { initEventDetails } from './components/event/event-details.js';
 import { initEventActions } from "./components/event/event-actions.js";
 import { initViewToggle } from "./components/ui/view-toggle.js";
+import { initThemeToggle } from "./components/ui/theme-toggle.js";
 
 document.addEventListener('DOMContentLoaded', () => {
+    initThemeToggle();
+
 
     initDashboard();
     initVenueManagement();

@@ -1,6 +1,6 @@
 ﻿/* --- FOOTER --- */
 .footer-stanza {
-    background-color: var(--color-ink-black);
+    background-color: var(--bg-footer);
     color: rgba(255, 255, 255, 0.7);
     padding-top: 5rem;
     padding-bottom: 2rem;

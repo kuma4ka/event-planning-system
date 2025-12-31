@@ -23,6 +23,10 @@
     --bg-surface: var(--color-white);
     --bg-surface-glass: rgba(255, 255, 255, 0.95);
 
+    /* New: Explicit footer background for theme stability */
+    --bg-footer: var(--color-ink-black);
+
+
     --text-main: var(--color-ink-black);
     --text-muted: var(--color-air-force-blue);
     --text-on-image: var(--color-white);
@@ -50,4 +54,39 @@
 }
 
 /* --- DARK THEME --- */
-/* [data-theme="dark"] will be populated later */
+[data-theme="dark"] {
+    /* --- OCEAN DEPTHS PALETTE --- */
+    --color-ink-black: #e6f1f5;
+    /* Inverted for text */
+    --color-dark-teal: #4ea8de;
+    /* Brighter accent */
+    --color-air-force-blue: #a8dadc;
+    --color-cool-mist: #0b1d26;
+    /* Dark bg */
+    --color-white: #162a35;
+    /* Surface bg */
+    --color-accent-cyan: #3dccc7;
+
+    /* Semantic Theme Overrides */
+    --bg-body: #0b1d26;
+    --bg-surface: #162a35;
+    --bg-surface-glass: rgba(22, 42, 53, 0.95);
+    --bg-footer: #08161c;
+    /* Even darker than body for footer */
+
+    --text-main: #e6f1f5;
+    --text-muted: #8899a6;
+    --text-on-image: #ffffff;
+
+    --border-light: #2c3e50;
+
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+    --bs-body-bg: var(--bg-body);
+    --bs-body-color: var(--text-main);
+
+    /* Bootstrap overrides for dark mode specific */
+    --bs-light: #162a35;
+    --bs-dark: #f8f9fa;
+}
