@@ -1,0 +1,129 @@
+@{
+    ViewData["Title"] = "Events & Ticketing Guide";
+}
+
+<div class="support-hero">
+    <div class="container animate-fade-in">
+        <h1>Events & Ticketing</h1>
+        <p>Learn how to create, manage, and ticket your events.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-5">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3">
+            <div class="guidelines-nav sticky-top" style="top: 100px;">
+                <nav id="events-scrollspy" class="h-100 flex-column align-items-stretch">
+                    <nav class="nav nav-pills flex-column">
+                        <a class="nav-link" href="#organizing-events">Organizing Events</a>
+                        <nav class="nav nav-pills flex-column">
+                            <a class="nav-link ms-3 my-1" href="#create-event">Create an Event</a>
+                            <a class="nav-link ms-3 my-1" href="#manage-attendees">Manage Attendees</a>
+                        </nav>
+                        <a class="nav-link" href="#ticketing">Ticketing</a>
+                    </nav>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="col-lg-9">
+            <div class="guidelines-content animate-fade-up" data-bs-spy="scroll" data-bs-target="#events-scrollspy"
+                data-bs-smooth-scroll="true" tabindex="0">
+
+                <!-- Organizing Events -->
+                <section id="organizing-events" class="mb-5">
+                    <h2 class="fw-bold mb-4">Organizing Events</h2>
+                    <p class="text-muted">
+                        Stanza makes it easy to bring people together. Whether it's a small meetup or a large
+                        conference,
+                        we have the tools you need.
+                    </p>
+
+                    <div id="create-event" class="mt-5">
+                        <h4 class="fw-bold mb-3">Create an Event</h4>
+                        <p class="text-muted">
+                            To start hosting, click the <strong>Create Event</strong> button in the navigation bar.
+                            You'll be guided through a simple 3-step process:
+                        </p>
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-4">
+                                <div class="guide-card h-100 p-3 text-center">
+                                    <div class="fs-4 text-primary mb-2"><i class="bi bi-info-circle"></i></div>
+                                    <h6 class="fw-bold">1. Basic Info</h6>
+                                    <p class="small text-muted mb-0">Title, description, and category.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="guide-card h-100 p-3 text-center">
+                                    <div class="fs-4 text-primary mb-2"><i class="bi bi-geo-alt"></i></div>
+                                    <h6 class="fw-bold">2. Location</h6>
+                                    <p class="small text-muted mb-0">Venue address or online link.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="guide-card h-100 p-3 text-center">
+                                    <div class="fs-4 text-primary mb-2"><i class="bi bi-calendar-check"></i></div>
+                                    <h6 class="fw-bold">3. Date & Time</h6>
+                                    <p class="small text-muted mb-0">Start and end schedule.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="manage-attendees" class="mt-5">
+                        <h4 class="fw-bold mb-3">Manage Attendees</h4>
+                        <p class="text-muted">
+                            Once your event is live, you can track RSVPs directly from your <strong>My Events</strong>
+                            dashboard.
+                        </p>
+                        <div class="accordion guide-accordion mt-3" id="attendeeAccordion">
+                            <div class="accordion-item border shadow-sm overflow-hidden">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed fw-bold" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#att1">
+                                        How do I see who is coming?
+                                    </button>
+                                </h2>
+                                <div id="att1" class="accordion-collapse collapse" data-bs-parent="#attendeeAccordion">
+                                    <div class="accordion-body text-muted small">
+                                        Go to "My Events", select your event, and view the "Attendees" list on the
+                                        sidebar.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <hr class="my-5" style="border-color: var(--border-light);">
+
+                <!-- Ticketing -->
+                <section id="ticketing" class="mb-5">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h2 class="fw-bold mb-0">Ticketing & Payments</h2>
+                        <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Coming Soon</span>
+                    </div>
+
+                    <div class="guide-card p-4 text-center">
+                        <div class="display-1 text-muted mb-3 opacity-25"><i class="bi bi-ticket-perforated"></i></div>
+                        <h4 class="fw-bold">Ticketing System is under construction</h4>
+                        <p class="text-muted max-w-md mx-auto">
+                            We are currently working hard to bring you a robust ticketing system.
+                            Soon you will be able to sell tickets, manage refunds, and track sales directly within
+                            Stanza.
+                        </p>
+                    </div>
+                </section>
+
+                <div class="mt-5 p-4 rounded-3 text-center" style="background-color: var(--bg-surface-secondary);">
+                    <h4 class="fw-bold">Have a feature request?</h4>
+                    <p class="text-muted mb-3">Let us know what you'd like to see in the ticketing system.</p>
+                    <a asp-controller="Support" asp-action="Contact" class="btn btn-primary px-4 fw-bold">Contact Us</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
