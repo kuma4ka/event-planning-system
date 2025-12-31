@@ -133,7 +133,7 @@ public class EventController(
         }
     }
 
-    [HttpPost("delete/{id:guid}")]
+    [HttpPost("delete/{id}")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
