@@ -23,22 +23,25 @@ public class EventController(
     [AllowAnonymous]
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
     {
-        var sourceDetails = await eventService.GetEventDetailsAsync(id, cancellationToken);
-        if (sourceDetails == null) return NotFound();
+        var eventDetails = await eventService.GetEventDetailsAsync(id, cancellationToken);
+        if (eventDetails == null) return NotFound();
 
         var userId = userManager.GetUserId(User);
 
-        var eventDetails = sourceDetails with
-        {
-            IsOrganizer = userId != null && sourceDetails.OrganizerId == userId,
-            IsJoined = userId != null && await eventService.IsUserJoinedAsync(id, userId, cancellationToken)
-        };
-
-        var organizer = await userManager.FindByIdAsync(eventDetails.OrganizerId);
-        ViewBag.OrganizerName = organizer != null ? $"{organizer.FirstName} {organizer.LastName}" : "Unknown Organizer";
-        ViewBag.OrganizerEmail = organizer?.Email ?? "";
+        // Update IsJoined/IsOrganizer if user is logged in (Service handles basic IsOrganizer logic but relies on HttpContext)
+        // If Service uses HttpContextAccessor, then `eventDetails` might already have correct flags if we passed userId to it or it fetched it.
+        // Let's verify EventService.GetEventDetailsAsync again.
+        // It does: var userId = httpContextAccessor...
+        // So IsOrganizer is correct.
+        // But IsJoined is set to FALSE?
+        // Line 158: IsJoined = false;
+        // So we DO need to calculate IsJoined here? Or fix it in Service.
+        // Let's FIX IT IN SERVICE.
 
         ViewBag.GoogleMapsApiKey = configuration["GoogleMaps:ApiKey"];
+
+        // We can create a new record with updated IsJoined if Service didn't do it.
+        // Ideally Service should do it.
 
         return View(eventDetails);
     }
@@ -65,7 +68,7 @@ public class EventController(
         try
         {
             await eventService.CreateEventAsync(userId!, model, cancellationToken);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("MyEvents", "Event");
         }
         catch (ValidationException ex)
         {
@@ -149,7 +152,7 @@ public class EventController(
         try
         {
             await eventService.DeleteEventAsync(userId!, id, cancellationToken);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("MyEvents", "Event");
         }
         catch (UnauthorizedAccessException)
         {

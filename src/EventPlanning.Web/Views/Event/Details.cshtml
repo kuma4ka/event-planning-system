@@ -285,43 +285,8 @@
                 <form asp-controller="Guest" asp-action="AddManually" method="post">
                     <div class="modal-body">
                         <input type="hidden" name="EventId" value="@Model.Id" />
-                        <div class="row g-3 mb-3">
-                            <div class="col-6">
-                                <label for="addFirstName" class="form-label small text-muted fw-bold">First Name</label>
-                                <input id="addFirstName" name="FirstName" class="form-control" required placeholder="John"
-                                    autocomplete="given-name" />
-                            </div>
-                            <div class="col-6">
-                                <label for="addLastName" class="form-label small text-muted fw-bold">Last Name</label>
-                                <input id="addLastName" name="LastName" class="form-control" required placeholder="Doe"
-                                    autocomplete="family-name" />
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="addEmail" class="form-label small text-muted fw-bold">Email</label>
-                            <input id="addEmail" name="Email" type="email" class="form-control" required
-                                placeholder="guest@example.com" autocomplete="email" />
-                        </div>
-                        <div class="row g-3 mb-3">
-                            <div class="col-4">
-                                <label for="addCountryCode" class="form-label small text-muted fw-bold">Code</label>
-                                <select id="addCountryCode" name="CountryCode" class="form-select"
-                                    autocomplete="tel-country-code">
-                                    @foreach (var country in
-                                   EventPlanning.Application.Constants.CountryConstants.SupportedCountries)
-                                    {
-                                        <option value="@country.Code"
-                                            selected="@(country.Code == EventPlanning.Application.Constants.CountryConstants.DefaultCode)">
-                                            @country.DisplayValue</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-8">
-                                <label for="addPhone" class="form-label small text-muted fw-bold">Phone</label>
-                                <input id="addPhone" name="PhoneNumber" class="form-control" placeholder="991234567"
-                                    pattern="\d{7,15}" autocomplete="tel-local" />
-                            </div>
-                        </div>
+                        <partial name="_GuestFormFields" model="null"
+                            view-data='new ViewDataDictionary(ViewData) { { "Prefix", "add" } }' />
                     </div>
                     <div class="modal-footer border-0 pt-0">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
@@ -344,42 +309,8 @@
                         <input type="hidden" name="EventId" value="@Model.Id" />
                         <input type="hidden" name="Id" id="editGuestId" />
 
-                        <div class="row g-3 mb-3">
-                            <div class="col-6">
-                                <label for="editGuestFirstName" class="form-label small text-muted fw-bold">First
-                                    Name</label>
-                                <input name="FirstName" id="editGuestFirstName" class="form-control" required
-                                    autocomplete="given-name" />
-                            </div>
-                            <div class="col-6">
-                                <label for="editGuestLastName" class="form-label small text-muted fw-bold">Last Name</label>
-                                <input name="LastName" id="editGuestLastName" class="form-control" required
-                                    autocomplete="family-name" />
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editGuestEmail" class="form-label small text-muted fw-bold">Email</label>
-                            <input name="Email" id="editGuestEmail" type="email" class="form-control" required
-                                autocomplete="email" />
-                        </div>
-                        <div class="row g-3 mb-3">
-                            <div class="col-4">
-                                <label for="editGuestCountryCode" class="form-label small text-muted fw-bold">Code</label>
-                                <select name="CountryCode" id="editGuestCountryCode" class="form-select"
-                                    autocomplete="tel-country-code">
-                                    @foreach (var country in
-                                   EventPlanning.Application.Constants.CountryConstants.SupportedCountries)
-                                    {
-                                        <option value="@country.Code">@country.DisplayValue</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-8">
-                                <label for="editGuestPhone" class="form-label small text-muted fw-bold">Phone</label>
-                                <input name="PhoneNumber" id="editGuestPhone" class="form-control" pattern="\d{7,15}"
-                                    autocomplete="tel-local" />
-                            </div>
-                        </div>
+                        <partial name="_GuestFormFields" model="null"
+                            view-data='new ViewDataDictionary(ViewData) { { "Prefix", "editGuest" } }' />
                     </div>
                     <div class="modal-footer border-0 pt-0">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>

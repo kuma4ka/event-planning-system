@@ -16,6 +16,7 @@ public class EventServiceTests
 {
     private readonly Mock<IEventRepository> _eventRepoMock;
     private readonly Mock<IValidator<CreateEventDto>> _createValidatorMock;
+    private readonly Mock<IUserRepository> _userRepoMock;
     private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock;
 
     private readonly EventService _service;
@@ -24,6 +25,7 @@ public class EventServiceTests
     {
         _eventRepoMock = new Mock<IEventRepository>();
         _createValidatorMock = new Mock<IValidator<CreateEventDto>>();
+        _userRepoMock = new Mock<IUserRepository>();
         Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
         Mock<IValidator<EventSearchDto>> searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
         _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
@@ -34,6 +36,7 @@ public class EventServiceTests
             _createValidatorMock.Object,
             updateValidatorMock.Object,
             searchValidatorMock.Object,
+            _userRepoMock.Object,
             _httpContextAccessorMock.Object,
             cache
         );
@@ -210,6 +213,42 @@ public class EventServiceTests
         guestDto.Email.Should().Be("guest@test.com");
         guestDto.PhoneNumber.Should().Be("234567890"); // Parsed local number
         guestDto.CountryCode.Should().Be("+1"); // Parsed Code
+    }
+
+    [Fact]
+    public async Task GetEventDetailsAsync_ShouldPopulateOrganizerInfo_WhenUserFound()
+    {
+        // Arrange
+        var eventId = Guid.NewGuid();
+        var organizerId = "user-1";
+        var user = new User("John", "Doe", UserRole.User, "john@example.com", "john@example.com", "+123456789", "+1");
+        // Reflection to set Id is tricky for IdentityUser inheritance but User entity has public constructor. 
+        // User entity inherits from IdentityUser, so Id is string and settable? No, IdentityUser Id is string and has setter.
+        user.Id = organizerId;
+
+        var eventEntity = new Event(
+            "Test Event",
+            "Desc",
+            DateTime.UtcNow.AddDays(1),
+            EventType.Conference,
+            organizerId);
+        typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
+
+        _eventRepoMock
+            .Setup(r => r.GetDetailsByIdAsync(eventId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(eventEntity);
+
+        _userRepoMock
+            .Setup(r => r.GetByIdAsync(organizerId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        // Act
+        var result = await _service.GetEventDetailsAsync(eventId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.OrganizerName.Should().Be("John Doe");
+        result.OrganizerEmail.Should().Be("john@example.com");
     }
 
     private void SetupHttpContextUser(string userId)
