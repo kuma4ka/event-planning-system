@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Confirm email";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="st-card text-center py-5">
+                <div class="mb-4 text-success">
+                    <i class="bi bi-patch-check-fill" style="font-size: 4rem;"></i>
+                </div>
+                <h2 class="fw-bold mb-3">Email Confirmed!</h2>
+                <p class="text-muted mb-4 lead">
+                    Thank you for confirming your email. Your account is now active.
+                </p>
+                <div class="d-grid gap-2 col-8 mx-auto">
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-primary fw-bold">Login Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
