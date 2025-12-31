@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initEventActions();
     initViewToggle();
     initHelpCenter();
+    new NewsletterSubscription();
 
     console.log('Stanza JS loaded modules successfully.');
 });
