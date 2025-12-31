@@ -20,7 +20,7 @@
 }
 
 .footer-heading {
-    color: #ffffff;
+    color: var(--color-white);
     font-family: var(--font-heading, serif), serif;
     font-weight: 700;
     margin-bottom: 1.5rem;
@@ -65,7 +65,7 @@
 .footer-stanza .footer-subscribe-input {
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--color-white);
+    color: var(--color-static-white);
     padding: 0.75rem 1rem;
     border-radius: 8px;
 }
@@ -73,13 +73,14 @@
 .footer-stanza .footer-subscribe-input:focus {
     background-color: rgba(255, 255, 255, 0.1);
     border-color: var(--color-air-force-blue);
-    color: var(--color-white);
+    color: var(--color-static-white);
     box-shadow: none;
     outline: none;
 }
 
 .footer-stanza .footer-subscribe-input::placeholder {
     color: rgba(255, 255, 255, 0.5);
+    opacity: 1;
 }
 
 .footer-bottom {
