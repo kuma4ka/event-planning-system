@@ -2,8 +2,8 @@
 @model EventDto
 
 <div class="col-md-6 col-lg-4 col-xl-4 d-flex">
-    <div class="card h-100 w-100 shadow-sm hover-effect transition-transform border-0 bg-white">
-        <div class="position-relative" style="overflow: hidden; background-color: #f0f2f5;">
+    <div class="card h-100 w-100 shadow-sm hover-effect transition-transform border-0">
+        <div class="position-relative" style="overflow: hidden;">
             @if (!string.IsNullOrEmpty(Model.VenueImageUrl))
             {
                 <img src="@Model.VenueImageUrl" class="card-img-top" style="height: 220px; object-fit: cover;"
@@ -30,7 +30,7 @@
 
             <h5 class="card-title fw-bold mb-2 fs-5">
                 <a asp-controller="Event" asp-action="Details" asp-route-id="@Model.Id"
-                    class="text-decoration-none text-dark stretched-link">
+                    class="text-decoration-none stretched-link" style="color: var(--text-main);">
                     @Model.Name
                 </a>
             </h5>
@@ -41,7 +41,7 @@
             </p>
 
             <div class="d-flex align-items-center text-muted small pt-3 border-top mt-auto"
-                style="border-color: #f0f2f5 !important;">
+                style="border-color: var(--border-light) !important;">
                 <i class="bi bi-geo-alt-fill me-2 text-danger"></i>
                 <span class="text-truncate">@Model.VenueName</span>
             </div>

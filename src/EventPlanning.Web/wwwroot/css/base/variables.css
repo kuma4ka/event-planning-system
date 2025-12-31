@@ -78,7 +78,8 @@
     --bg-hero-gradient: radial-gradient(circle at top right, #1a4f63 0%, #051016 60%);
 
     --text-main: #e6f1f5;
-    --text-muted: #8899a6;
+    --text-muted: #b8c6d1;
+    /* Brightened from #8899a6 for better contrast */
     --text-on-image: #ffffff;
 
     --border-light: #2c3e50;
@@ -92,4 +93,7 @@
     /* Bootstrap overrides for dark mode specific */
     --bs-light: #162a35;
     --bs-dark: #f8f9fa;
+    --bs-body-color: var(--text-main);
+    --bs-secondary-color: var(--text-muted);
+    /* Ensure Bootstrap text-muted uses my variable */
 }
