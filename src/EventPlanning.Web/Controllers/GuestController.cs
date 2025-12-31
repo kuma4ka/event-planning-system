@@ -14,8 +14,8 @@ public class GuestController(
     IGuestService guestService,
     UserManager<User> userManager) : Controller
 {
-    [HttpGet("create/{eventId:int}")]
-    public IActionResult Create(int eventId)
+    [HttpGet("create/{eventId:guid}")]
+    public IActionResult Create(Guid eventId)
     {
         return View(new CreateGuestDto(eventId));
     }
@@ -62,9 +62,9 @@ public class GuestController(
         {
             return Forbid();
         }
-        catch (InvalidOperationException ex) 
+        catch (InvalidOperationException ex)
         {
-            TempData["ErrorMessage"] = ex.Message; 
+            TempData["ErrorMessage"] = ex.Message;
         }
         catch (Exception)
         {
@@ -107,7 +107,7 @@ public class GuestController(
     }
 
     [HttpPost("remove")]
-    public async Task<IActionResult> Remove(int eventId, string guestId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Remove(Guid eventId, Guid guestId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         try

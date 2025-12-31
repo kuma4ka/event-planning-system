@@ -49,8 +49,8 @@ public class VenueController(
         }
     }
 
-    [HttpGet("edit/{id:int}")]
-    public async Task<IActionResult> Edit(int id, CancellationToken cancellationToken)
+    [HttpGet("edit/{id:guid}")]
+    public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
         var venueDto = await venueService.GetVenueByIdAsync(id, cancellationToken);
 
@@ -69,9 +69,9 @@ public class VenueController(
         return View(updateModel);
     }
 
-    [HttpPost("edit/{id:int}")]
+    [HttpPost("edit/{id:guid}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, UpdateVenueDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(Guid id, UpdateVenueDto model, CancellationToken cancellationToken)
     {
         if (id != model.Id)
         {
@@ -97,9 +97,9 @@ public class VenueController(
         }
     }
 
-    [HttpPost("delete/{id:int}")]
+    [HttpPost("delete/{id:guid}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         await venueService.DeleteVenueAsync(id, cancellationToken);
 
