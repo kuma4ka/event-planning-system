@@ -7,5 +7,5 @@ public record CreateEventDto(
     string Description,
     DateTime Date,
     EventType Type,
-    int VenueId
+    Guid VenueId
 ) : EventBaseDto(Name, Description, Date, Type, VenueId);

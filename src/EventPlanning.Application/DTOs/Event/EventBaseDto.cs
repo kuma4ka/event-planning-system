@@ -7,5 +7,5 @@ public abstract record EventBaseDto(
     string Description,
     DateTime Date,
     EventType Type,
-    int VenueId
+    Guid VenueId
 );

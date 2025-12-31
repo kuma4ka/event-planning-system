@@ -21,7 +21,6 @@ public class CreateEventDtoValidator : AbstractValidator<CreateEventDto>
         RuleFor(x => x.Type)
             .IsInEnum().WithMessage("Invalid event type.");
 
-        RuleFor(x => x.VenueId)
-            .GreaterThanOrEqualTo(0).WithMessage("Invalid venue identifier.");
+
     }
 }

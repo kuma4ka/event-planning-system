@@ -7,14 +7,14 @@ public record EventDetailsDto(
     int VenueCapacity,
     bool IsPrivate,
     List<GuestDto> Guests,
-    int Id,
+    Guid Id,
     string Name,
     string Description,
     DateTime Date,
     EventType Type,
     string OrganizerId,
     string VenueName,
-    int? VenueId,
+    Guid? VenueId,
     string? VenueImageUrl,
     string? VenueAddress
 ) : EventDto(Id, Name, Description, Date, Type, OrganizerId, VenueName, VenueId, VenueImageUrl)

@@ -1,7 +1,7 @@
 ﻿namespace EventPlanning.Application.DTOs.Guest;
 
 public record GuestDto(
-    string Id,
+    Guid Id,
     string FirstName,
     string LastName,
     string Email,

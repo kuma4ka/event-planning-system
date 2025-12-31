@@ -8,7 +8,7 @@ public class UpdateEventDtoValidator : AbstractValidator<UpdateEventDto>
     public UpdateEventDtoValidator()
     {
         RuleFor(x => x.Id)
-            .GreaterThan(0).WithMessage("Invalid event ID.");
+            .NotEmpty().WithMessage("Invalid event ID.");
 
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")
@@ -24,7 +24,6 @@ public class UpdateEventDtoValidator : AbstractValidator<UpdateEventDto>
         RuleFor(x => x.Type)
             .IsInEnum().WithMessage("Invalid event type.");
 
-        RuleFor(x => x.VenueId)
-            .GreaterThanOrEqualTo(0).WithMessage("Invalid venue identifier.");
+
     }
 }

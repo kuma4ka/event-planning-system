@@ -7,6 +7,6 @@ public class UpdateVenueDtoValidator : VenueBaseDtoValidator<UpdateVenueDto>
 {
     public UpdateVenueDtoValidator()
     {
-        RuleFor(x => x.Id).GreaterThan(0).WithMessage("Invalid Venue ID.");
+        RuleFor(x => x.Id).NotEmpty().WithMessage("Invalid Venue ID.");
     }
 }

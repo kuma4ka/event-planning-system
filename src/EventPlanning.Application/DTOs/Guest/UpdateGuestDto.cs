@@ -1,8 +1,8 @@
 ﻿namespace EventPlanning.Application.DTOs.Guest;
 
 public record UpdateGuestDto(
-    string Id,
-    int EventId,
+    Guid Id,
+    Guid EventId,
     string FirstName,
     string LastName,
     string Email,
