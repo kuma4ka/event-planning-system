@@ -1,7 +1,3 @@
-/**
- * Newsletter Subscription Component
- * Handles the footer newsletter subscription form submission.
- */
 export class NewsletterSubscription {
     constructor() {
         this.form = document.getElementById('newsletter-form');
@@ -23,7 +19,6 @@ export class NewsletterSubscription {
         const email = this.input.value;
         if (!email) return;
 
-        // Disable button to prevent double submit
         this.setLoading(true);
 
         try {
@@ -37,14 +32,14 @@ export class NewsletterSubscription {
             const result = await response.json();
 
             if (result.success) {
-                this.showToast('Success', result.message, 'success');
+                this.showModal('newsletterSuccessModal', result.message);
                 this.form.reset();
             } else {
-                this.showToast('Error', result.message, 'error');
+                this.showModal('newsletterErrorModal', result.message);
             }
         } catch (error) {
             console.error('Newsletter error:', error);
-            this.showToast('Error', 'Something went wrong. Please try again.', 'error');
+            this.showModal('newsletterErrorModal', 'Something went wrong. Please try again.');
         } finally {
             this.setLoading(false);
         }
@@ -61,11 +56,20 @@ export class NewsletterSubscription {
         }
     }
 
-    showToast(title, message, type) {
-        if (window.showToast) {
-            window.showToast(message, type);
+    showModal(modalId, message) {
+        if (message) {
+            const messageEl = document.getElementById(
+                modalId === 'newsletterSuccessModal' ? 'newsletterSuccessMessage' : 'newsletterErrorMessage'
+            );
+            if (messageEl) messageEl.textContent = message;
+        }
+
+        const modalEl = document.getElementById(modalId);
+        if (modalEl && window.bootstrap) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
         } else {
-            alert(`${title}: ${message}`);
+            alert(message);
         }
     }
 }
