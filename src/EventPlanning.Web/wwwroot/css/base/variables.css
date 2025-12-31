@@ -45,6 +45,7 @@
     --shadow-text: 0 2px 10px rgba(0, 0, 0, 0.3);
 
     --gradient-hero-overlay: linear-gradient(to top, rgba(1, 22, 30, 0.9), transparent);
+    --bg-hero-gradient: radial-gradient(circle at top right, var(--color-dark-teal) 0%, var(--color-ink-black) 60%);
 
     /* --- BOOTSTRAP OVERRIDES --- */
     --bs-primary: var(--color-dark-teal);
@@ -73,6 +74,8 @@
     --bg-surface-glass: rgba(22, 42, 53, 0.95);
     --bg-footer: #08161c;
     /* Even darker than body for footer */
+    /* Hero should stay dark/rich in dark mode, not invert to white */
+    --bg-hero-gradient: radial-gradient(circle at top right, #1a4f63 0%, #051016 60%);
 
     --text-main: #e6f1f5;
     --text-muted: #8899a6;

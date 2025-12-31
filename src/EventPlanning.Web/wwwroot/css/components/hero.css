@@ -1,6 +1,6 @@
 ﻿/* --- HERO SECTION --- */
 .hero-stanza-container {
-    background: radial-gradient(circle at top right, var(--color-dark-teal) 0%, var(--color-ink-black) 60%);
+    background: var(--bg-hero-gradient);
     border-radius: 4px 4px 24px 24px;
     position: relative;
     overflow: hidden;
@@ -14,7 +14,7 @@
     position: relative;
     z-index: 20;
     padding: 5rem;
-    color: var(--color-white);
+    color: var(--text-on-image);
     max-width: 700px;
 }
 
