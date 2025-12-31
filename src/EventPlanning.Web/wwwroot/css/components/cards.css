@@ -6,6 +6,12 @@
     overflow: hidden;
 }
 
+[data-theme="dark"] .card {
+    background-color: #0f242e;
+    /* Slightly lighter/different than surface for depth */
+    border-color: #2c3e50;
+}
+
 .badge {
     border-radius: 6px;
     font-weight: 600;

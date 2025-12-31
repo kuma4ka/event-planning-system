@@ -20,7 +20,8 @@
 }
 
 .footer-heading {
-    color: var(--color-white);
+    color: #ffffff;
+    /* Explicit white for max contrast */
     font-family: var(--font-heading, serif), serif;
     font-weight: 700;
     margin-bottom: 1.5rem;

@@ -10,6 +10,20 @@
     backdrop-filter: blur(10px);
 }
 
+/* Dark Mode Input Fixes for Filter Bar */
+[data-theme="dark"] .filter-floating-card input,
+[data-theme="dark"] .filter-floating-card select,
+[data-theme="dark"] .filter-floating-card .input-group-text,
+[data-theme="dark"] .filter-floating-card .form-select {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--color-white) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .filter-floating-card input::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
 .filter-floating-card.hero-overlay {
     margin-top: -60px;
     box-shadow: var(--shadow-strong);
