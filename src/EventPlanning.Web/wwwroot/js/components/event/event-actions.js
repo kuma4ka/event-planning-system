@@ -33,24 +33,36 @@ function initShareModal() {
     const copyBtn = shareModalEl.querySelector('#btnCopyShare');
     const successMsg = shareModalEl.querySelector('#copySuccessMsg');
 
+    if (!shareInput || !copyBtn) {
+        console.warn('Share modal elements missing');
+        return;
+    }
+
     shareModalEl.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
+        if (!button) return;
+
         const url = button.getAttribute('data-event-url');
+        console.log('Share Modal Open:', { url, button });
 
         if (shareInput) {
-            shareInput.value = url;
+            shareInput.value = url || '';
             // Reset state
-            successMsg.classList.remove('opacity-100');
-            successMsg.classList.add('opacity-0');
+            if (successMsg) {
+                successMsg.classList.remove('opacity-100');
+                successMsg.classList.add('opacity-0');
+            }
         }
     });
 
-    if (copyBtn && shareInput) {
-        copyBtn.addEventListener('click', function () {
-            shareInput.select();
-            shareInput.setSelectionRange(0, 99999); // For mobile devices
+    copyBtn.addEventListener('click', function () {
+        if (!shareInput.value) return;
 
-            navigator.clipboard.writeText(shareInput.value).then(() => {
+        shareInput.select();
+        shareInput.setSelectionRange(0, 99999); // For mobile devices
+
+        navigator.clipboard.writeText(shareInput.value).then(() => {
+            if (successMsg) {
                 successMsg.classList.remove('opacity-0');
                 successMsg.classList.add('opacity-100');
 
@@ -58,9 +70,9 @@ function initShareModal() {
                     successMsg.classList.remove('opacity-100');
                     successMsg.classList.add('opacity-0');
                 }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-            });
+            }
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
         });
-    }
+    });
 }
