@@ -26,22 +26,7 @@ public class EventController(
         var eventDetails = await eventService.GetEventDetailsAsync(id, cancellationToken);
         if (eventDetails == null) return NotFound();
 
-        var userId = userManager.GetUserId(User);
-
-        // Update IsJoined/IsOrganizer if user is logged in (Service handles basic IsOrganizer logic but relies on HttpContext)
-        // If Service uses HttpContextAccessor, then `eventDetails` might already have correct flags if we passed userId to it or it fetched it.
-        // Let's verify EventService.GetEventDetailsAsync again.
-        // It does: var userId = httpContextAccessor...
-        // So IsOrganizer is correct.
-        // But IsJoined is set to FALSE?
-        // Line 158: IsJoined = false;
-        // So we DO need to calculate IsJoined here? Or fix it in Service.
-        // Let's FIX IT IN SERVICE.
-
         ViewBag.GoogleMapsApiKey = configuration["GoogleMaps:ApiKey"];
-
-        // We can create a new record with updated IsJoined if Service didn't do it.
-        // Ideally Service should do it.
 
         return View(eventDetails);
     }
@@ -214,29 +199,46 @@ public class EventController(
         var userId = userManager.GetUserId(User);
         var now = DateTime.Now;
 
+        // Apply view type defaults
         if (viewType == "past")
         {
             to ??= now;
-            if (string.IsNullOrEmpty(sortOrder)) sortOrder = "date_desc";
+            sortOrder = string.IsNullOrEmpty(sortOrder) ? "date_desc" : sortOrder;
         }
         else
         {
             from ??= now;
-            if (string.IsNullOrEmpty(sortOrder)) sortOrder = "date_asc";
+            sortOrder = string.IsNullOrEmpty(sortOrder) ? "date_asc" : sortOrder;
         }
-
-        var adjustedToDate = to?.Date.AddDays(1).AddTicks(-1);
 
         var searchDto = new EventSearchDto
         {
             SearchTerm = searchTerm,
             Type = type,
             FromDate = from,
-            ToDate = adjustedToDate,
+            ToDate = to?.Date.AddDays(1).AddTicks(-1),
             PageNumber = page,
             PageSize = 10
         };
 
+        SetMyEventsViewBag(searchTerm, type, from, to, sortOrder, viewType, now);
+
+        PagedResult<EventDto> result;
+        try
+        {
+            result = await eventService.GetEventsAsync(userId!, userId, searchDto, sortOrder, cancellationToken);
+        }
+        catch (ValidationException ex)
+        {
+            foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            result = new PagedResult<EventDto>([], 0, 1, 10);
+        }
+
+        return View(result);
+    }
+
+    private void SetMyEventsViewBag(string? searchTerm, EventType? type, DateTime? from, DateTime? to, string? sortOrder, string viewType, DateTime now)
+    {
         ViewBag.CurrentViewType = viewType;
         ViewBag.CurrentSearch = searchTerm;
         ViewBag.CurrentType = type;
@@ -252,20 +254,6 @@ public class EventController(
         ViewBag.CurrentSort = sortOrder;
         ViewBag.DateSortParam = sortOrder == "date_desc" ? "date_asc" : "date_desc";
         ViewBag.NameSortParam = sortOrder == "name_asc" ? "name_desc" : "name_asc";
-
-        PagedResult<EventDto> result;
-
-        try
-        {
-            result = await eventService.GetEventsAsync(userId!, userId, searchDto, sortOrder, cancellationToken);
-        }
-        catch (ValidationException ex)
-        {
-            foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            result = new PagedResult<EventDto>(new List<EventDto>(), 0, 1, 10);
-        }
-
-        return View(result);
     }
 
     private async Task LoadVenuesToViewBag(CancellationToken token)
