@@ -1,5 +1,4 @@
 ﻿using EventPlanning.Application.Constants;
-using EventPlanning.Domain.Constants;
 
 namespace EventPlanning.Application.DTOs.Guest;
 
@@ -8,6 +7,6 @@ public record CreateGuestDto(
     string FirstName = "",
     string LastName = "",
     string Email = "",
-    string CountryCode = CountryConstants.DefaultCode,
+    string CountryCode = "+380",
     string PhoneNumber = ""
 ) : GuestBaseDto(EventId, FirstName, LastName, Email, CountryCode, PhoneNumber);

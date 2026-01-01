@@ -1,5 +1,4 @@
 ﻿using EventPlanning.Application.Constants;
-using EventPlanning.Domain.Constants;
 using EventPlanning.Domain.ValueObjects;
 using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Application.Interfaces;
@@ -16,6 +15,7 @@ public class ProfileService(
     IUserRepository userRepository,
     IValidator<EditProfileDto> profileValidator,
     IValidator<ChangePasswordDto> passwordValidator,
+    ICountryService countryService,
     ILogger<ProfileService> logger) : IProfileService
 {
     public async Task<EditProfileDto> GetProfileAsync(string userId, CancellationToken cancellationToken = default)
@@ -28,7 +28,7 @@ public class ProfileService(
 
         var joinedCount = await eventRepository.CountJoinedEventsAsync(userId, cancellationToken);
 
-        var (code, number) = PhoneNumber.Parse(user.PhoneNumber);
+        var (code, number) = countryService.ParsePhoneNumber(user.PhoneNumber);
 
         return new EditProfileDto
         {

@@ -1,5 +1,5 @@
 ﻿using EventPlanning.Application.Constants;
-using EventPlanning.Domain.Constants;
+using EventPlanning.Domain.ValueObjects;
 using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
@@ -16,6 +16,7 @@ namespace EventPlanning.Web.Controllers;
 [Route("profile")]
 public class ProfileController(
     IProfileService profileService,
+    ICountryService countryService,
     UserManager<ApplicationUser> userManager,
     ILogger<ProfileController> logger) : Controller
 {
@@ -115,7 +116,7 @@ public class ProfileController(
     private void LoadSharedViewData()
     {
         ViewBag.Countries = new SelectList(
-            CountryConstants.SupportedCountries, 
+            countryService.GetSupportedCountries(), 
             nameof(CountryInfo.Code),
             nameof(CountryInfo.DisplayValue)
         );
