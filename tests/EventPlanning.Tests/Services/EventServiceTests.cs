@@ -104,44 +104,7 @@ public class EventServiceTests
         _eventRepoMock.Verify(x => x.AddAsync(It.IsAny<Event>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
-    [Fact]
-    public async Task JoinEventAsync_ShouldThrowInvalidOperation_WhenUserAlreadyJoined()
-    {
-        // Arrange
-        var eventId = Guid.NewGuid();
-        var userId = "user-123";
 
-        var eventEntity = new Event(
-            "Test Event",
-            "Description",
-            DateTime.UtcNow.AddDays(5),
-            EventType.Conference,
-            "other-organizer");
-
-        // Reflection to set Id for testing
-        typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
-
-        _eventRepoMock
-            .Setup(r => r.GetByIdAsync(eventId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(eventEntity);
-
-        _eventRepoMock
-            .Setup(r => r.GuestEmailExistsAsync(eventId, "test@test.com", null, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
-
-        _userRepoMock
-            .Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new User(userId, "Test", "User", UserRole.User, "test@test.com", "test@test.com", "+123456789", "+1"));
-
-        // Act
-        Func<Task> act = async () => await _service.JoinEventAsync(eventId, userId);
-
-        // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("You are already registered for this event.");
-
-        _eventRepoMock.Verify(x => x.AddGuestAsync(It.IsAny<Guest>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
 
     [Fact]
     public async Task GetEventDetailsAsync_ShouldMaskData_WhenUserIsNotOrganizer()

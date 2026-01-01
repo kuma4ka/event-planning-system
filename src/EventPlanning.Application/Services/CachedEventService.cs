@@ -79,22 +79,7 @@ public class CachedEventService(
         InvalidateEventCache(eventId);
     }
 
-    public async Task JoinEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
-    {
-        await innerService.JoinEventAsync(eventId, userId, cancellationToken);
-        InvalidateEventCache(eventId);
-    }
 
-    public async Task LeaveEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
-    {
-        await innerService.LeaveEventAsync(eventId, userId, cancellationToken);
-        InvalidateEventCache(eventId);
-    }
-
-    public Task<bool> IsUserJoinedAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
-    {
-        return innerService.IsUserJoinedAsync(eventId, userId, cancellationToken);
-    }
 
     private void InvalidateEventCache(Guid eventId)
     {

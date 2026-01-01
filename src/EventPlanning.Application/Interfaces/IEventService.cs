@@ -22,9 +22,5 @@ public interface IEventService
 
     Task DeleteEventAsync(string userId, Guid eventId, CancellationToken cancellationToken = default);
 
-    Task JoinEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default);
 
-    Task LeaveEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default);
-
-    Task<bool> IsUserJoinedAsync(Guid eventId, string userId, CancellationToken cancellationToken = default);
 }
