@@ -102,7 +102,15 @@ public class VenueController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        await venueService.DeleteVenueAsync(id, cancellationToken);
+        try
+        {
+            await venueService.DeleteVenueAsync(id, cancellationToken);
+            TempData["SuccessMessage"] = "Venue deleted successfully.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
 
         return RedirectToAction(nameof(Index));
     }

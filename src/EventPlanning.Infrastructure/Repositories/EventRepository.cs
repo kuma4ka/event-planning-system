@@ -194,4 +194,11 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .AsNoTracking()
             .CountAsync(g => (string)g.Email == user.Email, cancellationToken);
     }
+
+    public async Task<bool> HasEventsAtVenueAsync(Guid venueId, CancellationToken cancellationToken = default)
+    {
+        return await context.Events
+            .AsNoTracking()
+            .AnyAsync(e => e.VenueId == venueId, cancellationToken);
+    }
 }
