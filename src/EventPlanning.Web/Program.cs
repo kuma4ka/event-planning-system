@@ -1,5 +1,6 @@
 using EventPlanning.Application;
 using EventPlanning.Infrastructure;
+using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.RateLimiting;
 
 using Serilog;
@@ -78,6 +79,11 @@ try
 
     Log.Information("Application Starting Up");
     app.Run();
+}
+catch (HostAbortedException)
+{
+    // Expected behavior when running dotnet-ef commands (e.g. database drop/update)
+    // The host is built but aborted before running the app.
 }
 catch (Exception ex)
 {
