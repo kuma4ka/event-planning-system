@@ -1,4 +1,5 @@
 ﻿using EventPlanning.Application.Constants;
+using EventPlanning.Domain.Constants;
 using EventPlanning.Application.DTOs.Guest;
 using FluentValidation;
 

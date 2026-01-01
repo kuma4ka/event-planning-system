@@ -1,13 +1,11 @@
-﻿@using EventPlanning.Application.Models
+﻿@using EventPlanning.Web.Models
 @using EventPlanning.Domain.Enums
-@model PagedResult<EventDto>
+@model EventListViewModel
 
 @{
     ViewData["Title"] = "My Events";
-
-    var currentViewType = ViewBag.CurrentViewType as string ?? "upcoming";
-    var currentTypeEnum = ViewBag.CurrentType as EventType?;
-
+    var currentViewType = Model.ViewType;
+    var currentTypeEnum = Model.Type;
 }
 
 <div class="container mt-5 mb-5">
@@ -40,18 +38,13 @@
     </ul>
 
     <div class="mb-5">
-        @{
-            var fromDate = ViewBag.CurrentFrom as string != null ? DateTime.Parse(ViewBag.CurrentFrom) : (DateTime?)null;
-            var toDate = ViewBag.CurrentTo as string != null ? DateTime.Parse(ViewBag.CurrentTo) : (DateTime?)null;
-        }
-
-        <vc:event-filter controller-name="Event" action-name="MyEvents" search-term="@ViewBag.CurrentSearch"
-            type="@currentTypeEnum" from="@fromDate" to="@toDate" sort-order="@ViewBag.CurrentSort"
+        <vc:event-filter controller-name="Event" action-name="MyEvents" search-term="@Model.SearchTerm"
+            type="@currentTypeEnum" from="@Model.FromDate" to="@Model.ToDate" sort-order="@Model.SortOrder"
             view-type="@currentViewType" show-search="false">
         </vc:event-filter>
     </div>
 
-    @if (!Model.Items.Any())
+    @if (!Model.Events.Items.Any())
     {
         <div class="text-center py-5 rounded-3 border shadow-sm"
             style="background-color: var(--bg-surface); border-color: var(--border-light) !important;">
@@ -70,7 +63,7 @@
                     ? "You don't have any upcoming events planned. Ready to start?"
                     : "Your history is clean. Completed events will appear here.")
             </p>
-            @if (currentViewType == "upcoming" && ViewBag.CurrentSearch == null)
+            @if (currentViewType == "upcoming" && Model.SearchTerm == null)
             {
                 <a asp-controller="Event" asp-action="Create" class="btn btn-primary mt-3 px-4">Create Event</a>
             }
@@ -90,7 +83,7 @@
                 </h4>
                 <span class="badge border shadow-sm px-2 py-1 mt-1 fw-normal"
                     style="background-color: var(--bg-surface); color: var(--text-muted);">
-                    @Model.TotalCount items
+                    @Model.Events.TotalCount items
                 </span>
             </div>
 
@@ -105,24 +98,24 @@
         </div>
 
         <div id="itemsContainer" class="row g-4">
-            @foreach (var item in Model.Items)
+            @foreach (var item in Model.Events.Items)
             {
                 <partial name="Partials/_EventCard" model="item" />
             }
         </div>
 
         <div class="mt-5">
-            @if (Model.TotalPages > 1)
+            @if (Model.Events.TotalPages > 1)
             {
                 <nav aria-label="Page navigation">
                     <ul class="pagination justify-content-center">
-                        <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-                            @if (Model.PageNumber > 1)
+                        <li class="page-item @(Model.Events.PageNumber == 1 ? "disabled" : "")">
+                            @if (Model.Events.PageNumber > 1)
                             {
                                 <a class="page-link" asp-controller="Event" asp-action="MyEvents"
-                                    asp-route-page="@(Model.PageNumber - 1)" asp-route-viewType="@currentViewType"
-                                    asp-route-sortOrder="@ViewBag.CurrentSort" asp-route-searchTerm="@ViewBag.CurrentSearch"
-                                    asp-route-type="@ViewBag.CurrentType" aria-label="Previous">
+                                    asp-route-page="@(Model.Events.PageNumber - 1)" asp-route-viewType="@currentViewType"
+                                    asp-route-sortOrder="@Model.SortOrder" asp-route-searchTerm="@Model.SearchTerm"
+                                    asp-route-type="@Model.Type" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                     <span class="ms-1">Previous</span>
                                 </a>
@@ -136,32 +129,32 @@
                             }
                         </li>
 
-                        @for (var i = 1; i <= Model.TotalPages; i++)
+                        @for (var i = 1; i <= Model.Events.TotalPages; i++)
                         {
                             var pageIndex = i;
 
-                            <li class="page-item @(pageIndex == Model.PageNumber ? "active" : "")">
-                                @if (pageIndex == Model.PageNumber)
+                            <li class="page-item @(pageIndex == Model.Events.PageNumber ? "active" : "")">
+                                @if (pageIndex == Model.Events.PageNumber)
                                 {
                                     <span class="page-link">@pageIndex</span>
                                 }
                                 else
                                 {
                                     <a class="page-link" asp-controller="Event" asp-action="MyEvents" asp-route-page="@pageIndex"
-                                        asp-route-viewType="@currentViewType" asp-route-sortOrder="@ViewBag.CurrentSort"
-                                        asp-route-searchTerm="@ViewBag.CurrentSearch"
-                                        asp-route-type="@ViewBag.CurrentType">@pageIndex</a>
+                                        asp-route-viewType="@currentViewType" asp-route-sortOrder="@Model.SortOrder"
+                                        asp-route-searchTerm="@Model.SearchTerm"
+                                        asp-route-type="@Model.Type">@pageIndex</a>
                                 }
                             </li>
                         }
 
-                        <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
-                            @if (Model.PageNumber < Model.TotalPages)
+                        <li class="page-item @(Model.Events.PageNumber == Model.Events.TotalPages ? "disabled" : "")">
+                            @if (Model.Events.PageNumber < Model.Events.TotalPages)
                             {
                                 <a class="page-link" asp-controller="Event" asp-action="MyEvents"
-                                    asp-route-page="@(Model.PageNumber + 1)" asp-route-viewType="@currentViewType"
-                                    asp-route-sortOrder="@ViewBag.CurrentSort" asp-route-searchTerm="@ViewBag.CurrentSearch"
-                                    asp-route-type="@ViewBag.CurrentType" aria-label="Next">
+                                    asp-route-page="@(Model.Events.PageNumber + 1)" asp-route-viewType="@currentViewType"
+                                    asp-route-sortOrder="@Model.SortOrder" asp-route-searchTerm="@Model.SearchTerm"
+                                    asp-route-type="@Model.Type" aria-label="Next">
                                     <span class="me-1">Next</span>
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>

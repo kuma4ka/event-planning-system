@@ -5,6 +5,7 @@ using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
+using EventPlanning.Domain.ValueObjects;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 
@@ -16,11 +17,8 @@ public class EventService(
     IValidator<UpdateEventDto> updateValidator,
     IValidator<EventSearchDto> searchValidator,
     IUserRepository userRepository,
-    ICacheService cache,
     ILogger<EventService> logger) : IEventService
 {
-    private const string EventCacheKeyPrefix = "event_details_";
-
     public async Task<PagedResult<EventDto>> GetEventsAsync(
         string userId,
         string? organizerIdFilter,
@@ -31,13 +29,11 @@ public class EventService(
         var validationResult = await searchValidator.ValidateAsync(searchDto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-        var fromDate = searchDto.FromDate;
-
         var pagedEvents = await eventRepository.GetFilteredAsync(
             organizerIdFilter,
             userId,
             searchDto.SearchTerm,
-            fromDate,
+            searchDto.FromDate,
             searchDto.ToDate,
             searchDto.Type,
             sortOrder,
@@ -83,27 +79,6 @@ public class EventService(
 
     public async Task<EventDetailsDto?> GetEventDetailsAsync(Guid id, string? userId, CancellationToken cancellationToken = default)
     {
-
-
-        var publicCacheKey = $"{EventCacheKeyPrefix}{id}_public";
-        var organizerCacheKey = $"{EventCacheKeyPrefix}{id}_organizer";
-
-        if (cache.Get<EventDetailsDto>(publicCacheKey) is { } publicCachedEvent)
-        {
-            if (publicCachedEvent.OrganizerId != userId)
-            {
-                return publicCachedEvent;
-            }
-        }
-
-        if (cache.Get<EventDetailsDto>(organizerCacheKey) is { } organizerCachedEvent)
-        {
-            if (organizerCachedEvent.OrganizerId == userId)
-            {
-                return organizerCachedEvent;
-            }
-        }
-
         var eventEntity = await eventRepository.GetDetailsByIdAsync(id, cancellationToken);
         if (eventEntity == null) return null;
 
@@ -123,9 +98,7 @@ public class EventService(
                 );
             }
 
-            var localNumber = g.PhoneNumber != null && !string.IsNullOrEmpty(g.CountryCode) && g.PhoneNumber.Value.StartsWith(g.CountryCode)
-                ? g.PhoneNumber.Value.Substring(g.CountryCode.Length)
-                : (g.PhoneNumber?.Value ?? "");
+            var (_, localNumber) = PhoneNumber.Parse(g.PhoneNumber?.Value);
 
             return new GuestDto(
                 g.Id,
@@ -166,20 +139,6 @@ public class EventService(
                 OrganizerName = $"{organizer.FirstName} {organizer.LastName}",
                 OrganizerEmail = organizer.Email ?? ""
             };
-        }
-
-
-
-        var slidingExpiration = TimeSpan.FromMinutes(10);
-        var absoluteExpiration = TimeSpan.FromHours(1);
-
-        if (isOrganizer)
-        {
-            cache.Set(organizerCacheKey, eventDetails, slidingExpiration, absoluteExpiration);
-        }
-        else
-        {
-            cache.Set(publicCacheKey, eventDetails, slidingExpiration, absoluteExpiration);
         }
 
         return eventDetails;
@@ -233,8 +192,6 @@ public class EventService(
         );
 
         await eventRepository.UpdateAsync(eventEntity, cancellationToken);
-
-        InvalidateEventCache(dto.Id);
     }
 
     public async Task DeleteEventAsync(string userId, Guid eventId, CancellationToken cancellationToken = default)
@@ -249,8 +206,6 @@ public class EventService(
         }
 
         await eventRepository.DeleteAsync(eventEntity, cancellationToken);
-
-        InvalidateEventCache(eventId);
     }
 
     public async Task JoinEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
@@ -293,42 +248,15 @@ public class EventService(
              logger.LogWarning("Join failed: Event {EventId} is full.", eventId);
              throw new InvalidOperationException("Sorry, this event is fully booked or unavailable.");
         }
-
-        InvalidateEventCache(eventId);
     }
 
     public async Task LeaveEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
     {
         await eventRepository.RemoveGuestAsync(eventId, userId, cancellationToken);
-
-        InvalidateEventCache(eventId);
     }
 
     public async Task<bool> IsUserJoinedAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
     {
         return await eventRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);
-    }
-
-    private void InvalidateEventCache(Guid eventId)
-    {
-        cache.Remove($"{EventCacheKeyPrefix}{eventId}_public");
-        cache.Remove($"{EventCacheKeyPrefix}{eventId}_organizer");
-    }
-
-    private static (string CountryCode, string PhoneNumber) ParsePhoneNumber(string? fullPhoneNumber)
-    {
-        if (string.IsNullOrEmpty(fullPhoneNumber)) return (CountryConstants.DefaultCode, string.Empty);
-
-        var country = CountryConstants.SupportedCountries
-            .OrderByDescending(c => c.Code.Length)
-            .FirstOrDefault(c => fullPhoneNumber.StartsWith(c.Code));
-
-        if (country != null)
-        {
-            var localNumber = fullPhoneNumber.Substring(country.Code.Length);
-            return (country.Code, localNumber);
-        }
-
-        return (CountryConstants.DefaultCode, fullPhoneNumber);
     }
 }

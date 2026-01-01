@@ -1,4 +1,6 @@
 ﻿using EventPlanning.Application.Constants;
+using EventPlanning.Domain.Constants;
+using EventPlanning.Domain.ValueObjects;
 using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Interfaces;
@@ -26,7 +28,7 @@ public class ProfileService(
 
         var joinedCount = await eventRepository.CountJoinedEventsAsync(userId, cancellationToken);
 
-        var (code, number) = ParsePhoneNumber(user.PhoneNumber);
+        var (code, number) = PhoneNumber.Parse(user.PhoneNumber);
 
         return new EditProfileDto
         {
@@ -103,21 +105,4 @@ public class ProfileService(
         }
     }
 
-    private (string Code, string Number) ParsePhoneNumber(string? fullNumber)
-    {
-        if (string.IsNullOrEmpty(fullNumber))
-            return (CountryConstants.DefaultCode, string.Empty);
-
-        var matchedCountry = CountryConstants.SupportedCountries
-            .OrderByDescending(c => c.Code.Length)
-            .FirstOrDefault(c => fullNumber.StartsWith(c.Code));
-
-        if (matchedCountry != null)
-        {
-            var numberBody = fullNumber.Substring(matchedCountry.Code.Length);
-            return (matchedCountry.Code, numberBody);
-        }
-
-        return (CountryConstants.DefaultCode, fullNumber);
-    }
 }

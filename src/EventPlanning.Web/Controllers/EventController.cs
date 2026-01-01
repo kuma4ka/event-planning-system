@@ -178,6 +178,13 @@ public class EventController(
         return RedirectToAction(nameof(Details), new { id });
     }
 
+    [HttpGet("join/{id:guid}")]
+    public IActionResult JoinPrompt(Guid id)
+    {
+        TempData["InfoMessage"] = "Please confirm your action by clicking the button again.";
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
     [HttpPost("leave/{id:guid}")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Leave(Guid id, CancellationToken cancellationToken)
@@ -200,6 +207,13 @@ public class EventController(
         return RedirectToAction(nameof(Details), new { id });
     }
 
+    [HttpGet("leave/{id:guid}")]
+    public IActionResult LeavePrompt(Guid id)
+    {
+         TempData["InfoMessage"] = "Please confirm your action by clicking the button again.";
+         return RedirectToAction(nameof(Details), new { id });
+    }
+
     [HttpGet("my-events")]
     public async Task<IActionResult> MyEvents(
         string? searchTerm,
@@ -214,34 +228,36 @@ public class EventController(
         var userId = userManager.GetUserId(User);
         var now = DateTime.Now;
 
-        // Apply view type defaults
+        // Apply defaults for Querying
+        var searchFrom = from;
+        var searchTo = to;
+        var searchSort = sortOrder;
+
         if (viewType == "past")
         {
-            to ??= now;
-            sortOrder = string.IsNullOrEmpty(sortOrder) ? "date_desc" : sortOrder;
+            searchTo ??= now;
+            searchSort = string.IsNullOrEmpty(sortOrder) ? "date_desc" : sortOrder;
         }
         else
         {
-            from ??= now;
-            sortOrder = string.IsNullOrEmpty(sortOrder) ? "date_asc" : sortOrder;
+            searchFrom ??= now;
+            searchSort = string.IsNullOrEmpty(sortOrder) ? "date_asc" : sortOrder;
         }
 
         var searchDto = new EventSearchDto
         {
             SearchTerm = searchTerm,
             Type = type,
-            FromDate = from,
-            ToDate = to?.Date.AddDays(1).AddTicks(-1),
+            FromDate = searchFrom,
+            ToDate = searchTo?.Date.AddDays(1).AddTicks(-1),
             PageNumber = page,
             PageSize = 10
         };
 
-        SetMyEventsViewBag(searchTerm, type, from, to, sortOrder, viewType, now);
-
         PagedResult<EventDto> result;
         try
         {
-            result = await eventService.GetEventsAsync(userId!, userId, searchDto, sortOrder, cancellationToken);
+            result = await eventService.GetEventsAsync(userId!, userId, searchDto, searchSort, cancellationToken);
         }
         catch (ValidationException ex)
         {
@@ -249,28 +265,20 @@ public class EventController(
             result = new PagedResult<EventDto>([], 0, 1, 10);
         }
 
-        return View(result);
+        var viewModel = new EventListViewModel
+        {
+            Events = result,
+            SearchTerm = searchTerm,
+            Type = type,
+            FromDate = from,
+            ToDate = to,
+            ViewType = viewType,
+            SortOrder = searchSort
+        };
+
+        return View(viewModel);
     }
-
-    private void SetMyEventsViewBag(string? searchTerm, EventType? type, DateTime? from, DateTime? to, string? sortOrder, string viewType, DateTime now)
-    {
-        ViewBag.CurrentViewType = viewType;
-        ViewBag.CurrentSearch = searchTerm;
-        ViewBag.CurrentType = type;
-
-        ViewBag.CurrentFrom = from.HasValue && Math.Abs((from.Value - now).TotalMinutes) < 1 && viewType == "upcoming"
-            ? null
-            : from?.ToString("yyyy-MM-dd");
-
-        ViewBag.CurrentTo = to.HasValue && Math.Abs((to.Value - now).TotalMinutes) < 1 && viewType == "past"
-            ? null
-            : to?.ToString("yyyy-MM-dd");
-
-        ViewBag.CurrentSort = sortOrder;
-        ViewBag.DateSortParam = sortOrder == "date_desc" ? "date_asc" : "date_desc";
-        ViewBag.NameSortParam = sortOrder == "name_asc" ? "name_desc" : "name_asc";
-    }
-
+    
     private async Task<List<SelectListItem>> GetVenuesList(CancellationToken token)
     {
         var venues = await venueService.GetVenuesAsync(token);
