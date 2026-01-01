@@ -9,7 +9,7 @@ public class CachedEventService(
     IEventService innerService,
     ICacheService cache) : IEventService
 {
-    private const string EventCacheKeyPrefix = "event_details_";
+    public const string EventCacheKeyPrefix = "event_details_";
 
     public Task<PagedResult<EventDto>> GetEventsAsync(string userId, string? organizerIdFilter, EventSearchDto searchDto, string? sortOrder, CancellationToken cancellationToken = default)
     {
@@ -28,7 +28,6 @@ public class CachedEventService(
 
         if (cache.Get<EventDetailsDto>(organizerCacheKey) is { } organizerCachedEvent)
         {
-            // If I am the organizer and I found my cached copy
             if (organizerCachedEvent.OrganizerId == userId)
             {
                 return organizerCachedEvent;
@@ -37,7 +36,6 @@ public class CachedEventService(
 
         if (cache.Get<EventDetailsDto>(publicCacheKey) is { } publicCachedEvent)
         {
-            // If I am NOT the organizer (or userId is null), safe to return public copy
             if (publicCachedEvent.OrganizerId != userId)
             {
                 return publicCachedEvent;

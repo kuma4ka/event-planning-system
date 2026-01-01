@@ -230,7 +230,8 @@ public class EventController(
         var userId = userManager.GetUserId(User);
         var now = DateTime.Now;
 
-        // Apply defaults for Querying
+
+
         var searchFrom = from;
         var searchTo = to;
         var searchSort = sortOrder;

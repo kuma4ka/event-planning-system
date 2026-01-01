@@ -35,4 +35,5 @@ public interface IEventRepository
     Task<bool> GuestPhoneExistsAsync(Guid eventId, string phoneNumber, Guid? excludeGuestId = null, CancellationToken cancellationToken = default);
     Task<bool> HasEventsAtVenueAsync(Guid venueId, CancellationToken cancellationToken = default);
     Task<bool> TryJoinEventAsync(Guest guest, CancellationToken cancellationToken = default);
+    Task<List<Guid>> UpdateGuestDetailsAsync(string email, string firstName, string lastName, string countryCode, string? phoneNumber, CancellationToken cancellationToken = default);
 }
