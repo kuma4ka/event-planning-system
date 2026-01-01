@@ -181,7 +181,7 @@ public class EventService(
              throw new UnauthorizedAccessException("Not your event");
         }
 
-        // Domain entity handles logic for past events now. Redundant check removed.
+
 
         eventEntity.UpdateDetails(
             dto.Name,

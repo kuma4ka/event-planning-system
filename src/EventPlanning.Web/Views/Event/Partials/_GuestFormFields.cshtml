@@ -1,9 +1,6 @@
 @model EventPlanning.Application.DTOs.Guest.GuestBaseDto
 @{
     var prefix = ViewData["Prefix"] as string ?? "guest";
-    // Assuming Model might be null for "Add", or populated for "Edit" 
-    // (though Edit uses JS to populate, so initial values matter less).
-    // So distinct IDs are the most important thing.
 }
 
 <div class="row g-3 mb-3">

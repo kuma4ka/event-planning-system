@@ -17,7 +17,7 @@ public class CountryService : ICountryService
         var filePath = configuration["CountrySettings:FilePath"];
         if (string.IsNullOrEmpty(filePath))
         {
-            filePath = "countries.json"; // Default convention
+            filePath = "countries.json";
         }
 
         var fullPath = Path.Combine(env.ContentRootPath, filePath);

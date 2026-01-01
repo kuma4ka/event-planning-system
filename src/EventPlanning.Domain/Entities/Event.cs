@@ -21,7 +21,6 @@ public class Event
 
     public ICollection<Guest> Guests { get; private set; } = new List<Guest>();
 
-    // Constructor for EF Core
     private Event()
     {
         Name = null!;
