@@ -59,4 +59,10 @@ public class Event
         Type = type;
         VenueId = venueId;
     }
+
+    public bool IsFull(int currentGuestCount)
+    {
+        if (Venue == null || Venue.Capacity <= 0) return false;
+        return currentGuestCount >= Venue.Capacity;
+    }
 }

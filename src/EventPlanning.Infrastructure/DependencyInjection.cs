@@ -59,6 +59,7 @@ public static class DependencyInjection
 
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<ICacheService, MemoryCacheService>();
+        services.AddScoped<ICountryService, CountryService>();
 
         services.AddScoped<IIdentityService, IdentityService>();
 

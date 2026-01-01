@@ -221,7 +221,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
                    var currentCount = await context.Guests
                        .CountAsync(g => g.EventId == guest.EventId, cancellationToken);
                     
-                   if (currentCount >= eventEntity.Venue.Capacity)
+                   if (eventEntity.IsFull(currentCount))
                    {
                        return false;
                    }

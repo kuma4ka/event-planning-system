@@ -18,6 +18,7 @@ public class EventServiceTests
     private readonly Mock<IValidator<CreateEventDto>> _createValidatorMock;
     private readonly Mock<IUserRepository> _userRepoMock;
     private readonly Mock<ILogger<EventService>> _loggerMock;
+    private readonly Mock<ICountryService> _countryServiceMock;
 
     private readonly EventService _service;
 
@@ -29,6 +30,8 @@ public class EventServiceTests
         Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
         Mock<IValidator<EventSearchDto>> searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
         _loggerMock = new Mock<ILogger<EventService>>();
+        _countryServiceMock = new Mock<ICountryService>();
+        _countryServiceMock.Setup(c => c.ParsePhoneNumber(It.IsAny<string>())).Returns(("+1", "1231231234"));
 
         _service = new EventService(
             _eventRepoMock.Object,
@@ -36,6 +39,7 @@ public class EventServiceTests
             updateValidatorMock.Object,
             searchValidatorMock.Object,
             _userRepoMock.Object,
+            _countryServiceMock.Object,
             _loggerMock.Object
         );
     }
@@ -200,6 +204,10 @@ public class EventServiceTests
         _eventRepoMock
             .Setup(r => r.GetDetailsByIdAsync(eventId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(eventEntity);
+
+        _countryServiceMock
+            .Setup(c => c.ParsePhoneNumber(It.IsAny<string>()))
+            .Returns(("+1", "234567890"));
 
         // Act
         var result = await _service.GetEventDetailsAsync(eventId, currentUserId);

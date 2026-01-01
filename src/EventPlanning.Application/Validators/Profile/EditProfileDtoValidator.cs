@@ -1,5 +1,4 @@
-﻿using EventPlanning.Application.Constants;
-using EventPlanning.Domain.Constants;
+﻿using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.DTOs.Profile;
 using FluentValidation;
 
@@ -7,7 +6,7 @@ namespace EventPlanning.Application.Validators.Profile;
 
 public class EditProfileDtoValidator : AbstractValidator<EditProfileDto>
 {
-    public EditProfileDtoValidator()
+    public EditProfileDtoValidator(ICountryService countryService)
     {
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("First name is required.")
@@ -21,7 +20,7 @@ public class EditProfileDtoValidator : AbstractValidator<EditProfileDto>
 
         RuleFor(x => x.CountryCode)
             .NotEmpty()
-            .Must(code => CountryConstants.SupportedCountries.Any(c => c.Code == code))
+            .Must(code => countryService.GetSupportedCountries().Any(c => c.Code == code))
             .WithMessage("Invalid or unsupported country code.");
 
         RuleFor(x => x.PhoneNumber)

@@ -20,6 +20,7 @@ public class EventController(
     IVenueService venueService,
     UserManager<ApplicationUser> userManager,
     IConfiguration configuration,
+    ICountryService countryService,
     ILogger<EventController> logger) : Controller
 {
     [HttpGet("details/{id:guid}")]
@@ -31,6 +32,7 @@ public class EventController(
         if (eventDetails == null) return NotFound();
 
         ViewBag.GoogleMapsApiKey = configuration["GoogleMaps:ApiKey"];
+        ViewBag.Countries = new SelectList(countryService.GetSupportedCountries(), "Code", "DisplayValue");
 
         return View(eventDetails);
     }
