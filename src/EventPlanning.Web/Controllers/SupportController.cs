@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EventPlanning.Web.Controllers;
 
-public class SupportController(ILogger<SupportController> logger) : Controller
+public class SupportController : Controller
 {
     [HttpGet("support")]
     public IActionResult Index()

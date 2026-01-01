@@ -13,8 +13,7 @@ public class VenueService(
     IEventRepository eventRepository,
     IImageService imageService,
     IValidator<CreateVenueDto> createValidator,
-    IValidator<UpdateVenueDto> updateValidator,
-    ILogger<VenueService> logger
+    IValidator<UpdateVenueDto> updateValidator
 ) : IVenueService
 {
     public async Task<List<VenueDto>> GetVenuesAsync(CancellationToken cancellationToken = default)
