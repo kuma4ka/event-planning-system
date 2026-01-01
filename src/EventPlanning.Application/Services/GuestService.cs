@@ -33,10 +33,7 @@ public class GuestService(
             throw new UnauthorizedAccessException("Not your event");
         }
 
-        if (await guestRepository.EmailExistsAtEventAsync(dto.EventId, dto.Email, null, cancellationToken))
-        {
-            throw new InvalidOperationException($"Guest with email '{dto.Email}' is already registered for this event.");
-        }
+        await CheckUniqueEmailAsync(dto.EventId, dto.Email, null, cancellationToken);
 
         var guest = CreateGuestEntity(dto);
         await guestRepository.AddAsync(guest, cancellationToken);
@@ -60,27 +57,13 @@ public class GuestService(
         if (eventEntity.Date < DateTime.Now)
             throw new InvalidOperationException("Cannot add guests to an event that has already ended.");
 
-        if (eventEntity.Venue is { Capacity: > 0 })
-        {
-            var guestCount = await guestRepository.CountGuestsAtEventAsync(dto.EventId, cancellationToken);
-            if (guestCount >= eventEntity.Venue.Capacity)
-                throw new InvalidOperationException("Venue is fully booked.");
-        }
-
-        if (await guestRepository.EmailExistsAtEventAsync(dto.EventId, dto.Email, null, cancellationToken))
-        {
-            throw new InvalidOperationException($"Guest with email '{dto.Email}' is already added to this event.");
-        }
+        await CheckCapacityAsync(eventEntity, dto.EventId, cancellationToken);
+        await CheckUniqueEmailAsync(dto.EventId, dto.Email, null, cancellationToken);
 
         var fullPhoneNumber = dto.CountryCode + dto.PhoneNumber.Replace(" ", "").Replace("-", "");
         if (!string.IsNullOrEmpty(dto.PhoneNumber))
         {
-            bool phoneExists = await guestRepository.PhoneExistsAtEventAsync(dto.EventId, fullPhoneNumber, null, cancellationToken);
-            if (phoneExists)
-            {
-                var displayPhone = fullPhoneNumber.StartsWith("+") ? fullPhoneNumber : $"+{fullPhoneNumber}";
-                throw new InvalidOperationException($"Guest with phone number {displayPhone} is already added to this event.");
-            }
+            await CheckUniquePhoneAsync(dto.EventId, fullPhoneNumber, null, cancellationToken);
         }
 
         var guest = CreateGuestEntity(dto);
@@ -112,20 +95,13 @@ public class GuestService(
 
         if (!guest.Email.Value.Equals(dto.Email, StringComparison.OrdinalIgnoreCase))
         {
-            if (await guestRepository.EmailExistsAtEventAsync(guest.EventId, dto.Email, guest.Id, cancellationToken))
-            {
-                throw new InvalidOperationException($"Another guest with email '{dto.Email}' already exists in this event.");
-            }
+            await CheckUniqueEmailAsync(guest.EventId, dto.Email, guest.Id, cancellationToken);
         }
 
         var newFullPhone = dto.CountryCode + dto.PhoneNumber;
         if ((guest.PhoneNumber != null ? guest.PhoneNumber.Value : null) != newFullPhone && !string.IsNullOrEmpty(dto.PhoneNumber))
         {
-            if (await guestRepository.PhoneExistsAtEventAsync(guest.EventId, newFullPhone, guest.Id, cancellationToken))
-            {
-                var displayPhone = newFullPhone.StartsWith("+") ? newFullPhone : $"+{newFullPhone}";
-                throw new InvalidOperationException($"Another guest with phone number {displayPhone} already exists.");
-            }
+             await CheckUniquePhoneAsync(guest.EventId, newFullPhone, guest.Id, cancellationToken);
         }
 
         guest.UpdateDetails(dto.FirstName, dto.LastName, dto.Email, dto.CountryCode, newFullPhone);
@@ -174,5 +150,33 @@ public class GuestService(
             dto.CountryCode,
             dto.CountryCode + dto.PhoneNumber
         );
+    }
+
+    private async Task CheckCapacityAsync(Event eventEntity, Guid eventId, CancellationToken cancellationToken)
+    {
+        if (eventEntity.Venue is { Capacity: > 0 })
+        {
+            var guestCount = await guestRepository.CountGuestsAtEventAsync(eventId, cancellationToken);
+            if (guestCount >= eventEntity.Venue.Capacity)
+                throw new InvalidOperationException("Venue is fully booked.");
+        }
+    }
+
+    private async Task CheckUniqueEmailAsync(Guid eventId, string email, Guid? excludeGuestId, CancellationToken cancellationToken)
+    {
+        if (await guestRepository.EmailExistsAtEventAsync(eventId, email, excludeGuestId, cancellationToken))
+        {
+            throw new InvalidOperationException($"Guest with email '{email}' is already registered for this event.");
+        }
+    }
+
+    private async Task CheckUniquePhoneAsync(Guid eventId, string phoneNumber, Guid? excludeGuestId, CancellationToken cancellationToken)
+    {
+        bool phoneExists = await guestRepository.PhoneExistsAtEventAsync(eventId, phoneNumber, excludeGuestId, cancellationToken);
+        if (phoneExists)
+        {
+            var displayPhone = phoneNumber.StartsWith("+") ? phoneNumber : $"+{phoneNumber}";
+            throw new InvalidOperationException($"Guest with phone number {displayPhone} is already added to this event.");
+        }
     }
 }

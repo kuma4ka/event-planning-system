@@ -4,12 +4,13 @@ using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
 using EventPlanning.Infrastructure.Identity;
+using EventPlanning.Web.Extensions;
+using EventPlanning.Web.Models;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using EventPlanning.Web.Models;
 
 namespace EventPlanning.Web.Controllers;
 
@@ -17,7 +18,6 @@ namespace EventPlanning.Web.Controllers;
 [Route("events")]
 public class EventController(
     IEventService eventService,
-    IEventParticipationService participationService,
     IVenueService venueService,
     UserManager<ApplicationUser> userManager,
     IConfiguration configuration,
@@ -68,9 +68,7 @@ public class EventController(
         }
         catch (ValidationException ex)
         {
-            foreach (var error in ex.Errors)
-                ModelState.AddModelError($"CreateDto.{error.PropertyName}", error.ErrorMessage);
-
+            ModelState.AddValidationErrors(ex);
             viewModel.Venues = await GetVenuesList(cancellationToken);
             return View(viewModel);
         }
@@ -121,7 +119,7 @@ public class EventController(
         }
         catch (ValidationException ex)
         {
-            foreach (var error in ex.Errors) ModelState.AddModelError($"UpdateDto.{error.PropertyName}", error.ErrorMessage);
+            ModelState.AddValidationErrors(ex);
             viewModel.Venues = await GetVenuesList(cancellationToken);
             return View(viewModel);
         }
@@ -159,64 +157,6 @@ public class EventController(
         }
     }
 
-    [HttpPost("join/{id:guid}")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Join(Guid id, CancellationToken cancellationToken)
-    {
-        var userId = userManager.GetUserId(User);
-        if (userId == null) return RedirectToAction("Login", "Account");
-
-        try
-        {
-            await participationService.JoinEventAsync(id, userId, cancellationToken);
-            logger.LogInformation("User {User} joined event {EventId}", User.Identity?.Name, id);
-            TempData["SuccessMessage"] = "You have successfully joined the event!";
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error joining event: {EventId} by {User}", id, User.Identity?.Name);
-            TempData["ErrorMessage"] = ex.Message;
-        }
-
-        return RedirectToAction(nameof(Details), new { id });
-    }
-
-    [HttpGet("join/{id:guid}")]
-    public IActionResult JoinPrompt(Guid id)
-    {
-        TempData["InfoMessage"] = "Please confirm your action by clicking the button again.";
-        return RedirectToAction(nameof(Details), new { id });
-    }
-
-    [HttpPost("leave/{id:guid}")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Leave(Guid id, CancellationToken cancellationToken)
-    {
-        var userId = userManager.GetUserId(User);
-        if (userId == null) return RedirectToAction("Login", "Account");
-
-        try
-        {
-            await participationService.LeaveEventAsync(id, userId, cancellationToken);
-            logger.LogInformation("User {User} left event {EventId}", User.Identity?.Name, id);
-            TempData["SuccessMessage"] = "You have left the event.";
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error leaving event: {EventId} by {User}", id, User.Identity?.Name);
-            TempData["ErrorMessage"] = ex.Message;
-        }
-
-        return RedirectToAction(nameof(Details), new { id });
-    }
-
-    [HttpGet("leave/{id:guid}")]
-    public IActionResult LeavePrompt(Guid id)
-    {
-         TempData["InfoMessage"] = "Please confirm your action by clicking the button again.";
-         return RedirectToAction(nameof(Details), new { id });
-    }
-
     [HttpGet("my-events")]
     public async Task<IActionResult> MyEvents(
         string? searchTerm,
@@ -230,8 +170,6 @@ public class EventController(
     {
         var userId = userManager.GetUserId(User);
         var now = DateTime.Now;
-
-
 
         var searchFrom = from;
         var searchTo = to;
@@ -265,7 +203,7 @@ public class EventController(
         }
         catch (ValidationException ex)
         {
-            foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            ModelState.AddValidationErrors(ex);
             result = new PagedResult<EventDto>([], 0, 1, 10);
         }
 
