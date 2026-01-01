@@ -1,7 +1,9 @@
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.ValueObjects;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace EventPlanning.Infrastructure.Services;
 
@@ -10,19 +12,32 @@ public class CountryService : ICountryService
     private readonly List<CountryInfo> _supportedCountries;
     private const string DefaultCode = "+380";
 
-    public CountryService(IConfiguration configuration, ILogger<CountryService> logger)
+    public CountryService(IConfiguration configuration, IWebHostEnvironment env, ILogger<CountryService> logger)
     {
-        var countrySection = configuration.GetSection("CountrySettings:SupportedCountries");
-        var countries = countrySection.Get<List<CountryInfo>>();
-
-        if (countries == null || countries.Count == 0)
+        var filePath = configuration["CountrySettings:FilePath"];
+        if (string.IsNullOrEmpty(filePath))
         {
-            logger.LogWarning("No supported countries found in configuration.");
-            _supportedCountries = new List<CountryInfo>();
+            filePath = "countries.json"; // Default convention
         }
-        else
+
+        var fullPath = Path.Combine(env.ContentRootPath, filePath);
+
+        if (!File.Exists(fullPath))
         {
-            _supportedCountries = countries;
+             logger.LogWarning("Country data file not found at {Path}. Using empty list.", fullPath);
+             _supportedCountries = new List<CountryInfo>();
+             return;
+        }
+
+        try 
+        {
+            var json = File.ReadAllText(fullPath);
+            _supportedCountries = JsonSerializer.Deserialize<List<CountryInfo>>(json) ?? new List<CountryInfo>();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to load country data from {Path}", fullPath);
+            _supportedCountries = new List<CountryInfo>();
         }
     }
 

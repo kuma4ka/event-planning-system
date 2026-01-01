@@ -1,0 +1,32 @@
+[
+  {
+    "Code": "+380",
+    "Flag": "🇺🇦",
+    "Name": "Ukraine"
+  },
+  {
+    "Code": "+1",
+    "Flag": "🇺🇸",
+    "Name": "USA"
+  },
+  {
+    "Code": "+1",
+    "Flag": "🇨🇦",
+    "Name": "Canada"
+  },
+  {
+    "Code": "+44",
+    "Flag": "🇬🇧",
+    "Name": "UK"
+  },
+  {
+    "Code": "+49",
+    "Flag": "🇩🇪",
+    "Name": "Germany"
+  },
+  {
+    "Code": "+48",
+    "Flag": "🇵🇱",
+    "Name": "Poland"
+  }
+]

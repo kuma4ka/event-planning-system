@@ -21,6 +21,12 @@
     <Folder Include="Areas\Admin\Views\Shared\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="countries.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
