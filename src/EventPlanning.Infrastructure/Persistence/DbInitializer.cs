@@ -146,19 +146,18 @@ public static class DbInitializer
         }
         else
         {
-            // Sync/Fix logic (simplified)
+            // Sync/Fix logic
             domainUser = await context.Users.FindAsync(appUser.Id);
             if (domainUser == null)
             {
-                // Should not happen if data is consistent, but self-heal if missing
+                // Self-heal key mismatch
                 domainUser = new User(appUser.Id, fName, lName, Enum.Parse<UserRole>(role), email, email, phoneNumber, "+1");
                 await context.Users.AddAsync(domainUser);
                 await context.SaveChangesAsync();
             }
-             else if (domainUser.PhoneNumber != phoneNumber)
+            else if (domainUser.PhoneNumber != phoneNumber)
             {
-                 // Update specific fields if needed
-                 // For now just assuming seed data override or sync
+                // Sync phone number
             }
         }
 

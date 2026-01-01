@@ -96,7 +96,6 @@ public class AccountController(
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error creating domain user profile for {Email}", model.Email);
-                // In a real app, we might want to delete the appUser to keep state consistent (Compensating Transaction)
                 await userManager.DeleteAsync(appUser);
                 ModelState.AddModelError(string.Empty, "An error occurred while creating your profile. Please try again.");
                 return View(model);

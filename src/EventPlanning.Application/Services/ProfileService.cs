@@ -54,6 +54,7 @@ public class ProfileService(
             ? null
             : $"{dto.CountryCode}{dto.PhoneNumber}";
 
+        // Sync with Identity
         if (newFullPhoneNumber != user.PhoneNumber && !string.IsNullOrEmpty(newFullPhoneNumber))
         {
             var isPhoneTaken = await userRepository.IsPhoneNumberTakenAsync(newFullPhoneNumber, userId, cancellationToken);
@@ -66,7 +67,6 @@ public class ProfileService(
                 ]);
             }
             
-            // Sync with Identity
             var (succeeded, errors) = await identityService.UpdatePhoneNumberAsync(userId, newFullPhoneNumber);
             if (!succeeded)
             {
@@ -76,22 +76,12 @@ public class ProfileService(
         }
 
         user.UpdateProfile(dto.FirstName, dto.LastName);
-        // Update Domain Phone Number
+        
         if (newFullPhoneNumber != user.PhoneNumber)
         {
-             // We can just invoke private setter or logic? 
-             // User entity has `PhoneNumber {get; private set;}`.
-             // We need a method `UpdatePhoneNumber` on Domain User if we want to be clean.
-             // Or assign via constructor if immutable? No, it's mutable.
-             // Wait, `User.cs` has `PhoneNumber { get; private set; }`.
-             // I need to add `UpdatePhoneNumber` method to `User` entity or use reflection (bad).
-             // Let's add `UpdatePhoneNumber` to User entity.
-             // FOR NOW, assuming I add it.
              user.UpdatePhoneNumber(newFullPhoneNumber);
         }
         
-        // Also update CountryCode if it changed?
-        // Logic seems to assume CountryCode is part of Phone Number logic but also stored separately.
         user.SetCountryCode(dto.CountryCode);
 
         await userRepository.UpdateAsync(user, cancellationToken);

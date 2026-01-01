@@ -30,7 +30,7 @@ public class User
         if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("First Name is required.", nameof(firstName));
         if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("Last Name is required.", nameof(lastName));
         if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email is required.", nameof(email));
-        // We can relax CountryCode validation for legacy/seeding if needed, but for now enforce it.
+        
         if (string.IsNullOrWhiteSpace(countryCode)) countryCode = "+1"; // Default fall-back if missing
 
         Id = id;

@@ -12,7 +12,6 @@ public class IdentityService(
 {
     public async Task<User?> GetUserByIdAsync(string userId)
     {
-        // Check if Identity User exists (optional, could just check domain user)
         var appUser = await userManager.FindByIdAsync(userId);
         if (appUser == null) return null;
 

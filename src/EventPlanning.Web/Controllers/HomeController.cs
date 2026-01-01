@@ -6,6 +6,7 @@ using EventPlanning.Domain.Enums;
 using EventPlanning.Web.Extensions;
 using EventPlanning.Web.Models;
 using FluentValidation;
+using EventPlanning.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,7 @@ namespace EventPlanning.Web.Controllers;
 [Route("home")]
 public class HomeController(
     IEventService eventService,
-    UserManager<User> userManager) : Controller
+    UserManager<ApplicationUser> userManager) : Controller
 {
     [HttpGet("")]
     [HttpGet("index")]
