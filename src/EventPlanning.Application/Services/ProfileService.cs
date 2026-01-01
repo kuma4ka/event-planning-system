@@ -1,17 +1,15 @@
 ﻿using EventPlanning.Application.Constants;
 using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Application.Interfaces;
-using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace EventPlanning.Application.Services;
 
 public class ProfileService(
-    UserManager<User> userManager,
+    IIdentityService identityService,
     IEventRepository eventRepository,
     IUserRepository userRepository,
     IValidator<EditProfileDto> profileValidator,
@@ -20,7 +18,7 @@ public class ProfileService(
 {
     public async Task<EditProfileDto> GetProfileAsync(string userId, CancellationToken cancellationToken = default)
     {
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await userRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null) throw new KeyNotFoundException("User not found");
 
         var organizedEvents = await eventRepository.GetFilteredAsync(
@@ -49,7 +47,7 @@ public class ProfileService(
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await userRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null) throw new KeyNotFoundException("User not found");
 
         var newFullPhoneNumber = string.IsNullOrEmpty(dto.PhoneNumber)
@@ -67,20 +65,36 @@ public class ProfileService(
                     new ValidationFailure("PhoneNumber", "This phone number is already linked to another account.")
                 ]);
             }
+            
+            // Sync with Identity
+            var (succeeded, errors) = await identityService.UpdatePhoneNumberAsync(userId, newFullPhoneNumber);
+            if (!succeeded)
+            {
+                logger.LogWarning("Identity phone update failed for user {UserId}: {Errors}", userId, string.Join(", ", errors));
+                 throw new ValidationException(errors.Select(e => new ValidationFailure(string.Empty, e)));
+            }
         }
 
         user.UpdateProfile(dto.FirstName, dto.LastName);
-        user.PhoneNumber = newFullPhoneNumber;
-
-        var result = await userManager.UpdateAsync(user);
-
-        if (!result.Succeeded)
+        // Update Domain Phone Number
+        if (newFullPhoneNumber != user.PhoneNumber)
         {
-            logger.LogWarning("Profile update failed for user {UserId}: {Errors}", userId, string.Join(", ", result.Errors.Select(e => e.Description)));
-            var errors = result.Errors.Select(e =>
-                new ValidationFailure(string.Empty, e.Description));
-            throw new ValidationException(errors);
+             // We can just invoke private setter or logic? 
+             // User entity has `PhoneNumber {get; private set;}`.
+             // We need a method `UpdatePhoneNumber` on Domain User if we want to be clean.
+             // Or assign via constructor if immutable? No, it's mutable.
+             // Wait, `User.cs` has `PhoneNumber { get; private set; }`.
+             // I need to add `UpdatePhoneNumber` method to `User` entity or use reflection (bad).
+             // Let's add `UpdatePhoneNumber` to User entity.
+             // FOR NOW, assuming I add it.
+             user.UpdatePhoneNumber(newFullPhoneNumber);
         }
+        
+        // Also update CountryCode if it changed?
+        // Logic seems to assume CountryCode is part of Phone Number logic but also stored separately.
+        user.SetCountryCode(dto.CountryCode);
+
+        await userRepository.UpdateAsync(user, cancellationToken);
     }
 
     public async Task ChangePasswordAsync(string userId, ChangePasswordDto dto,
@@ -90,17 +104,12 @@ public class ProfileService(
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
-        var user = await userManager.FindByIdAsync(userId);
-        if (user == null) throw new KeyNotFoundException("User not found");
+        var (succeeded, errors) = await identityService.ChangePasswordAsync(userId, dto.CurrentPassword, dto.NewPassword);
 
-        var result = await userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
-
-        if (!result.Succeeded)
+        if (!succeeded)
         {
-            logger.LogWarning("Password change failed for user {UserId}: {Errors}", userId, string.Join(", ", result.Errors.Select(e => e.Description)));
-            var errors = result.Errors.Select(e =>
-                new ValidationFailure(string.Empty, e.Description));
-            throw new ValidationException(errors);
+            logger.LogWarning("Password change failed for user {UserId}: {Errors}", userId, string.Join(", ", errors));
+             throw new ValidationException(errors.Select(e => new ValidationFailure(string.Empty, e)));
         }
     }
 

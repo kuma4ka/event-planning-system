@@ -1,6 +1,8 @@
 ﻿using EventPlanning.Application.DTOs.Auth;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
+using EventPlanning.Domain.Interfaces;
+using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,11 +11,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace EventPlanning.Web.Controllers;
 
 public class AccountController(
-    UserManager<User> userManager,
-    SignInManager<User> signInManager,
+    UserManager<ApplicationUser> userManager,
+    SignInManager<ApplicationUser> signInManager,
+    IUserRepository userRepository,
     IValidator<RegisterUserDto> registerValidator,
     IValidator<LoginUserDto> loginValidator,
-    IEmailSender<User> emailSender,
+    IEmailSender<ApplicationUser> emailSender,
     ILogger<AccountController> logger) : Controller
 {
     [HttpGet]
@@ -35,54 +38,74 @@ public class AccountController(
             return View(model);
         }
 
-        var user = new User(
-            model.FirstName,
-            model.LastName,
-            UserRole.User,
-            model.Email,
-            model.Email,
-            model.PhoneNumber,
-            model.CountryCode
-        );
+        var appUser = new ApplicationUser
+        {
+            UserName = model.Email,
+            Email = model.Email,
+            PhoneNumber = model.PhoneNumber
+        };
 
-        var result = await userManager.CreateAsync(user, model.Password);
+        var result = await userManager.CreateAsync(appUser, model.Password);
 
         if (result.Succeeded)
         {
-            var userId = await userManager.GetUserIdAsync(user);
-            var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
-            
-            var callbackUrl = Url.Action(
-                "ConfirmEmail",
-                "Account",
-                new { userId, code },
-                protocol: Request.Scheme);
-
-            if (string.IsNullOrEmpty(callbackUrl))
+            try 
             {
-                logger.LogError("Error generating confirmation email link for {Email}", model.Email);
-                ModelState.AddModelError(string.Empty, "Error generating confirmation email.");
+                var domainUser = new User(
+                    appUser.Id,
+                    model.FirstName,
+                    model.LastName,
+                    UserRole.User,
+                    model.Email,
+                    model.Email,
+                    model.PhoneNumber,
+                    model.CountryCode
+                );
+
+                await userRepository.AddAsync(domainUser);
+
+                var userId = await userManager.GetUserIdAsync(appUser);
+                var code = await userManager.GenerateEmailConfirmationTokenAsync(appUser);
+                
+                var callbackUrl = Url.Action(
+                    "ConfirmEmail",
+                    "Account",
+                    new { userId, code },
+                    protocol: Request.Scheme);
+
+                if (string.IsNullOrEmpty(callbackUrl))
+                {
+                    logger.LogError("Error generating confirmation email link for {Email}", model.Email);
+                    ModelState.AddModelError(string.Empty, "Error generating confirmation email.");
+                    return View(model);
+                }
+
+                await emailSender.SendConfirmationLinkAsync(appUser, model.Email, callbackUrl);
+
+                if (userManager.Options.SignIn.RequireConfirmedAccount)
+                {
+                    ViewBag.Email = model.Email;
+                    return View("RegisterConfirmation");
+                }
+                else
+                {
+                    await signInManager.SignInAsync(appUser, isPersistent: false);
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error creating domain user profile for {Email}", model.Email);
+                // In a real app, we might want to delete the appUser to keep state consistent (Compensating Transaction)
+                await userManager.DeleteAsync(appUser);
+                ModelState.AddModelError(string.Empty, "An error occurred while creating your profile. Please try again.");
                 return View(model);
-            }
-
-            await emailSender.SendConfirmationLinkAsync(user, model.Email, callbackUrl);
-
-            if (userManager.Options.SignIn.RequireConfirmedAccount)
-            {
-                ViewBag.Email = model.Email;
-                return View("RegisterConfirmation");
-            }
-            else
-            {
-                await signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Index", "Home");
             }
         }
 
         foreach (var error in result.Errors)
             ModelState.AddModelError(string.Empty, error.Description);
 
-        // Don't log validation errors as warnings, maybe just info or debug if highly verbose, but per specs "Login Fail" is Warn. Register failure often validation.
         logger.LogWarning("Registration failed for {Email}: {Errors}", model.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
 
         return View(model);
@@ -135,7 +158,6 @@ public class AccountController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        var email = User.Identity?.Name;
         await signInManager.SignOutAsync();
         return RedirectToAction("Index", "Home");
     }

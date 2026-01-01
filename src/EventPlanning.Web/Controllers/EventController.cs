@@ -3,6 +3,7 @@ using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
+using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,7 +17,7 @@ namespace EventPlanning.Web.Controllers;
 public class EventController(
     IEventService eventService,
     IVenueService venueService,
-    UserManager<User> userManager,
+    UserManager<ApplicationUser> userManager,
     IConfiguration configuration,
     ILogger<EventController> logger) : Controller
 {

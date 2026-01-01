@@ -1,6 +1,7 @@
 ﻿using EventPlanning.Application.DTOs.Venue;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
+using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,7 +14,7 @@ namespace EventPlanning.Web.Areas.Admin.Controllers;
 [Authorize(Roles = "Admin")]
 public class VenueController(
     IVenueService venueService,
-    UserManager<User> userManager,
+    UserManager<ApplicationUser> userManager,
     ILogger<VenueController> logger) : Controller
 {
     [HttpGet("")]

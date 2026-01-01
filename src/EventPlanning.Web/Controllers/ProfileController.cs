@@ -2,6 +2,7 @@
 using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
+using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -14,7 +15,7 @@ namespace EventPlanning.Web.Controllers;
 [Route("profile")]
 public class ProfileController(
     IProfileService profileService,
-    UserManager<User> userManager,
+    UserManager<ApplicationUser> userManager,
     ILogger<ProfileController> logger) : Controller
 {
     private const string TabProfile = "profile";

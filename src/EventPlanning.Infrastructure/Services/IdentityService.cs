@@ -1,13 +1,40 @@
 ﻿using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
+using EventPlanning.Domain.Interfaces;
+using EventPlanning.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 
 namespace EventPlanning.Infrastructure.Services;
 
-public class IdentityService(UserManager<User> userManager) : IIdentityService
+public class IdentityService(
+    UserManager<ApplicationUser> userManager,
+    IUserRepository userRepository) : IIdentityService
 {
     public async Task<User?> GetUserByIdAsync(string userId)
     {
-        return await userManager.FindByIdAsync(userId);
+        // Check if Identity User exists (optional, could just check domain user)
+        var appUser = await userManager.FindByIdAsync(userId);
+        if (appUser == null) return null;
+
+        return await userRepository.GetByIdAsync(userId, default);
+    }
+
+    public async Task<(bool Succeeded, string[] Errors)> ChangePasswordAsync(string userId, string currentPassword, string newPassword)
+    {
+        var appUser = await userManager.FindByIdAsync(userId);
+        if (appUser == null) return (false, ["User not found"]);
+
+        var result = await userManager.ChangePasswordAsync(appUser, currentPassword, newPassword);
+        return (result.Succeeded, result.Errors.Select(e => e.Description).ToArray());
+    }
+
+    public async Task<(bool Succeeded, string[] Errors)> UpdatePhoneNumberAsync(string userId, string phoneNumber)
+    {
+        var appUser = await userManager.FindByIdAsync(userId);
+        if (appUser == null) return (false, ["User not found"]);
+
+        var token = await userManager.GenerateChangePhoneNumberTokenAsync(appUser, phoneNumber);
+        var result = await userManager.ChangePhoneNumberAsync(appUser, phoneNumber, token);
+        return (result.Succeeded, result.Errors.Select(e => e.Description).ToArray());
     }
 }

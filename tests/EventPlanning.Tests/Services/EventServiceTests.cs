@@ -129,7 +129,7 @@ public class EventServiceTests
 
         _userRepoMock
             .Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new User("Test", "User", UserRole.User, "test@test.com", "test@test.com", "+123456789", "+1"));
+            .ReturnsAsync(new User(userId, "Test", "User", UserRole.User, "test@test.com", "test@test.com", "+123456789", "+1"));
 
         // Act
         Func<Task> act = async () => await _service.JoinEventAsync(eventId, userId);
@@ -221,10 +221,7 @@ public class EventServiceTests
         // Arrange
         var eventId = Guid.NewGuid();
         var organizerId = "user-1";
-        var user = new User("John", "Doe", UserRole.User, "john@example.com", "john@example.com", "+123456789", "+1");
-        // Reflection to set Id is tricky for IdentityUser inheritance but User entity has public constructor. 
-        // User entity inherits from IdentityUser, so Id is string and settable? No, IdentityUser Id is string and has setter.
-        user.Id = organizerId;
+        var user = new User(organizerId, "John", "Doe", UserRole.User, "john@example.com", "john@example.com", "+123456789", "+1");
 
         var eventEntity = new Event(
             "Test Event",

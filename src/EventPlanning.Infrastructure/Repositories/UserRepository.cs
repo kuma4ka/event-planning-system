@@ -16,4 +16,16 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository
     {
         return await context.Users.FindAsync([userId], cancellationToken);
     }
+
+    public async Task AddAsync(EventPlanning.Domain.Entities.User user, CancellationToken cancellationToken = default)
+    {
+        await context.Users.AddAsync(user, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateAsync(EventPlanning.Domain.Entities.User user, CancellationToken cancellationToken = default)
+    {
+        context.Users.Update(user);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 }
