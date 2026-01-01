@@ -1,4 +1,4 @@
-using EventPlanning.Domain.Constants;
+using EventPlanning.Domain.ValueObjects;
 
 namespace EventPlanning.Application.Interfaces;
 

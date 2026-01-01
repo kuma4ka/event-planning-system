@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using EventPlanning.Domain.Constants;
 
 namespace EventPlanning.Domain.ValueObjects;
 
@@ -33,24 +32,6 @@ public record PhoneNumber
 
     public static implicit operator string?(PhoneNumber? phone) => phone?.Value;
 
-    public static (string CountryCode, string LocalNumber) Parse(string? fullPhoneNumber)
-    {
-        if (string.IsNullOrEmpty(fullPhoneNumber)) 
-            return (CountryConstants.DefaultCode, string.Empty);
-
-        var country = CountryConstants.SupportedCountries
-            .OrderByDescending(c => c.Code.Length)
-            .FirstOrDefault(c => fullPhoneNumber.StartsWith(c.Code));
-
-        if (country != null)
-        {
-            var localNumber = fullPhoneNumber.Substring(country.Code.Length);
-            return (country.Code, localNumber);
-        }
-
-        return (CountryConstants.DefaultCode, fullPhoneNumber);
-    }
-    
     public string Format(string? countryCode = null)
     {
         // If country code is provided and matches start, we can try to format securely 

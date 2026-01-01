@@ -1,5 +1,5 @@
 ﻿using EventPlanning.Application.Constants;
-using EventPlanning.Domain.Constants;
+using EventPlanning.Domain.ValueObjects;
 using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;

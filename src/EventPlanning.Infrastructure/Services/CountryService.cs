@@ -1,5 +1,5 @@
 using EventPlanning.Application.Interfaces;
-using EventPlanning.Domain.Constants;
+using EventPlanning.Domain.ValueObjects;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -17,8 +17,8 @@ public class CountryService : ICountryService
 
         if (countries == null || countries.Count == 0)
         {
-            logger.LogWarning("No supported countries found in configuration. Using defaults from CountryConstants.");
-            _supportedCountries = CountryConstants.SupportedCountries;
+            logger.LogWarning("No supported countries found in configuration.");
+            _supportedCountries = new List<CountryInfo>();
         }
         else
         {
