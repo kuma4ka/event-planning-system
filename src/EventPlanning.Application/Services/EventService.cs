@@ -83,8 +83,7 @@ public class EventService(
 
     public async Task<EventDetailsDto?> GetEventDetailsAsync(Guid id, string? userId, CancellationToken cancellationToken = default)
     {
-        // Removed internal resolution of userId via HttpContextAccessor
-        // var userId = httpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
 
         var publicCacheKey = $"{EventCacheKeyPrefix}{id}_public";
         var organizerCacheKey = $"{EventCacheKeyPrefix}{id}_organizer";
@@ -112,16 +111,15 @@ public class EventService(
 
         var guestsDto = eventEntity.Guests.Select(g =>
         {
-            // Mask data if not organizer
             if (!isOrganizer)
             {
                 return new GuestDto(
                     g.Id,
                     g.FirstName,
                     g.LastName,
-                    "REDACTED", // Masked Email
-                    "",   // Masked CountryCode
-                    ""   // Masked Phone
+                    "REDACTED",
+                    "",
+                    ""
                 );
             }
 
@@ -269,8 +267,7 @@ public class EventService(
         var user = await userRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null) throw new KeyNotFoundException($"User {userId} not found");
 
-        // Check if already joined (Email or Phone)
-        // IsUserJoinedAsync only checks Email. The old logic checked Phone too.
+        // Check if already joined
         var emailExists = await eventRepository.GuestEmailExistsAsync(eventId, user.Email!, null, cancellationToken);
         if (emailExists) throw new InvalidOperationException("You are already registered for this event.");
 

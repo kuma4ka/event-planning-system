@@ -3,7 +3,6 @@
 @model EventFormViewModel
 
 @{
-    // Helper to get the actual DTO object for binding expression or logic
     var dto = Model.IsEditMode ? (EventPlanning.Application.DTOs.Event.EventBaseDto)Model.UpdateDto! : Model.CreateDto!;
 }
 

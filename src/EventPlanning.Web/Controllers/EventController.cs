@@ -46,7 +46,6 @@ public class EventController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(EventFormViewModel viewModel, CancellationToken cancellationToken)
     {
-        // Re-bind just the create dto from form or pass it directly if cleaner
         if (viewModel.CreateDto == null) return BadRequest();
         var model = viewModel.CreateDto;
 

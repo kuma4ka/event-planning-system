@@ -9,10 +9,8 @@ public class EventFormViewModel
     public UpdateEventDto? UpdateDto { get; set; }
     public List<SelectListItem> Venues { get; set; } = [];
 
-    // Helper to determine if we are in Edit mode
     public bool IsEditMode => UpdateDto != null;
     
-    // Helper to populate Venues
     public static EventFormViewModel ForCreate(CreateEventDto? dto, List<SelectListItem> venues)
     {
         return new EventFormViewModel { CreateDto = dto ?? new CreateEventDto("", "", DateTime.Today.AddDays(1), Domain.Enums.EventType.Conference, Guid.Empty), Venues = venues };

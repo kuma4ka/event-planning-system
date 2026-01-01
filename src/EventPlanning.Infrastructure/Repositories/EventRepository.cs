@@ -210,7 +210,6 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
             try
             {
-                // Re-fetch event with venue to check capacity inside the transaction lock
                 var eventEntity = await context.Events
                     .Include(e => e.Venue)
                     .FirstOrDefaultAsync(e => e.Id == guest.EventId, cancellationToken);
