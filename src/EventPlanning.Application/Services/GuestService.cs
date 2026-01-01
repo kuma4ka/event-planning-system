@@ -105,6 +105,11 @@ public class GuestService(
         if (eventEntity.OrganizerId != currentUserId)
             throw new UnauthorizedAccessException("Not your event. Only the organizer can update guests.");
 
+        if (guest.UserId != null)
+        {
+            throw new InvalidOperationException("Cannot edit a guest who is a registered user. They must update their own profile.");
+        }
+
         if (!guest.Email.Value.Equals(dto.Email, StringComparison.OrdinalIgnoreCase))
         {
             if (await eventRepository.GuestEmailExistsAsync(guest.EventId, dto.Email, guest.Id, cancellationToken))
