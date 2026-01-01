@@ -26,7 +26,6 @@ public class EventParticipationService(
         var user = await userRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null) throw new KeyNotFoundException($"User {userId} not found");
 
-        // Check if already joined
         var emailExists = await guestRepository.EmailExistsAtEventAsync(eventId, user.Email!, null, cancellationToken);
         if (emailExists) throw new InvalidOperationException("You are already registered for this event.");
 
@@ -46,7 +45,6 @@ public class EventParticipationService(
             user.Id
         );
 
-        // Attempt to join transactionally
         var success = await guestRepository.TryJoinEventAsync(guest, cancellationToken);
         if (!success)
         {

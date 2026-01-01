@@ -14,7 +14,7 @@ public sealed class Venue
 
     public ICollection<Event> Events { get; private set; } = new List<Event>();
 
-    // For EF Core
+
     private Venue()
     {
         Name = null!;

@@ -14,32 +14,27 @@ public class NewsletterService(
 {
     public async Task SubscribeAsync(string email, CancellationToken cancellationToken = default)
     {
-        // 1. Basic validation
         if (string.IsNullOrWhiteSpace(email) || !email.Contains("@"))
         {
             throw new ArgumentException("Invalid email address.");
         }
 
-        // 2. Check if already subscribed
         var existing = await newsletterRepository.GetSubscriberByEmailAsync(email, cancellationToken);
 
         if (existing != null && existing.IsConfirmed)
         {
-            // Already confirmed - return success (idempotent)
             return;
         }
 
         string token;
         if (existing != null)
         {
-            // Resend confirmation if not confirmed
             token = Guid.NewGuid().ToString();
             existing.ConfirmationToken = token;
             await newsletterRepository.UpdateSubscriberAsync(existing, cancellationToken);
         }
         else
         {
-            // New subscriber
             token = Guid.NewGuid().ToString();
             var subscriber = new NewsletterSubscriber
             {
@@ -52,7 +47,6 @@ public class NewsletterService(
             await newsletterRepository.AddSubscriberAsync(subscriber, cancellationToken);
         }
 
-        // 3. Send Confirmation Email (Double Opt-In)
         var request = httpContextAccessor.HttpContext?.Request;
         var baseUrl = request != null
             ? $"{request.Scheme}://{request.Host}"
@@ -72,20 +66,17 @@ public class NewsletterService(
         var subscriber = await newsletterRepository.GetSubscriberByEmailAsync(email, cancellationToken);
         if (subscriber == null) return false;
 
-        // Check token
-        if (subscriber.IsConfirmed) return true; // Already confirmed
+        if (subscriber.IsConfirmed) return true;
         if (subscriber.ConfirmationToken != token)
         {
             logger.LogWarning("Invalid confirmation token provided for {Email}", email);
             return false;
         }
 
-        // Confirm
         subscriber.IsConfirmed = true;
-        subscriber.ConfirmationToken = null; // Clear token after use
+        subscriber.ConfirmationToken = null;
         await newsletterRepository.UpdateSubscriberAsync(subscriber, cancellationToken);
 
-        // Send Welcome Email
         await emailService.SendEmailAsync(
             email,
             "Welcome to Stanza!",
