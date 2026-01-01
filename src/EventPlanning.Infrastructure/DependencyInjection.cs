@@ -58,6 +58,7 @@ public static class DependencyInjection
         services.AddScoped<INewsletterRepository, NewsletterRepository>();
 
         services.AddScoped<IImageService, ImageService>();
+        services.AddScoped<ICacheService, MemoryCacheService>();
 
         services.AddScoped<IIdentityService, IdentityService>();
 

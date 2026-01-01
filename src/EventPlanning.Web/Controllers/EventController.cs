@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using EventPlanning.Web.Models;
 
 namespace EventPlanning.Web.Controllers;
 
@@ -37,18 +38,21 @@ public class EventController(
     [HttpGet("create")]
     public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
-        await LoadVenuesToViewBag(cancellationToken);
-        return View();
+        var venues = await GetVenuesList(cancellationToken);
+        return View(EventFormViewModel.ForCreate(null, venues));
     }
 
     [HttpPost("create")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(CreateEventDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(EventFormViewModel viewModel, CancellationToken cancellationToken)
     {
+        if (viewModel.CreateDto == null) return BadRequest();
+        var model = viewModel.CreateDto;
+
         if (!ModelState.IsValid)
         {
-            await LoadVenuesToViewBag(cancellationToken);
-            return View(model);
+            viewModel.Venues = await GetVenuesList(cancellationToken);
+            return View(viewModel);
         }
 
         var userId = userManager.GetUserId(User);
@@ -62,10 +66,10 @@ public class EventController(
         catch (ValidationException ex)
         {
             foreach (var error in ex.Errors)
-                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                ModelState.AddModelError($"CreateDto.{error.PropertyName}", error.ErrorMessage);
 
-            await LoadVenuesToViewBag(cancellationToken);
-            return View(model);
+            viewModel.Venues = await GetVenuesList(cancellationToken);
+            return View(viewModel);
         }
     }
 
@@ -78,8 +82,6 @@ public class EventController(
         if (eventDto == null) return NotFound();
         if (eventDto.OrganizerId != userId) return Forbid();
 
-        await LoadVenuesToViewBag(cancellationToken);
-
         var updateModel = new UpdateEventDto(
             eventDto.Id,
             eventDto.Name,
@@ -89,19 +91,21 @@ public class EventController(
             eventDto.VenueId ?? Guid.Empty
         );
 
-        return View(updateModel);
+        var venues = await GetVenuesList(cancellationToken);
+        return View(EventFormViewModel.ForEdit(updateModel, venues));
     }
 
     [HttpPost("edit/{id:guid}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, UpdateEventDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(Guid id, EventFormViewModel viewModel, CancellationToken cancellationToken)
     {
-        if (id != model.Id) return BadRequest("ID mismatch");
+        if (viewModel.UpdateDto == null || id != viewModel.UpdateDto.Id) return BadRequest("ID mismatch");
+        var model = viewModel.UpdateDto;
 
         if (!ModelState.IsValid)
         {
-            await LoadVenuesToViewBag(cancellationToken);
-            return View(model);
+            viewModel.Venues = await GetVenuesList(cancellationToken);
+            return View(viewModel);
         }
 
         var userId = userManager.GetUserId(User);
@@ -114,15 +118,15 @@ public class EventController(
         }
         catch (ValidationException ex)
         {
-            foreach (var error in ex.Errors) ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-            await LoadVenuesToViewBag(cancellationToken);
-            return View(model);
+            foreach (var error in ex.Errors) ModelState.AddModelError($"UpdateDto.{error.PropertyName}", error.ErrorMessage);
+            viewModel.Venues = await GetVenuesList(cancellationToken);
+            return View(viewModel);
         }
         catch (InvalidOperationException ex)
         {
             TempData["ErrorMessage"] = ex.Message;
-            await LoadVenuesToViewBag(cancellationToken);
-            return View(model);
+            viewModel.Venues = await GetVenuesList(cancellationToken);
+            return View(viewModel);
         }
         catch (UnauthorizedAccessException)
         {
@@ -267,11 +271,11 @@ public class EventController(
         ViewBag.NameSortParam = sortOrder == "name_asc" ? "name_desc" : "name_asc";
     }
 
-    private async Task LoadVenuesToViewBag(CancellationToken token)
+    private async Task<List<SelectListItem>> GetVenuesList(CancellationToken token)
     {
         var venues = await venueService.GetVenuesAsync(token);
 
-        ViewBag.Venues = venues.Select(v => new SelectListItem
+        return venues.Select(v => new SelectListItem
         {
             Value = v.Id.ToString(),
             Text = v.Name
