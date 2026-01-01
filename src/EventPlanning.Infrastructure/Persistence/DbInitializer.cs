@@ -1,5 +1,6 @@
 ﻿using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
+using EventPlanning.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +13,7 @@ public static class DbInitializer
     public static async Task SeedAsync(IServiceProvider serviceProvider)
     {
         var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
-        var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+        var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
@@ -29,7 +30,7 @@ public static class DbInitializer
                 "Seeding failed: Admin credentials are missing. " +
                 "Use 'dotnet user-secrets set' or Environment Variables to set 'Seed:AdminEmail' and 'Seed:AdminPassword'.");
 
-        var adminUser = await EnsureUserAsync(userManager, adminEmail, adminPassword, "System", "Admin", "Admin", "+15550000001");
+        var adminUser = await EnsureUserAsync(context, userManager, adminEmail, adminPassword, "System", "Admin", "Admin", "+15550000001");
 
         var organizerEmail = configuration["Seed:OrganizerEmail"];
         var organizerPassword = configuration["Seed:OrganizerPassword"];
@@ -40,7 +41,7 @@ public static class DbInitializer
                 "Use 'dotnet user-secrets set' or Environment Variables to set 'Seed:OrganizerEmail' and 'Seed:OrganizerPassword'.");
 
         var organizerUser =
-            await EnsureUserAsync(userManager, organizerEmail, organizerPassword, "John", "Doe", "User", "+15550000002");
+            await EnsureUserAsync(context, userManager, organizerEmail, organizerPassword, "John", "Doe", "User", "+15550000002");
 
         IList<Venue> venues;
         if (!await context.Venues.AnyAsync())
@@ -126,32 +127,42 @@ public static class DbInitializer
         if (!await roleManager.RoleExistsAsync(roleName)) await roleManager.CreateAsync(new IdentityRole(roleName));
     }
 
-    private static async Task<User> EnsureUserAsync(UserManager<User> userManager, string email, string password,
+    private static async Task<User> EnsureUserAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, string email, string password,
         string fName, string lName, string role, string phoneNumber)
     {
-        var user = await userManager.FindByEmailAsync(email);
-        if (user == null)
+        var appUser = await userManager.FindByEmailAsync(email);
+        User? domainUser = null;
+
+        if (appUser == null)
         {
-            user = new User(fName, lName, Enum.Parse<UserRole>(role), email, email, phoneNumber, "+1");
-            user.EmailConfirmed = true;
-            var result = await userManager.CreateAsync(user, password);
-            if (!result.Succeeded)
-                throw new Exception(
-                    $"Failed to create user {email}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            appUser = new ApplicationUser { UserName = email, Email = email, EmailConfirmed = true, PhoneNumber = phoneNumber };
+            var result = await userManager.CreateAsync(appUser, password);
+             if (!result.Succeeded)
+                throw new Exception($"Failed to create user {email}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            
+            domainUser = new User(appUser.Id, fName, lName, Enum.Parse<UserRole>(role), email, email, phoneNumber, "+1");
+            await context.Users.AddAsync(domainUser);
+            await context.SaveChangesAsync();
         }
         else
         {
-            // Ensure phone number matches (fix for duplicate seeding issue)
-            if (user.PhoneNumber != phoneNumber || string.IsNullOrEmpty(user.CountryCode))
+            // Sync/Fix logic
+            domainUser = await context.Users.FindAsync(appUser.Id);
+            if (domainUser == null)
             {
-                user.PhoneNumber = phoneNumber;
-                user.SetCountryCode("+1");
-                await userManager.UpdateAsync(user);
+                // Self-heal key mismatch
+                domainUser = new User(appUser.Id, fName, lName, Enum.Parse<UserRole>(role), email, email, phoneNumber, "+1");
+                await context.Users.AddAsync(domainUser);
+                await context.SaveChangesAsync();
+            }
+            else if (domainUser.PhoneNumber != phoneNumber)
+            {
+                // Sync phone number
             }
         }
 
-        if (!await userManager.IsInRoleAsync(user, role)) await userManager.AddToRoleAsync(user, role);
+        if (!await userManager.IsInRoleAsync(appUser, role)) await userManager.AddToRoleAsync(appUser, role);
 
-        return user;
+        return domainUser;
     }
 }

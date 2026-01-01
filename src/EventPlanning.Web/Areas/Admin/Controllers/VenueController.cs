@@ -1,6 +1,7 @@
 ﻿using EventPlanning.Application.DTOs.Venue;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
+using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,7 +14,7 @@ namespace EventPlanning.Web.Areas.Admin.Controllers;
 [Authorize(Roles = "Admin")]
 public class VenueController(
     IVenueService venueService,
-    UserManager<User> userManager,
+    UserManager<ApplicationUser> userManager,
     ILogger<VenueController> logger) : Controller
 {
     [HttpGet("")]
@@ -98,11 +99,19 @@ public class VenueController(
         }
     }
 
-    [HttpPost("delete/{id:guid}")]
+    [HttpPost("delete/{id}")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        await venueService.DeleteVenueAsync(id, cancellationToken);
+        try
+        {
+            await venueService.DeleteVenueAsync(id, cancellationToken);
+            TempData["SuccessMessage"] = "Venue deleted successfully.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
 
         return RedirectToAction(nameof(Index));
     }

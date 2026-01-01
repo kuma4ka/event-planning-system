@@ -1,17 +1,15 @@
 ﻿using EventPlanning.Application.Constants;
 using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Application.Interfaces;
-using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace EventPlanning.Application.Services;
 
 public class ProfileService(
-    UserManager<User> userManager,
+    IIdentityService identityService,
     IEventRepository eventRepository,
     IUserRepository userRepository,
     IValidator<EditProfileDto> profileValidator,
@@ -20,7 +18,7 @@ public class ProfileService(
 {
     public async Task<EditProfileDto> GetProfileAsync(string userId, CancellationToken cancellationToken = default)
     {
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await userRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null) throw new KeyNotFoundException("User not found");
 
         var organizedEvents = await eventRepository.GetFilteredAsync(
@@ -49,13 +47,14 @@ public class ProfileService(
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await userRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null) throw new KeyNotFoundException("User not found");
 
         var newFullPhoneNumber = string.IsNullOrEmpty(dto.PhoneNumber)
             ? null
             : $"{dto.CountryCode}{dto.PhoneNumber}";
 
+        // Sync with Identity
         if (newFullPhoneNumber != user.PhoneNumber && !string.IsNullOrEmpty(newFullPhoneNumber))
         {
             var isPhoneTaken = await userRepository.IsPhoneNumberTakenAsync(newFullPhoneNumber, userId, cancellationToken);
@@ -67,20 +66,25 @@ public class ProfileService(
                     new ValidationFailure("PhoneNumber", "This phone number is already linked to another account.")
                 ]);
             }
+            
+            var (succeeded, errors) = await identityService.UpdatePhoneNumberAsync(userId, newFullPhoneNumber);
+            if (!succeeded)
+            {
+                logger.LogWarning("Identity phone update failed for user {UserId}: {Errors}", userId, string.Join(", ", errors));
+                 throw new ValidationException(errors.Select(e => new ValidationFailure(string.Empty, e)));
+            }
         }
 
         user.UpdateProfile(dto.FirstName, dto.LastName);
-        user.PhoneNumber = newFullPhoneNumber;
-
-        var result = await userManager.UpdateAsync(user);
-
-        if (!result.Succeeded)
+        
+        if (newFullPhoneNumber != user.PhoneNumber)
         {
-            logger.LogWarning("Profile update failed for user {UserId}: {Errors}", userId, string.Join(", ", result.Errors.Select(e => e.Description)));
-            var errors = result.Errors.Select(e =>
-                new ValidationFailure(string.Empty, e.Description));
-            throw new ValidationException(errors);
+             user.UpdatePhoneNumber(newFullPhoneNumber);
         }
+        
+        user.SetCountryCode(dto.CountryCode);
+
+        await userRepository.UpdateAsync(user, cancellationToken);
     }
 
     public async Task ChangePasswordAsync(string userId, ChangePasswordDto dto,
@@ -90,17 +94,12 @@ public class ProfileService(
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
-        var user = await userManager.FindByIdAsync(userId);
-        if (user == null) throw new KeyNotFoundException("User not found");
+        var (succeeded, errors) = await identityService.ChangePasswordAsync(userId, dto.CurrentPassword, dto.NewPassword);
 
-        var result = await userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
-
-        if (!result.Succeeded)
+        if (!succeeded)
         {
-            logger.LogWarning("Password change failed for user {UserId}: {Errors}", userId, string.Join(", ", result.Errors.Select(e => e.Description)));
-            var errors = result.Errors.Select(e =>
-                new ValidationFailure(string.Empty, e.Description));
-            throw new ValidationException(errors);
+            logger.LogWarning("Password change failed for user {UserId}: {Errors}", userId, string.Join(", ", errors));
+             throw new ValidationException(errors.Select(e => new ValidationFailure(string.Empty, e)));
         }
     }
 

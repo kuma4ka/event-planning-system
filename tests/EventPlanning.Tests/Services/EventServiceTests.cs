@@ -6,7 +6,6 @@ using EventPlanning.Domain.Interfaces;
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -18,7 +17,6 @@ public class EventServiceTests
     private readonly Mock<IEventRepository> _eventRepoMock;
     private readonly Mock<IValidator<CreateEventDto>> _createValidatorMock;
     private readonly Mock<IUserRepository> _userRepoMock;
-    private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock;
     private readonly Mock<ILogger<EventService>> _loggerMock;
 
     private readonly EventService _service;
@@ -30,7 +28,6 @@ public class EventServiceTests
         _userRepoMock = new Mock<IUserRepository>();
         Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
         Mock<IValidator<EventSearchDto>> searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
-        _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         _loggerMock = new Mock<ILogger<EventService>>();
         IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
 
@@ -40,7 +37,6 @@ public class EventServiceTests
             updateValidatorMock.Object,
             searchValidatorMock.Object,
             _userRepoMock.Object,
-            _httpContextAccessorMock.Object,
             cache,
             _loggerMock.Object
         );
@@ -128,8 +124,12 @@ public class EventServiceTests
             .ReturnsAsync(eventEntity);
 
         _eventRepoMock
-            .Setup(r => r.IsUserJoinedAsync(eventId, userId, It.IsAny<CancellationToken>()))
+            .Setup(r => r.GuestEmailExistsAsync(eventId, "test@test.com", null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
+
+        _userRepoMock
+            .Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new User(userId, "Test", "User", UserRole.User, "test@test.com", "test@test.com", "+123456789", "+1"));
 
         // Act
         Func<Task> act = async () => await _service.JoinEventAsync(eventId, userId);
@@ -138,7 +138,7 @@ public class EventServiceTests
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("You are already registered for this event.");
 
-        _eventRepoMock.Verify(x => x.TryJoinEventAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _eventRepoMock.Verify(x => x.AddGuestAsync(It.IsAny<Guest>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -166,10 +166,8 @@ public class EventServiceTests
             .Setup(r => r.GetDetailsByIdAsync(eventId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(eventEntity);
 
-        SetupHttpContextUser(currentUserId);
-
         // Act
-        var result = await _service.GetEventDetailsAsync(eventId);
+        var result = await _service.GetEventDetailsAsync(eventId, currentUserId);
 
         // Assert
         result.Should().NotBeNull();
@@ -205,10 +203,8 @@ public class EventServiceTests
             .Setup(r => r.GetDetailsByIdAsync(eventId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(eventEntity);
 
-        SetupHttpContextUser(currentUserId);
-
         // Act
-        var result = await _service.GetEventDetailsAsync(eventId);
+        var result = await _service.GetEventDetailsAsync(eventId, currentUserId);
 
         // Assert
         result.Should().NotBeNull();
@@ -225,10 +221,7 @@ public class EventServiceTests
         // Arrange
         var eventId = Guid.NewGuid();
         var organizerId = "user-1";
-        var user = new User("John", "Doe", UserRole.User, "john@example.com", "john@example.com", "+123456789", "+1");
-        // Reflection to set Id is tricky for IdentityUser inheritance but User entity has public constructor. 
-        // User entity inherits from IdentityUser, so Id is string and settable? No, IdentityUser Id is string and has setter.
-        user.Id = organizerId;
+        var user = new User(organizerId, "John", "Doe", UserRole.User, "john@example.com", "john@example.com", "+123456789", "+1");
 
         var eventEntity = new Event(
             "Test Event",
@@ -247,7 +240,8 @@ public class EventServiceTests
             .ReturnsAsync(user);
 
         // Act
-        var result = await _service.GetEventDetailsAsync(eventId);
+        // Act
+        var result = await _service.GetEventDetailsAsync(eventId, null);
 
         // Assert
         result.Should().NotBeNull();
@@ -255,16 +249,5 @@ public class EventServiceTests
         result.OrganizerEmail.Should().Be("john@example.com");
     }
 
-    private void SetupHttpContextUser(string userId)
-    {
-        var claims = new List<System.Security.Claims.Claim>
-        {
-            new(System.Security.Claims.ClaimTypes.NameIdentifier, userId)
-        };
-        var identity = new System.Security.Claims.ClaimsIdentity(claims, "TestAuth");
-        var claimsPrincipal = new System.Security.Claims.ClaimsPrincipal(identity);
 
-        var httpContext = new DefaultHttpContext { User = claimsPrincipal };
-        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
-    }
 }

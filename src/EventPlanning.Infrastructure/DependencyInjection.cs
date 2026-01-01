@@ -1,5 +1,6 @@
 ﻿using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
+using EventPlanning.Infrastructure.Identity;
 using EventPlanning.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,7 @@ public static class DependencyInjection
         services.AddMemoryCache();
         services.AddHttpContextAccessor(); // Required for generating absolute links dynamically
 
-            services.AddIdentity<User, IdentityRole>(options =>
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
                 options.Password.RequireDigit = true;
@@ -63,7 +64,7 @@ public static class DependencyInjection
         // Email
         services.Configure<Application.Models.EmailSettings>(configuration.GetSection(Application.Models.EmailSettings.SectionName));
         services.AddTransient<IEmailService, SmtpEmailService>();
-        services.AddTransient<IEmailSender<User>, IdentityEmailSender>();
+        services.AddTransient<IEmailSender<ApplicationUser>, IdentityEmailSender>();
 
         return services;
     }

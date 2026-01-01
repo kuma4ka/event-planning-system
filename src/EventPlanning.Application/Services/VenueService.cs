@@ -10,6 +10,7 @@ namespace EventPlanning.Application.Services;
 
 public class VenueService(
     IVenueRepository venueRepository,
+    IEventRepository eventRepository,
     IImageService imageService,
     IValidator<CreateVenueDto> createValidator,
     IValidator<UpdateVenueDto> updateValidator,
@@ -114,6 +115,12 @@ public class VenueService(
 
     public async Task DeleteVenueAsync(Guid id, CancellationToken cancellationToken = default)
     {
+        var hasEvents = await eventRepository.HasEventsAtVenueAsync(id, cancellationToken);
+        if (hasEvents)
+        {
+            throw new InvalidOperationException("Cannot delete venue because it is associated with existing events.");
+        }
+
         var venue = await venueRepository.GetByIdAsync(id, cancellationToken);
         if (venue == null) return;
 

@@ -102,7 +102,7 @@
                                         <button type="button"
                                                 class="btn-action text-danger"
                                                 data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal"
+                                                data-bs-target="#venueDeleteModal"
                                                 data-venue-id="@venue.Id"
                                                 data-venue-name="@venue.Name"
                                                 title="Remove Venue">
@@ -175,7 +175,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true"
+<div class="modal fade" id="venueDeleteModal" tabindex="-1" aria-hidden="true"
      data-url-template='@Url.Action("Delete", "Venue", new { area = "Admin", id = "PLACEHOLDER" })'>
 
     <div class="modal-dialog modal-dialog-centered">
@@ -190,7 +190,7 @@
             <div class="modal-body p-4 text-center">
                 <p class="text-muted mb-4">
                     Are you sure you want to permanently remove <br/>
-                    <strong style="color: var(--text-main);" class="fs-5" id="modalVenueName">Venue Name</strong>?
+                    <strong style="color: var(--text-main);" class="fs-5" id="venueModalNameDisplay">Venue Name</strong>?
                 </p>
 
                 <div class="d-flex gap-2 justify-content-center">
@@ -199,7 +199,7 @@
                         Cancel
                     </button>
 
-                    <form id="deleteForm" method="post" class="flex-grow-1">
+                    <form id="venueDeleteForm" method="post" class="flex-grow-1">
                         <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">
                             Yes, Delete It
                         </button>

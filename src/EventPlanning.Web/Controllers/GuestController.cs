@@ -1,6 +1,7 @@
 ﻿using EventPlanning.Application.DTOs.Guest;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
+using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -12,7 +13,7 @@ namespace EventPlanning.Web.Controllers;
 [Route("guests")]
 public class GuestController(
     IGuestService guestService,
-    UserManager<User> userManager,
+    UserManager<ApplicationUser> userManager,
     ILogger<GuestController> logger) : Controller
 {
 

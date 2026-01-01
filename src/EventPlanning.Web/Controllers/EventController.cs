@@ -3,6 +3,7 @@ using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
+using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,7 +17,7 @@ namespace EventPlanning.Web.Controllers;
 public class EventController(
     IEventService eventService,
     IVenueService venueService,
-    UserManager<User> userManager,
+    UserManager<ApplicationUser> userManager,
     IConfiguration configuration,
     ILogger<EventController> logger) : Controller
 {
@@ -24,7 +25,8 @@ public class EventController(
     [AllowAnonymous]
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
     {
-        var eventDetails = await eventService.GetEventDetailsAsync(id, cancellationToken);
+        var userId = userManager.GetUserId(User);
+        var eventDetails = await eventService.GetEventDetailsAsync(id, userId, cancellationToken);
         if (eventDetails == null) return NotFound();
 
         ViewBag.GoogleMapsApiKey = configuration["GoogleMaps:ApiKey"];
@@ -55,7 +57,7 @@ public class EventController(
         {
             var eventId = await eventService.CreateEventAsync(userId!, model, cancellationToken);
             logger.LogInformation("Event created: {EventId} by {User}", eventId, User.Identity?.Name);
-            return RedirectToAction("MyEvents", "Event");
+            return RedirectToAction(nameof(MyEvents));
         }
         catch (ValidationException ex)
         {
@@ -108,7 +110,7 @@ public class EventController(
         {
             await eventService.UpdateEventAsync(userId!, model, cancellationToken);
             logger.LogInformation("Event updated: {EventId} by {User}", id, User.Identity?.Name);
-            return RedirectToAction("MyEvents", "Event");
+            return RedirectToAction(nameof(MyEvents));
         }
         catch (ValidationException ex)
         {
@@ -132,7 +134,7 @@ public class EventController(
         }
     }
 
-    [HttpPost("delete/{id:guid}")]
+    [HttpPost("delete/{id}")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
@@ -141,7 +143,7 @@ public class EventController(
         {
             await eventService.DeleteEventAsync(userId!, id, cancellationToken);
             logger.LogInformation("Event deleted: {EventId} by {User}", id, User.Identity?.Name);
-            return RedirectToAction("MyEvents", "Event");
+            return RedirectToAction(nameof(MyEvents));
         }
         catch (UnauthorizedAccessException)
         {

@@ -1,7 +1,8 @@
 ﻿@using EventPlanning.Domain.Entities
+@using EventPlanning.Infrastructure.Identity
 @using Microsoft.AspNetCore.Identity
 
-@inject SignInManager<User> SignInManager
+@inject SignInManager<ApplicationUser> SignInManager
 
 @if (SignInManager.IsSignedIn(User))
 {
