@@ -17,6 +17,7 @@ public class EventService(
     IValidator<UpdateEventDto> updateValidator,
     IValidator<EventSearchDto> searchValidator,
     IUserRepository userRepository,
+    ICountryService countryService,
     ILogger<EventService> logger) : IEventService
 {
     public async Task<PagedResult<EventDto>> GetEventsAsync(
@@ -98,7 +99,7 @@ public class EventService(
                 );
             }
 
-            var (_, localNumber) = PhoneNumber.Parse(g.PhoneNumber?.Value);
+            var (_, localNumber) = countryService.ParsePhoneNumber(g.PhoneNumber?.Value);
 
             return new GuestDto(
                 g.Id,
@@ -180,8 +181,7 @@ public class EventService(
              throw new UnauthorizedAccessException("Not your event");
         }
 
-        if (eventEntity.Date < DateTime.UtcNow)
-            throw new InvalidOperationException("Cannot edit an event that has already ended.");
+
 
         eventEntity.UpdateDetails(
             dto.Name,

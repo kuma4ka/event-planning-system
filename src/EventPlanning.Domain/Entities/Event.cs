@@ -21,7 +21,6 @@ public class Event
 
     public ICollection<Guest> Guests { get; private set; } = new List<Guest>();
 
-    // Constructor for EF Core
     private Event()
     {
         Name = null!;
@@ -58,5 +57,11 @@ public class Event
         Date = date;
         Type = type;
         VenueId = venueId;
+    }
+
+    public bool IsFull(int currentGuestCount)
+    {
+        if (Venue == null || Venue.Capacity <= 0) return false;
+        return currentGuestCount >= Venue.Capacity;
     }
 }

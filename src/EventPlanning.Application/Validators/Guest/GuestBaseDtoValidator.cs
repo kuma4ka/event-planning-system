@@ -1,5 +1,4 @@
-﻿using EventPlanning.Application.Constants;
-using EventPlanning.Domain.Constants;
+﻿using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.DTOs.Guest;
 using FluentValidation;
 
@@ -7,7 +6,7 @@ namespace EventPlanning.Application.Validators.Guest;
 
 public abstract class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : GuestBaseDto
 {
-    protected GuestBaseDtoValidator()
+    protected GuestBaseDtoValidator(ICountryService countryService)
     {
         RuleFor(x => x.EventId)
             .NotEmpty().WithMessage("Event ID is required.");
@@ -35,7 +34,7 @@ public abstract class GuestBaseDtoValidator<T> : AbstractValidator<T> where T : 
 
         RuleFor(x => x.CountryCode)
             .NotEmpty()
-            .Must(code => CountryConstants.SupportedCountries.Any(c => c.Code == code))
+            .Must(code => countryService.GetSupportedCountries().Any(c => c.Code == code))
             .WithMessage("Invalid or unsupported country code.");
 
         RuleFor(x => x.PhoneNumber)

@@ -1,5 +1,4 @@
 ﻿using EventPlanning.Application.Constants;
-using EventPlanning.Domain.Constants;
 using EventPlanning.Domain.ValueObjects;
 using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Application.Interfaces;
@@ -16,6 +15,8 @@ public class ProfileService(
     IUserRepository userRepository,
     IValidator<EditProfileDto> profileValidator,
     IValidator<ChangePasswordDto> passwordValidator,
+    ICountryService countryService,
+    ICacheService cacheService,
     ILogger<ProfileService> logger) : IProfileService
 {
     public async Task<EditProfileDto> GetProfileAsync(string userId, CancellationToken cancellationToken = default)
@@ -28,7 +29,7 @@ public class ProfileService(
 
         var joinedCount = await eventRepository.CountJoinedEventsAsync(userId, cancellationToken);
 
-        var (code, number) = PhoneNumber.Parse(user.PhoneNumber);
+        var (code, number) = countryService.ParsePhoneNumber(user.PhoneNumber);
 
         return new EditProfileDto
         {
@@ -56,7 +57,6 @@ public class ProfileService(
             ? null
             : $"{dto.CountryCode}{dto.PhoneNumber}";
 
-        // Sync with Identity
         if (newFullPhoneNumber != user.PhoneNumber && !string.IsNullOrEmpty(newFullPhoneNumber))
         {
             var isPhoneTaken = await userRepository.IsPhoneNumberTakenAsync(newFullPhoneNumber, userId, cancellationToken);
@@ -87,6 +87,20 @@ public class ProfileService(
         user.SetCountryCode(dto.CountryCode);
 
         await userRepository.UpdateAsync(user, cancellationToken);
+
+        var affectedEventIds = await eventRepository.UpdateGuestDetailsAsync(
+            user.Email!, 
+            user.FirstName, 
+            user.LastName, 
+            user.CountryCode, 
+            user.PhoneNumber, 
+            cancellationToken);
+
+        foreach (var eventId in affectedEventIds)
+        {
+            cacheService.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId}_public");
+            cacheService.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId}_organizer");
+        }
     }
 
     public async Task ChangePasswordAsync(string userId, ChangePasswordDto dto,

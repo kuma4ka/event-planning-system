@@ -221,7 +221,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
                    var currentCount = await context.Guests
                        .CountAsync(g => g.EventId == guest.EventId, cancellationToken);
                     
-                   if (currentCount >= eventEntity.Venue.Capacity)
+                   if (eventEntity.IsFull(currentCount))
                    {
                        return false;
                    }
@@ -239,5 +239,26 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
                 throw;
             }
         });
+    }
+    public async Task<List<Guid>> UpdateGuestDetailsAsync(string email, string firstName, string lastName, string countryCode, string? phoneNumber, CancellationToken cancellationToken = default)
+    {
+        var guests = await context.Guests
+            .Where(g => (string)g.Email == email)
+            .ToListAsync(cancellationToken);
+
+        var affectedEventIds = new List<Guid>();
+
+        foreach (var guest in guests)
+        {
+            guest.UpdateDetails(firstName, lastName, email, countryCode, phoneNumber);
+            affectedEventIds.Add(guest.EventId);
+        }
+
+        if (guests.Any())
+        {
+            await context.SaveChangesAsync(cancellationToken);
+        }
+
+        return affectedEventIds;
     }
 }
