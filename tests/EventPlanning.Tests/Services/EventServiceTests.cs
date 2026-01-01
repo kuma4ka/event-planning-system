@@ -29,7 +29,6 @@ public class EventServiceTests
         Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
         Mock<IValidator<EventSearchDto>> searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
         _loggerMock = new Mock<ILogger<EventService>>();
-        Mock<ICacheService> cacheMock = new Mock<ICacheService>();
 
         _service = new EventService(
             _eventRepoMock.Object,
@@ -37,7 +36,6 @@ public class EventServiceTests
             updateValidatorMock.Object,
             searchValidatorMock.Object,
             _userRepoMock.Object,
-            cacheMock.Object,
             _loggerMock.Object
         );
     }

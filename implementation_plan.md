@@ -1,39 +1,43 @@
-# Refactoring Web and Application Layers
+# Architectural Refactoring Plan
 
-## Goal
-Address architectural violations and risks identified in the `EventPlanning` solution, specifically focusing on the Application and Web layers.
-
-## User Review Required
-> [!IMPORTANT]
-> **Breaking Change**: `EventService` constructor will change to accept `ICacheService` instead of `IMemoryCache`.
-> **Database Interaction**: `JoinEventAsync` will be refactored to ensure data consistency. This might involve adding new repository methods or transaction management.
+## Goal Description
+Address architectural violations identified in the analysis report. Specifically, we will improve separation of concerns by moving domain logic back to the Domain layer, extracting caching logic from the Service layer into a Decorator, and removing loosely-typed `ViewBag` usage in the Web layer in favor of strong ViewModels.
 
 ## Proposed Changes
 
-### 1. Application Layer: Fix Abstraction Leaks (Caching)
-Currently, `EventService` depends directly on `Microsoft.Extensions.Caching.Memory`.
-- **Create Interface**: `EventPlanning.Application.Interfaces.ICacheService`
-- **Implement Interface**: `EventPlanning.Infrastructure.Services.MemoryCacheService` (wrapping `IMemoryCache`)
-- **Refactor**: Update `EventService` to use `ICacheService`.
+### Domain Layer
+#### [MODIFY] [PhoneNumber.cs](file:///e:/PetProjects/event-planning-system/src/EventPlanning.Domain/ValueObjects/PhoneNumber.cs)
+- Implement `Parse` and `Format` logic that currently resides in `EventService`.
 
-### 2. Application Layer: Fix Concurrency in `JoinEventAsync`
-The "check-then-act" logic for event capacity is not thread-safe.
-- **Approach**: Move the "check capacity and add" logic into a transaction or a specialized Repository method that uses database-level locking or atomic updates.
-- **Change**: Introduce `IEventRepository.TryJoinEventAsync` which handles the check and insert atomically (or within a transaction scope).
+### Application Layer
+#### [NEW] [CachedEventService.cs](file:///e:/PetProjects/event-planning-system/src/EventPlanning.Application/Services/CachedEventService.cs)
+- Create a Decorator for `IEventService` that handles caching for `GetEventDetailsAsync`.
 
-### 3. Web Layer: Clean up `EventController`
-- **Refactor `MyEvents`**: Move the view state determination logic (upcoming/past, date defaults) into a helper or strictly typed logic.
-- **Remove `ViewBag.Venues`**:
-    - Create `EventFormViewModel` that includes the `CreateEventDto`/`UpdateEventDto` and the `Venues` list.
-    - Update `Create` and `Edit` views to use this ViewModel.
+#### [MODIFY] [EventService.cs](file:///e:/PetProjects/event-planning-system/src/EventPlanning.Application/Services/EventService.cs)
+- Remove `ParsePhoneNumber` static method.
+- Remove `ICacheService` dependency and all caching logic.
+- Simplify `GetEventDetailsAsync` to strictly fetch data and map DTOs.
+
+#### [MODIFY] [DependencyInjection.cs](file:///e:/PetProjects/event-planning-system/src/EventPlanning.Application/DependencyInjection.cs)
+- Update DI registration to decorate `EventService` with `CachedEventService`.
+
+### Web (MVC) Layer
+#### [NEW] [EventListViewModel.cs](file:///e:/PetProjects/event-planning-system/src/EventPlanning.Web/Models/EventListViewModel.cs)
+- Create a strongly-typed ViewModel to hold search results, pagination, and current filter state (replacing `ViewBag`).
+
+#### [MODIFY] [EventController.cs](file:///e:/PetProjects/event-planning-system/src/EventPlanning.Web/Controllers/EventController.cs)
+- Refactor `MyEvents` action to return `EventListViewModel`.
+- Remove `SetMyEventsViewBag`.
+
+#### [MODIFY] [MyEvents.cshtml](file:///e:/PetProjects/event-planning-system/src/EventPlanning.Web/Views/Event/MyEvents.cshtml)
+- Update view to use `model EventListViewModel`.
 
 ## Verification Plan
-
 ### Automated Tests
-- Run existing tests to ensure no regression.
-- `dotnet test`
+- Run existing unit tests to ensure no regressions in business logic.
+- Verify `EventService` tests still pass (might need adjustments for removed caching dependencies).
 
 ### Manual Verification
-- Verify `JoinEvent` flow works as expected.
-- Verify `MyEvents` filtering works as expected.
-- Verify `Create` and `Edit` pages load and save correctly with the new ViewModel.
+- **Caching**: Verify Event Details page still loads and hits cache (logs/debug).
+- **Phone Numbers**: Verify Guest List on Event Details correctly formats phone numbers.
+- **My Events**: Verify Sorting, Filtering, and Pagination work correctly with the new ViewModel.

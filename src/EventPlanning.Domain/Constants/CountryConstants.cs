@@ -1,4 +1,4 @@
-﻿namespace EventPlanning.Application.Constants;
+namespace EventPlanning.Domain.Constants;
 
 public record CountryInfo(string Code, string Flag, string Name)
 {

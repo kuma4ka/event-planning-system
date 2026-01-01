@@ -12,7 +12,12 @@ public static class DependencyInjection
     {
         services.AddValidatorsFromAssemblyContaining<CreateEventDtoValidator>();
 
-        services.AddScoped<IEventService, EventService>();
+        services.AddScoped<EventService>();
+        services.AddScoped<IEventService>(provider => 
+            new CachedEventService(
+                provider.GetRequiredService<EventService>(),
+                provider.GetRequiredService<ICacheService>()
+            ));
         services.AddScoped<IVenueService, VenueService>();
         services.AddScoped<IGuestService, GuestService>();
         services.AddScoped<IProfileService, ProfileService>();

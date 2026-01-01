@@ -27,10 +27,10 @@
     <div class="col-4">
         <label for="@(prefix)CountryCode" class="form-label small text-muted fw-bold">Code</label>
         <select id="@(prefix)CountryCode" name="CountryCode" class="form-select" autocomplete="tel-country-code">
-            @foreach (var country in EventPlanning.Application.Constants.CountryConstants.SupportedCountries)
+            @foreach (var country in EventPlanning.Domain.Constants.CountryConstants.SupportedCountries)
             {
                 <option value="@country.Code"
-                    selected="@(country.Code == EventPlanning.Application.Constants.CountryConstants.DefaultCode)">
+                    selected="@(country.Code == EventPlanning.Domain.Constants.CountryConstants.DefaultCode)">
                     @country.DisplayValue
                 </option>
             }

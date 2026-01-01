@@ -1,4 +1,5 @@
 ﻿using EventPlanning.Application.Constants;
+using EventPlanning.Domain.Constants;
 
 namespace EventPlanning.Application.DTOs.Guest;
 
