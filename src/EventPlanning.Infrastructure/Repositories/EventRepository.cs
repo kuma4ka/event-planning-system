@@ -15,7 +15,6 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
     {
         return await context.Events
             .Include(e => e.Venue)
-            // .Include(e => e.Guests) // Removed for performance (lazy loading split)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
