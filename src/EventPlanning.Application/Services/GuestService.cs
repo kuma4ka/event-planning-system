@@ -33,7 +33,7 @@ public class GuestService(
             throw new UnauthorizedAccessException("Not your event");
         }
 
-        if (await eventRepository.GuestEmailExistsAsync(dto.EventId, dto.Email, null, cancellationToken))
+        if (await guestRepository.EmailExistsAtEventAsync(dto.EventId, dto.Email, null, cancellationToken))
         {
             throw new InvalidOperationException($"Guest with email '{dto.Email}' is already registered for this event.");
         }
@@ -62,12 +62,12 @@ public class GuestService(
 
         if (eventEntity.Venue is { Capacity: > 0 })
         {
-            var guestCount = await eventRepository.CountGuestsAsync(dto.EventId, cancellationToken);
+            var guestCount = await guestRepository.CountGuestsAtEventAsync(dto.EventId, cancellationToken);
             if (guestCount >= eventEntity.Venue.Capacity)
                 throw new InvalidOperationException("Venue is fully booked.");
         }
 
-        if (await eventRepository.GuestEmailExistsAsync(dto.EventId, dto.Email, null, cancellationToken))
+        if (await guestRepository.EmailExistsAtEventAsync(dto.EventId, dto.Email, null, cancellationToken))
         {
             throw new InvalidOperationException($"Guest with email '{dto.Email}' is already added to this event.");
         }
@@ -75,7 +75,7 @@ public class GuestService(
         var fullPhoneNumber = dto.CountryCode + dto.PhoneNumber.Replace(" ", "").Replace("-", "");
         if (!string.IsNullOrEmpty(dto.PhoneNumber))
         {
-            bool phoneExists = await eventRepository.GuestPhoneExistsAsync(dto.EventId, fullPhoneNumber, null, cancellationToken);
+            bool phoneExists = await guestRepository.PhoneExistsAtEventAsync(dto.EventId, fullPhoneNumber, null, cancellationToken);
             if (phoneExists)
             {
                 var displayPhone = fullPhoneNumber.StartsWith("+") ? fullPhoneNumber : $"+{fullPhoneNumber}";
@@ -112,7 +112,7 @@ public class GuestService(
 
         if (!guest.Email.Value.Equals(dto.Email, StringComparison.OrdinalIgnoreCase))
         {
-            if (await eventRepository.GuestEmailExistsAsync(guest.EventId, dto.Email, guest.Id, cancellationToken))
+            if (await guestRepository.EmailExistsAtEventAsync(guest.EventId, dto.Email, guest.Id, cancellationToken))
             {
                 throw new InvalidOperationException($"Another guest with email '{dto.Email}' already exists in this event.");
             }
@@ -121,7 +121,7 @@ public class GuestService(
         var newFullPhone = dto.CountryCode + dto.PhoneNumber;
         if ((guest.PhoneNumber != null ? guest.PhoneNumber.Value : null) != newFullPhone && !string.IsNullOrEmpty(dto.PhoneNumber))
         {
-            if (await eventRepository.GuestPhoneExistsAsync(guest.EventId, newFullPhone, guest.Id, cancellationToken))
+            if (await guestRepository.PhoneExistsAtEventAsync(guest.EventId, newFullPhone, guest.Id, cancellationToken))
             {
                 var displayPhone = newFullPhone.StartsWith("+") ? newFullPhone : $"+{newFullPhone}";
                 throw new InvalidOperationException($"Another guest with phone number {displayPhone} already exists.");

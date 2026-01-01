@@ -13,6 +13,7 @@ namespace EventPlanning.Application.Services;
 
 public class EventService(
     IEventRepository eventRepository,
+    IGuestRepository guestRepository,
     IValidator<CreateEventDto> createValidator,
     IValidator<UpdateEventDto> updateValidator,
     IValidator<EventSearchDto> searchValidator,
@@ -111,7 +112,7 @@ public class EventService(
             );
         }).ToList();
 
-        var isJoined = !string.IsNullOrEmpty(userId) && await eventRepository.IsUserJoinedAsync(eventEntity.Id, userId, cancellationToken);
+        var isJoined = !string.IsNullOrEmpty(userId) && await guestRepository.IsUserJoinedAsync(eventEntity.Id, userId, cancellationToken);
 
         var eventDetails = new EventDetailsDto(
             eventEntity.Venue?.Capacity ?? 0,

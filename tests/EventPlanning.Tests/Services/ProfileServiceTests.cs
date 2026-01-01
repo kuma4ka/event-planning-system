@@ -15,6 +15,7 @@ public class ProfileServiceTests
 {
     private readonly Mock<IIdentityService> _identityServiceMock;
     private readonly Mock<IEventRepository> _eventRepositoryMock;
+    private readonly Mock<IGuestRepository> _guestRepositoryMock;
     private readonly Mock<IUserRepository> _userRepositoryMock;
     private readonly Mock<IValidator<EditProfileDto>> _profileValidatorMock;
     private readonly Mock<IValidator<ChangePasswordDto>> _passwordValidatorMock;
@@ -27,6 +28,7 @@ public class ProfileServiceTests
     {
         _identityServiceMock = new Mock<IIdentityService>();
         _eventRepositoryMock = new Mock<IEventRepository>();
+        _guestRepositoryMock = new Mock<IGuestRepository>();
         _userRepositoryMock = new Mock<IUserRepository>();
         _profileValidatorMock = new Mock<IValidator<EditProfileDto>>();
         _passwordValidatorMock = new Mock<IValidator<ChangePasswordDto>>();
@@ -37,6 +39,7 @@ public class ProfileServiceTests
         _service = new ProfileService(
             _identityServiceMock.Object,
             _eventRepositoryMock.Object,
+            _guestRepositoryMock.Object,
             _userRepositoryMock.Object,
             _profileValidatorMock.Object,
             _passwordValidatorMock.Object,
@@ -63,7 +66,7 @@ public class ProfileServiceTests
         _userRepositoryMock.Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
-        _eventRepositoryMock.Setup(r => r.UpdateGuestDetailsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        _guestRepositoryMock.Setup(r => r.UpdateGuestDetailsByEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Guid> { eventId1, eventId2 });
 
         _identityServiceMock.Setup(i => i.UpdatePhoneNumberAsync(It.IsAny<string>(), It.IsAny<string>()))
@@ -73,7 +76,7 @@ public class ProfileServiceTests
         await _service.UpdateProfileAsync(userId, dto);
 
         // Assert
-        _eventRepositoryMock.Verify(r => r.UpdateGuestDetailsAsync(user.Email!, dto.FirstName, dto.LastName, dto.CountryCode, "+15551234", It.IsAny<CancellationToken>()), Times.Once);
+        _guestRepositoryMock.Verify(r => r.UpdateGuestDetailsByEmailAsync(user.Email!, dto.FirstName, dto.LastName, dto.CountryCode, "+15551234", It.IsAny<CancellationToken>()), Times.Once);
         
         // Verify cache invalidation
         _cacheServiceMock.Verify(c => c.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId1}_public"), Times.Once);

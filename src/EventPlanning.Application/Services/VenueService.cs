@@ -106,7 +106,7 @@ public class VenueService(
             dto.Address,
             dto.Capacity,
             dto.Description,
-            newImageUrl // Pass the new (or existing) ImageUrl
+            newImageUrl
         );
 
         await venueRepository.UpdateAsync(venue, cancellationToken);

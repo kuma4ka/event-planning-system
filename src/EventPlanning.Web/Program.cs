@@ -37,7 +37,6 @@ try
 {
     var app = builder.Build();
 
-    // SECURE DB SEEDING
     using (var scope = app.Services.CreateScope())
     {
         try
@@ -47,7 +46,6 @@ try
         catch (Exception ex)
         {
             Log.Fatal(ex, "An error occurred while seeding the database.");
-            // Also log to fallback logger if needed, but Serilog Fatal covers it
         }
     }
 
@@ -60,7 +58,7 @@ try
     app.UseHttpsRedirection();
     app.UseStaticFiles();
 
-    app.UseSerilogRequestLogging(); // Request logging middleware
+    app.UseSerilogRequestLogging();
     
     app.UseRouting();
     app.UseRateLimiter();
@@ -72,7 +70,6 @@ try
         name: "areas",
         pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
-    // default route
     app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");

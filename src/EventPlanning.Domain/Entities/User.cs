@@ -4,7 +4,7 @@ namespace EventPlanning.Domain.Entities;
 
 public class User
 {
-    public string Id { get; private set; } // Matches IdentityUser ID format (Guid-as-string or Guid)
+    public string Id { get; private set; }
     public string UserName { get; private set; }
     public string Email { get; private set; }
     public string? PhoneNumber { get; private set; }
@@ -31,11 +31,11 @@ public class User
         if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("Last Name is required.", nameof(lastName));
         if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email is required.", nameof(email));
         
-        if (string.IsNullOrWhiteSpace(countryCode)) countryCode = "+1"; // Default fall-back if missing
+        if (string.IsNullOrWhiteSpace(countryCode)) countryCode = "+1";
 
         Id = id;
-        UserName = userName; // Should match IdentityUser
-        Email = email;       // Should match IdentityUser
+        UserName = userName;
+        Email = email;
         PhoneNumber = phoneNumber;
 
         CountryCode = countryCode;

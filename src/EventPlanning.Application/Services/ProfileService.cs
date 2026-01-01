@@ -12,6 +12,7 @@ namespace EventPlanning.Application.Services;
 public class ProfileService(
     IIdentityService identityService,
     IEventRepository eventRepository,
+    IGuestRepository guestRepository,
     IUserRepository userRepository,
     IValidator<EditProfileDto> profileValidator,
     IValidator<ChangePasswordDto> passwordValidator,
@@ -27,7 +28,7 @@ public class ProfileService(
         var organizedEvents = await eventRepository.GetFilteredAsync(
             userId, null, null, null, null, null, null, 1, 1, cancellationToken);
 
-        var joinedCount = await eventRepository.CountJoinedEventsAsync(userId, cancellationToken);
+        var joinedCount = await guestRepository.CountJoinedEventsAsync(userId, cancellationToken);
 
         var (code, number) = countryService.ParsePhoneNumber(user.PhoneNumber);
 
@@ -88,7 +89,7 @@ public class ProfileService(
 
         await userRepository.UpdateAsync(user, cancellationToken);
 
-        var affectedEventIds = await eventRepository.UpdateGuestDetailsAsync(
+        var affectedEventIds = await guestRepository.UpdateGuestDetailsByEmailAsync(
             user.Email!, 
             user.FirstName, 
             user.LastName, 

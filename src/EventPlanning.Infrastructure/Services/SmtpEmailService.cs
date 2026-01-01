@@ -31,16 +31,13 @@ public class SmtpEmailService(
 
             using var client = new SmtpClient();
 
-            // Connect
             await client.ConnectAsync(_settings.Server, _settings.Port, SecureSocketOptions.StartTls, cancellationToken);
 
-            // Authenticate (if needed)
             if (!string.IsNullOrEmpty(_settings.Username))
             {
                 await client.AuthenticateAsync(_settings.Username, _settings.Password, cancellationToken);
             }
 
-            // Send
             await client.SendAsync(message, cancellationToken);
             await client.DisconnectAsync(true, cancellationToken);
 
@@ -49,10 +46,7 @@ public class SmtpEmailService(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to send email to {To}", to);
-            // We do not rethrow here to prevent crashing the main flow (fire & forget style often desired for notifications)
-            // But depending on requirements, we might want to throw. 
-            // For this user request, logging is safer so the User subscription doesn't fail if SMTP is flaky.
-            // If critical, we should throw or return result.
+            // Suppress exception to prevent flow interruption; SMTP failure shouldn't block user action.
         }
     }
 }

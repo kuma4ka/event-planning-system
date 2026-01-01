@@ -12,6 +12,7 @@ namespace EventPlanning.Tests.Services;
 public class EventParticipationServiceTests
 {
     private readonly Mock<IEventRepository> _eventRepoMock;
+    private readonly Mock<IGuestRepository> _guestRepoMock;
     private readonly Mock<IUserRepository> _userRepoMock;
     private readonly Mock<ICacheService> _cacheServiceMock;
     private readonly Mock<ILogger<EventParticipationService>> _loggerMock;
@@ -20,12 +21,14 @@ public class EventParticipationServiceTests
     public EventParticipationServiceTests()
     {
         _eventRepoMock = new Mock<IEventRepository>();
+        _guestRepoMock = new Mock<IGuestRepository>();
         _userRepoMock = new Mock<IUserRepository>();
         _cacheServiceMock = new Mock<ICacheService>();
         _loggerMock = new Mock<ILogger<EventParticipationService>>();
 
         _service = new EventParticipationService(
             _eventRepoMock.Object,
+            _guestRepoMock.Object,
             _userRepoMock.Object,
             _cacheServiceMock.Object,
             _loggerMock.Object
@@ -54,8 +57,10 @@ public class EventParticipationServiceTests
             .Setup(r => r.GetByIdAsync(eventId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(eventEntity);
 
-        _eventRepoMock
-            .Setup(r => r.GuestEmailExistsAsync(eventId, "test@test.com", null, It.IsAny<CancellationToken>()))
+
+
+        _guestRepoMock
+            .Setup(r => r.EmailExistsAtEventAsync(eventId, "test@test.com", null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         _userRepoMock
@@ -90,9 +95,9 @@ public class EventParticipationServiceTests
         typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
 
         _eventRepoMock.Setup(r => r.GetByIdAsync(eventId, It.IsAny<CancellationToken>())).ReturnsAsync(eventEntity);
-        _eventRepoMock.Setup(r => r.GuestEmailExistsAsync(eventId, "test@test.com", null, It.IsAny<CancellationToken>())).ReturnsAsync(false);
-        _eventRepoMock.Setup(r => r.GuestPhoneExistsAsync(eventId, It.IsAny<string>(), null, It.IsAny<CancellationToken>())).ReturnsAsync(false);
-        _eventRepoMock.Setup(r => r.TryJoinEventAsync(It.IsAny<Guest>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _guestRepoMock.Setup(r => r.EmailExistsAtEventAsync(eventId, "test@test.com", null, It.IsAny<CancellationToken>())).ReturnsAsync(false);
+        _guestRepoMock.Setup(r => r.PhoneExistsAtEventAsync(eventId, It.IsAny<string>(), null, It.IsAny<CancellationToken>())).ReturnsAsync(false);
+        _guestRepoMock.Setup(r => r.TryJoinEventAsync(It.IsAny<Guest>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
         
         _userRepoMock.Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new User(userId, "Test", "User", UserRole.User, "test@test.com", "test@test.com", "+123456789", "+1"));
@@ -102,7 +107,7 @@ public class EventParticipationServiceTests
         await _service.JoinEventAsync(eventId, userId);
 
         // Assert
-        _eventRepoMock.Verify(x => x.TryJoinEventAsync(It.Is<Guest>(g => g.Email.Value == "test@test.com" && g.UserId == userId), It.IsAny<CancellationToken>()), Times.Once);
+        _guestRepoMock.Verify(x => x.TryJoinEventAsync(It.Is<Guest>(g => g.Email.Value == "test@test.com" && g.UserId == userId), It.IsAny<CancellationToken>()), Times.Once);
         
         // Verify Cache Invalidation
         _cacheServiceMock.Verify(x => x.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId}_public"), Times.Once);
