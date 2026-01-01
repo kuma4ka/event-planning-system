@@ -6,9 +6,9 @@ using EventPlanning.Domain.Interfaces;
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
+using EventPlanning.Application.Interfaces;
 
 namespace EventPlanning.Tests.Services;
 
@@ -29,7 +29,7 @@ public class EventServiceTests
         Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
         Mock<IValidator<EventSearchDto>> searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
         _loggerMock = new Mock<ILogger<EventService>>();
-        IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
+        Mock<ICacheService> cacheMock = new Mock<ICacheService>();
 
         _service = new EventService(
             _eventRepoMock.Object,
@@ -37,7 +37,7 @@ public class EventServiceTests
             updateValidatorMock.Object,
             searchValidatorMock.Object,
             _userRepoMock.Object,
-            cache,
+            cacheMock.Object,
             _loggerMock.Object
         );
     }
@@ -239,7 +239,6 @@ public class EventServiceTests
             .Setup(r => r.GetByIdAsync(organizerId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
-        // Act
         // Act
         var result = await _service.GetEventDetailsAsync(eventId, null);
 

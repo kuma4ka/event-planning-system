@@ -200,4 +200,45 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .AsNoTracking()
             .AnyAsync(e => e.VenueId == venueId, cancellationToken);
     }
+
+    public async Task<bool> TryJoinEventAsync(Guest guest, CancellationToken cancellationToken = default)
+    {
+        var strategy = context.Database.CreateExecutionStrategy();
+        
+        return await strategy.ExecuteAsync(async () =>
+        {
+            using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
+            try
+            {
+                // Re-fetch event with venue to check capacity inside the transaction lock
+                var eventEntity = await context.Events
+                    .Include(e => e.Venue)
+                    .FirstOrDefaultAsync(e => e.Id == guest.EventId, cancellationToken);
+                
+                if (eventEntity == null) return false;
+
+                if (eventEntity.VenueId.HasValue && eventEntity.Venue != null && eventEntity.Venue.Capacity > 0)
+                {
+                   var currentCount = await context.Guests
+                       .CountAsync(g => g.EventId == guest.EventId, cancellationToken);
+                    
+                   if (currentCount >= eventEntity.Venue.Capacity)
+                   {
+                       return false;
+                   }
+                }
+
+                await context.Guests.AddAsync(guest, cancellationToken);
+                await context.SaveChangesAsync(cancellationToken);
+                
+                await transaction.CommitAsync(cancellationToken);
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw;
+            }
+        });
+    }
 }

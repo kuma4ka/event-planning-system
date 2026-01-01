@@ -1,5 +1,6 @@
-﻿@using EventPlanning.Domain.Enums
-@model UpdateEventDto
+﻿@using EventPlanning.Web.Models
+@using EventPlanning.Domain.Enums
+@model EventFormViewModel
 
 @{
     ViewData["Title"] = "Edit Event";
@@ -29,7 +30,7 @@
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 shadow-sm mb-4 small">
                     </div>
 
-                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="UpdateDto!.Id" />
 
                     <partial name="Partials/_EventFormFields" model="Model" />
 
