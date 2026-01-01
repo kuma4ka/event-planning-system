@@ -20,6 +20,7 @@ public static class DependencyInjection
             ));
         services.AddScoped<IVenueService, VenueService>();
         services.AddScoped<IGuestService, GuestService>();
+        services.AddScoped<IEventParticipationService, EventParticipationService>();
         services.AddScoped<IProfileService, ProfileService>();
         services.AddScoped<INewsletterService, NewsletterService>();
 

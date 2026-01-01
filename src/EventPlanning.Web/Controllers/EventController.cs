@@ -17,6 +17,7 @@ namespace EventPlanning.Web.Controllers;
 [Route("events")]
 public class EventController(
     IEventService eventService,
+    IEventParticipationService participationService,
     IVenueService venueService,
     UserManager<ApplicationUser> userManager,
     IConfiguration configuration,
@@ -167,7 +168,7 @@ public class EventController(
 
         try
         {
-            await eventService.JoinEventAsync(id, userId, cancellationToken);
+            await participationService.JoinEventAsync(id, userId, cancellationToken);
             logger.LogInformation("User {User} joined event {EventId}", User.Identity?.Name, id);
             TempData["SuccessMessage"] = "You have successfully joined the event!";
         }
@@ -196,7 +197,7 @@ public class EventController(
 
         try
         {
-            await eventService.LeaveEventAsync(id, userId, cancellationToken);
+            await participationService.LeaveEventAsync(id, userId, cancellationToken);
             logger.LogInformation("User {User} left event {EventId}", User.Identity?.Name, id);
             TempData["SuccessMessage"] = "You have left the event.";
         }
