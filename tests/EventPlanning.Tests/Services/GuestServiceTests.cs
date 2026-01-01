@@ -114,7 +114,7 @@ public class GuestServiceTests
             .ReturnsAsync(eventEntity);
             
         // Mock Email/Phone checks
-        _eventRepositoryMock.Setup(r => r.GuestEmailExistsAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
+        _guestRepositoryMock.Setup(r => r.EmailExistsAtEventAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
         // Act

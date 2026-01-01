@@ -15,6 +15,7 @@ namespace EventPlanning.Tests.Services;
 public class EventServiceTests
 {
     private readonly Mock<IEventRepository> _eventRepoMock;
+    private readonly Mock<IGuestRepository> _guestRepoMock;
     private readonly Mock<IValidator<CreateEventDto>> _createValidatorMock;
     private readonly Mock<IUserRepository> _userRepoMock;
     private readonly Mock<ILogger<EventService>> _loggerMock;
@@ -25,6 +26,7 @@ public class EventServiceTests
     public EventServiceTests()
     {
         _eventRepoMock = new Mock<IEventRepository>();
+        _guestRepoMock = new Mock<IGuestRepository>();
         _createValidatorMock = new Mock<IValidator<CreateEventDto>>();
         _userRepoMock = new Mock<IUserRepository>();
         Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
@@ -35,6 +37,7 @@ public class EventServiceTests
 
         _service = new EventService(
             _eventRepoMock.Object,
+            _guestRepoMock.Object,
             _createValidatorMock.Object,
             updateValidatorMock.Object,
             searchValidatorMock.Object,
