@@ -51,7 +51,6 @@ public class EventParticipationServiceTests
             Guid.NewGuid(),
             null);
 
-        // Reflection to set Id for testing
         typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
 
         _eventRepoMock
@@ -65,8 +64,8 @@ public class EventParticipationServiceTests
             .ReturnsAsync(true);
 
         _userRepoMock
-            .Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new User(userId, "Test", "User", UserRole.User, "test@test.com", "test@test.com", "+123456789", "+1"));
+            .Setup(r => r.GetByIdentityIdAsync(userId.ToString(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new User(userId.ToString(), "Test", "User", UserRole.User, "test@test.com", "test@test.com", "+123456789", "+1"));
 
         // Act
         Func<Task> act = async () => await _service.JoinEventAsync(eventId, userId);
@@ -75,7 +74,6 @@ public class EventParticipationServiceTests
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("You are already registered for this event.");
 
-        // Verify cache was NOT invalidated
         _cacheServiceMock.Verify(x => x.Remove(It.IsAny<string>()), Times.Never);
     }
 
@@ -100,17 +98,16 @@ public class EventParticipationServiceTests
         _guestRepoMock.Setup(r => r.PhoneExistsAtEventAsync(eventId, It.IsAny<string>(), null, It.IsAny<CancellationToken>())).ReturnsAsync(false);
         _guestRepoMock.Setup(r => r.TryJoinEventAsync(It.IsAny<Guest>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
         
-        _userRepoMock.Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new User(userId, "Test", "User", UserRole.User, "test@test.com", "test@test.com", "+123456789", "+1"));
+        _userRepoMock.Setup(r => r.GetByIdentityIdAsync(userId.ToString(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new User(userId.ToString(), "Test", "User", UserRole.User, "test@test.com", "test@test.com", "+123456789", "+1"));
 
 
         // Act
         await _service.JoinEventAsync(eventId, userId);
 
         // Assert
-        _guestRepoMock.Verify(x => x.TryJoinEventAsync(It.Is<Guest>(g => g.Email.Value == "test@test.com" && g.UserId == userId), It.IsAny<CancellationToken>()), Times.Once);
+        _guestRepoMock.Verify(x => x.TryJoinEventAsync(It.Is<Guest>(g => g.Email.Value == "test@test.com" && g.UserId != userId), It.IsAny<CancellationToken>()), Times.Once); // UserId should be DomainId (Random), not IdentityId
         
-        // Verify Cache Invalidation
         _cacheServiceMock.Verify(x => x.Remove(CacheKeyGenerator.GetEventKeyPublic(eventId)), Times.Once);
         _cacheServiceMock.Verify(x => x.Remove(CacheKeyGenerator.GetEventKeyOrganizer(eventId)), Times.Once);
     }

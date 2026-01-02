@@ -56,7 +56,7 @@ public class ProfileServiceTests
         // Arrange
 
         var userId = Guid.NewGuid();
-        var user = new User(userId, "John", "Doe", UserRole.User, "john@example.com", "john@example.com", "5550001", "+1");
+        var user = new User(userId.ToString(), "John", "Doe", UserRole.User, "john@example.com", "john@example.com", "5550001", "+1");
         var dto = new EditProfileDto { FirstName = "Johnny", LastName = "Doe", CountryCode = "+1", PhoneNumber = "5551234" };
         var eventId1 = Guid.NewGuid();
         var eventId2 = Guid.NewGuid();
@@ -64,7 +64,7 @@ public class ProfileServiceTests
         _profileValidatorMock.Setup(v => v.ValidateAsync(dto, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
 
-        _userRepositoryMock.Setup(r => r.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
+        _userRepositoryMock.Setup(r => r.GetByIdentityIdAsync(userId.ToString(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
         _guestRepositoryMock.Setup(r => r.UpdateGuestDetailsByEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))

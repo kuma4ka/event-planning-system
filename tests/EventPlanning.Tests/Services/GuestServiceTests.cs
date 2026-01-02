@@ -1,5 +1,4 @@
 using EventPlanning.Application.DTOs.Guest;
-using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Services;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
@@ -18,6 +17,7 @@ public class GuestServiceTests
     private readonly Mock<IValidator<CreateGuestDto>> _createValidatorMock;
     private readonly Mock<IValidator<AddGuestManuallyDto>> _manualAddValidatorMock;
     private readonly Mock<IValidator<UpdateGuestDto>> _updateValidatorMock;
+    private readonly Mock<IUserRepository> _userRepoMock;
     private readonly Mock<IMemoryCache> _cacheMock;
     private readonly Mock<ILogger<GuestService>> _loggerMock;
     private readonly GuestService _service;
@@ -30,6 +30,7 @@ public class GuestServiceTests
         _manualAddValidatorMock = new Mock<IValidator<AddGuestManuallyDto>>();
         _updateValidatorMock = new Mock<IValidator<UpdateGuestDto>>();
         _cacheMock = new Mock<IMemoryCache>();
+        _userRepoMock = new Mock<IUserRepository>();
         _loggerMock = new Mock<ILogger<GuestService>>();
 
         _service = new GuestService(
@@ -38,6 +39,7 @@ public class GuestServiceTests
             _createValidatorMock.Object,
             _manualAddValidatorMock.Object,
             _updateValidatorMock.Object,
+            _userRepoMock.Object,
             _cacheMock.Object,
             _loggerMock.Object
         );
@@ -56,13 +58,7 @@ public class GuestServiceTests
 
         var eventEntity = new Event("Event", "Desc", DateTime.UtcNow.AddDays(1), Domain.Enums.EventType.Conference, userId, null);
         
-        // Use reflection to set Id as setter is private/init only usually or match standard Entity pattern
-        // Assuming we can just mock GetByIdAsync to return the Guest
-
         var guest = new Guest("First", "Last", "old@example.com", eventId, "+1", "0000000", registeredUserId); // Has UserId!
-        // We need to ensure Guest.Id matches guestId. 
-        // Since Id is created in constructor, we can't easily set it. 
-        // We will just assume the repository returns this guest when asked for guestId.
 
         _updateValidatorMock.Setup(v => v.ValidateAsync(dto, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
@@ -71,19 +67,8 @@ public class GuestServiceTests
             .ReturnsAsync(guest);
             
         _eventRepositoryMock.Setup(r => r.GetByIdAsync(eventId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(eventEntity); // This mock might be needed if guest.Event is null
+            .ReturnsAsync(eventEntity);
 
-        // In GuestService.UpdateGuestAsync: 
-        // var eventEntity = guest.Event ?? await eventRepository.GetByIdAsync...
-        // Since we created guest without Event object, it will query repository.
-        // But first, we need to match EventId.
-        // Guest.EventId is set in constructor.
-        // So we need to ensure eventEntity.Id matches guest.EventId? 
-        // Actually, GuestService uses guest.EventId to fetch event. 
-        // But eventEntity.Id is generated inside Event constructor... 
-        // This makes testing tricky if we can't set IDs. 
-        // Let's rely on eventRepository.GetByIdAsync being called with WHATEVER guest.EventId is.
-        
         _eventRepositoryMock.Setup(r => r.GetByIdAsync(guest.EventId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(eventEntity);
 
@@ -113,7 +98,6 @@ public class GuestServiceTests
         _eventRepositoryMock.Setup(r => r.GetByIdAsync(guest.EventId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(eventEntity);
             
-        // Mock Email/Phone checks
         _guestRepositoryMock.Setup(r => r.EmailExistsAtEventAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
