@@ -10,6 +10,7 @@ using EventPlanning.Domain.Interfaces;
 using EventPlanning.Infrastructure.Repositories;
 using EventPlanning.Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
+using Mapster;
 
 namespace EventPlanning.Infrastructure;
 
@@ -62,6 +63,7 @@ public static class DependencyInjection
         services.AddScoped<ICountryService, CountryService>();
 
         services.AddScoped<IIdentityService, IdentityService>();
+        services.AddMapster();
 
         services.Configure<Application.Models.EmailSettings>(configuration.GetSection(Application.Models.EmailSettings.SectionName));
         services.AddTransient<IEmailService, SmtpEmailService>();

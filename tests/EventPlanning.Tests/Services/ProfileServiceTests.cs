@@ -8,6 +8,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Moq;
+using EventPlanning.Application.Constants;
 
 namespace EventPlanning.Tests.Services;
 
@@ -79,9 +80,9 @@ public class ProfileServiceTests
         _guestRepositoryMock.Verify(r => r.UpdateGuestDetailsByEmailAsync(user.Email!, dto.FirstName, dto.LastName, dto.CountryCode, "+15551234", It.IsAny<CancellationToken>()), Times.Once);
         
         // Verify cache invalidation
-        _cacheServiceMock.Verify(c => c.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId1}_public"), Times.Once);
-        _cacheServiceMock.Verify(c => c.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId1}_organizer"), Times.Once);
-        _cacheServiceMock.Verify(c => c.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId2}_public"), Times.Once);
-        _cacheServiceMock.Verify(c => c.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId2}_organizer"), Times.Once);
+        _cacheServiceMock.Verify(c => c.Remove(CacheKeyGenerator.GetEventKeyPublic(eventId1)), Times.Once);
+        _cacheServiceMock.Verify(c => c.Remove(CacheKeyGenerator.GetEventKeyOrganizer(eventId1)), Times.Once);
+        _cacheServiceMock.Verify(c => c.Remove(CacheKeyGenerator.GetEventKeyPublic(eventId2)), Times.Once);
+        _cacheServiceMock.Verify(c => c.Remove(CacheKeyGenerator.GetEventKeyOrganizer(eventId2)), Times.Once);
     }
 }

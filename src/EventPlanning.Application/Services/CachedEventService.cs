@@ -1,5 +1,5 @@
 using EventPlanning.Application.DTOs.Event;
-using EventPlanning.Application.DTOs.Guest;
+using EventPlanning.Application.Constants;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Models;
 
@@ -9,7 +9,6 @@ public class CachedEventService(
     IEventService innerService,
     ICacheService cache) : IEventService
 {
-    public const string EventCacheKeyPrefix = "event_details_";
 
     public Task<PagedResult<EventDto>> GetEventsAsync(Guid userId, Guid? organizerIdFilter, EventSearchDto searchDto, string? sortOrder, CancellationToken cancellationToken = default)
     {
@@ -23,16 +22,8 @@ public class CachedEventService(
 
     public async Task<EventDetailsDto?> GetEventDetailsAsync(Guid id, Guid? userId, CancellationToken cancellationToken = default)
     {
-        var publicCacheKey = $"{EventCacheKeyPrefix}{id}_public";
-        var organizerCacheKey = $"{EventCacheKeyPrefix}{id}_organizer";
-
-        if (cache.Get<EventDetailsDto>(organizerCacheKey) is { } organizerCachedEvent)
-        {
-            if (userId.HasValue && organizerCachedEvent.OrganizerId == userId.Value)
-            {
-                return organizerCachedEvent;
-            }
-        }
+        var publicCacheKey = CacheKeyGenerator.GetEventKeyPublic(id);
+        var organizerCacheKey = CacheKeyGenerator.GetEventKeyOrganizer(id);
 
         if (cache.Get<EventDetailsDto>(publicCacheKey) is { } publicCachedEvent)
         {
@@ -83,7 +74,7 @@ public class CachedEventService(
 
     private void InvalidateEventCache(Guid eventId)
     {
-        cache.Remove($"{EventCacheKeyPrefix}{eventId}_public");
-        cache.Remove($"{EventCacheKeyPrefix}{eventId}_organizer");
+        cache.Remove(CacheKeyGenerator.GetEventKeyPublic(eventId));
+        cache.Remove(CacheKeyGenerator.GetEventKeyOrganizer(eventId));
     }
 }

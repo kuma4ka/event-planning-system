@@ -3,6 +3,7 @@ using EventPlanning.Application.Services;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
 using EventPlanning.Domain.Interfaces;
+using EventPlanning.Application.Constants;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -110,7 +111,7 @@ public class EventParticipationServiceTests
         _guestRepoMock.Verify(x => x.TryJoinEventAsync(It.Is<Guest>(g => g.Email.Value == "test@test.com" && g.UserId == userId), It.IsAny<CancellationToken>()), Times.Once);
         
         // Verify Cache Invalidation
-        _cacheServiceMock.Verify(x => x.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId}_public"), Times.Once);
-        _cacheServiceMock.Verify(x => x.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId}_organizer"), Times.Once);
+        _cacheServiceMock.Verify(x => x.Remove(CacheKeyGenerator.GetEventKeyPublic(eventId)), Times.Once);
+        _cacheServiceMock.Verify(x => x.Remove(CacheKeyGenerator.GetEventKeyOrganizer(eventId)), Times.Once);
     }
 }

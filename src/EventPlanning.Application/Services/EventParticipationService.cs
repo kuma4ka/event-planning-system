@@ -1,6 +1,7 @@
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
+using EventPlanning.Application.Constants;
 using Microsoft.Extensions.Logging;
 
 namespace EventPlanning.Application.Services;
@@ -68,7 +69,7 @@ public class EventParticipationService(
 
     private void InvalidateEventCache(Guid eventId)
     {
-        cacheService.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId}_public");
-        cacheService.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId}_organizer");
+        cacheService.Remove(CacheKeyGenerator.GetEventKeyPublic(eventId));
+        cacheService.Remove(CacheKeyGenerator.GetEventKeyOrganizer(eventId));
     }
 }
