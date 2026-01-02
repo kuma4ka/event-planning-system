@@ -1,27 +1,22 @@
-﻿@model EventPlanning.Application.DTOs.Event.EventDetailsDto
+﻿@model EventPlanning.Web.Models.EventDetailsViewModel
 
 @{
-    ViewData["Title"] = Model.Name;
-    var guestItemViewData = new ViewDataDictionary(ViewData)
-{
-{ "IsOrganizer", Model.IsOrganizer },
-{ "IsPast", Model.IsPast }
-};
+    ViewData["Title"] = Model.Event.Name;
 }
 
 <div class="container py-4 animate-fade-in">
 
-    <partial name="Partials/_EventHero" model="Model" />
+    <partial name="Partials/_EventHero" model="Model.Event" />
 
     <div class="row g-5">
         <div class="col-lg-8">
-            <partial name="Partials/_EventInfo" model="Model" />
+            <partial name="Partials/_EventInfo" model="Model.Event" />
         </div>
 
         <div class="col-lg-4">
-            <partial name="Partials/_EventSidebar" model="Model" />
+            <partial name="Partials/_EventSidebar" model="Model.Event" />
         </div>
     </div>
 </div>
 
-<partial name="Partials/_EventModals" model="Model" />
+<partial name="Partials/_EventModals" model="Model.Event" />

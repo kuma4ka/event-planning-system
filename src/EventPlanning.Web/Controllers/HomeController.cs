@@ -1,7 +1,6 @@
 using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Models;
-using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
 using EventPlanning.Web.Extensions;
 using EventPlanning.Web.Models;
@@ -27,7 +26,7 @@ public class HomeController(
         EventType? type,
         DateTime? from,
         DateTime? to,
-        string? sortOrder,
+        SortOrder? sortOrder,
         int page = 1,
         CancellationToken cancellationToken = default)
     {
@@ -45,10 +44,20 @@ public class HomeController(
             PageSize = 9
         };
 
+        var sortString = sortOrder switch
+        {
+            SortOrder.DateAsc => "date_asc",
+            SortOrder.DateDesc => "date_desc",
+            SortOrder.NameAsc => "name_asc",
+            SortOrder.NameDesc => "name_desc",
+            SortOrder.Newest => "newest",
+            _ => "date_asc"
+        };
+
         PagedResult<EventDto> result;
         try
         {
-            result = await eventService.GetEventsAsync(userId, null, searchDto, sortOrder, cancellationToken);
+            result = await eventService.GetEventsAsync(userId, null, searchDto, sortString, cancellationToken);
         }
         catch (ValidationException ex)
         {
@@ -63,13 +72,11 @@ public class HomeController(
             Type = type,
             From = from,
             To = to,
+            SortOrder = sortOrder,
             TypeOptions = type.ToSelectList("All Categories"),
             MinDate = now.ToString("yyyy-MM-dd"),
             HasFilters = !string.IsNullOrEmpty(searchTerm) || type.HasValue || from.HasValue || to.HasValue
         };
-
-        ViewBag.CurrentSort = sortOrder;
-        ViewBag.DateSortParam = string.IsNullOrEmpty(sortOrder) || sortOrder == "date_asc" ? "date_desc" : "date_asc";
 
         return View(viewModel);
     }

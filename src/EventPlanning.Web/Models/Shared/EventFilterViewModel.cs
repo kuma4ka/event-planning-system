@@ -1,23 +1,22 @@
 namespace EventPlanning.Web.Models.Shared;
 
-using EventPlanning.Domain.Enums;
+using Domain.Enums;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 public class EventFilterViewModel
 {
-    public string? SearchTerm { get; set; }
-    public EventType? Type { get; set; }
-    public DateTime? From { get; set; }
-    public DateTime? To { get; set; }
-    public IEnumerable<SelectListItem> TypeOptions { get; set; } = new List<SelectListItem>();
-    public string MinDate { get; set; } = DateTime.Now.ToString("yyyy-MM-dd");
-    public bool HasFilters { get; set; }
+    public string? SearchTerm { get; init; }
+    public EventType? Type { get; init; }
+    public DateTime? From { get; init; }
+    public DateTime? To { get; init; }
+    public IEnumerable<SelectListItem> TypeOptions { get; init; } = new List<SelectListItem>();
+    public string MinDate { get; init; } = DateTime.Now.ToString("yyyy-MM-dd");
+    public bool HasFilters { get; init; }
 
-    // Additional fields for MyEvents context
-    public string ControllerName { get; set; } = "Home";
-    public string ActionName { get; set; } = "Index";
-    public string? ViewType { get; set; } // "upcoming" or "past"
-    public string? SortOrder { get; set; }
-    public bool ShowSearch { get; set; } = false;
-    public bool IsHeroOverlay { get; set; } = false;
+    public string ControllerName { get; init; } = "Home";
+    public string ActionName { get; init; } = "Index";
+    public string? ViewType { get; init; }
+    public SortOrder? SortOrder { get; init; }
+    public bool ShowSearch { get; init; }
+    public bool IsHeroOverlay { get; init; }
 }
