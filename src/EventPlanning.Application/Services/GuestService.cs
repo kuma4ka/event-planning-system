@@ -27,15 +27,11 @@ public class GuestService(
 
         var eventEntity = await eventRepository.GetByIdAsync(dto.EventId, cancellationToken);
 
+        
         if (eventEntity == null) throw new KeyNotFoundException("Event not found");
-        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
-        if (user == null) throw new UnauthorizedAccessException("User not found");
+        
+        await ValidateOrganizerAccessAsync(eventEntity.OrganizerId, userId, cancellationToken);
 
-        if (eventEntity.OrganizerId != user.Id)
-        {
-            logger.LogWarning("Unauthorized guest add attempt by {UserId} for event {EventId}", userId, dto.EventId);
-            throw new UnauthorizedAccessException("Not your event");
-        }
 
         await CheckUniqueEmailAsync(dto.EventId, dto.Email, null, cancellationToken);
 
@@ -52,14 +48,12 @@ public class GuestService(
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
+
         var eventEntity = await eventRepository.GetByIdAsync(dto.EventId, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException("Event not found");
 
-        var user = await userRepository.GetByIdentityIdAsync(currentUserId.ToString(), cancellationToken);
-        if (user == null) throw new UnauthorizedAccessException("User not found");
+        await ValidateOrganizerAccessAsync(eventEntity.OrganizerId, currentUserId, cancellationToken);
 
-        if (eventEntity.OrganizerId != user.Id)
-            throw new UnauthorizedAccessException("Only the organizer can add guests manually.");
 
         if (eventEntity.Date < DateTime.Now)
             throw new InvalidOperationException("Cannot add guests to an event that has already ended.");
@@ -92,11 +86,8 @@ public class GuestService(
         var eventEntity = guest.Event ?? await eventRepository.GetByIdAsync(guest.EventId, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException("Event not found.");
 
-        var user = await userRepository.GetByIdentityIdAsync(currentUserId.ToString(), cancellationToken);
-        if (user == null) throw new UnauthorizedAccessException("User not found");
+        await ValidateOrganizerAccessAsync(eventEntity.OrganizerId, currentUserId, cancellationToken);
 
-        if (eventEntity.OrganizerId != user.Id)
-            throw new UnauthorizedAccessException("Not your event. Only the organizer can update guests.");
 
         if (guest.UserId != null)
         {
@@ -134,13 +125,14 @@ public class GuestService(
         if (guest.Event == null)
         {
             var eventEntity = await eventRepository.GetByIdAsync(guest.EventId, cancellationToken);
-            if (eventEntity == null || eventEntity.OrganizerId != user.Id)
-                throw new UnauthorizedAccessException("Not your event");
+            if (eventEntity == null) return;
+            await ValidateOrganizerAccessAsync(eventEntity.OrganizerId, userId, cancellationToken);
         }
-        else if (guest.Event.OrganizerId != user.Id)
+        else 
         {
-            throw new UnauthorizedAccessException("Not your event");
+             await ValidateOrganizerAccessAsync(guest.Event.OrganizerId, userId, cancellationToken);
         }
+
 
         await guestRepository.DeleteAsync(guest, cancellationToken);
 
@@ -186,6 +178,17 @@ public class GuestService(
         {
             var displayPhone = phoneNumber.StartsWith("+") ? phoneNumber : $"+{phoneNumber}";
             throw new InvalidOperationException($"Guest with phone number {displayPhone} is already added to this event.");
+        }
+    }
+
+    private async Task ValidateOrganizerAccessAsync(Guid eventOrganizerId, Guid userId, CancellationToken cancellationToken)
+    {
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) throw new UnauthorizedAccessException("User not found");
+
+        if (eventOrganizerId != user.Id)
+        {
+            throw new UnauthorizedAccessException("Not your event");
         }
     }
 }
