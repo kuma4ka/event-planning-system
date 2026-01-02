@@ -26,6 +26,7 @@ public class AccountController(
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("register-limit")]
     public async Task<IActionResult> Register(RegisterUserDto model)
     {
         var validationResult = await registerValidator.ValidateAsync(model);
@@ -94,6 +95,7 @@ public class AccountController(
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("login-limit")]
     public async Task<IActionResult> Login(LoginUserDto model, string? returnUrl = null)
     {
         returnUrl ??= Url.Content("~/");

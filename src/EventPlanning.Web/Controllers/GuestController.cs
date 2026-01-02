@@ -19,6 +19,7 @@ public class GuestController(
 
 
     [HttpPost("add-manually")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddManually(AddGuestManuallyDto model, CancellationToken cancellationToken)
     {
         var userIdString = userManager.GetUserId(User);
@@ -54,6 +55,7 @@ public class GuestController(
     }
 
     [HttpPost("edit")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(UpdateGuestDto model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
@@ -82,13 +84,14 @@ public class GuestController(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error updating guest {GuestId}", model.Id);
-            TempData["ErrorMessage"] = ex.Message;
+            TempData["ErrorMessage"] = "An unexpected error occurred.";
         }
 
         return RedirectToAction("Details", "Event", new { id = model.EventId });
     }
 
     [HttpPost("remove")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Remove(Guid eventId, Guid guestId, CancellationToken cancellationToken)
     {
         var userIdString = userManager.GetUserId(User);
@@ -105,7 +108,7 @@ public class GuestController(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error removing guest {GuestId} from event {EventId}", guestId, eventId);
-            TempData["ErrorMessage"] = ex.Message;
+            TempData["ErrorMessage"] = "An unexpected error occurred.";
         }
 
         return RedirectToAction("Details", "Event", new { id = eventId });
