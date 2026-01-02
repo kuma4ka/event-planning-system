@@ -36,7 +36,7 @@ public class EventController(
         var viewModel = new EventDetailsViewModel
         {
             Event = eventDetails,
-            GoogleMapsApiKey = configuration["GoogleMaps:ApiKey"],
+            GoogleMapsApiKey = configuration["GoogleMaps:ApiKey"] ?? configuration["Google:Maps:ApiKey"],
             Countries = new SelectList(countryService.GetSupportedCountries(), "Code", "DisplayValue")
         };
 
@@ -69,7 +69,7 @@ public class EventController(
         try
         {
             var eventId = await eventService.CreateEventAsync(userId, model, cancellationToken);
-            logger.LogInformation("Event created: {EventId} by {User}", eventId, User.Identity?.Name);
+            logger.LogInformation("Event created: {EventId} by {UserId}", eventId, userId);
             return RedirectToAction(nameof(MyEvents));
         }
         catch (ValidationException ex)
@@ -123,7 +123,7 @@ public class EventController(
         try
         {
             await eventService.UpdateEventAsync(userId, model, cancellationToken);
-            logger.LogInformation("Event updated: {EventId} by {User}", id, User.Identity?.Name);
+            logger.LogInformation("Event updated: {EventId} by {UserId}", id, userId);
             return RedirectToAction(nameof(MyEvents));
         }
         catch (ValidationException ex)
@@ -157,12 +157,12 @@ public class EventController(
         try
         {
             await eventService.DeleteEventAsync(userId, id, cancellationToken);
-            logger.LogInformation("Event deleted: {EventId} by {User}", id, User.Identity?.Name);
+            logger.LogInformation("Event deleted: {EventId} by {UserId}", id, userId);
             return RedirectToAction(nameof(MyEvents));
         }
         catch (UnauthorizedAccessException)
         {
-            logger.LogWarning("Unauthorized delete attempt: Event {EventId} by {User}", id, User.Identity?.Name);
+            logger.LogWarning("Unauthorized delete attempt: Event {EventId} by {UserId}", id, userId);
             return Forbid();
         }
     }

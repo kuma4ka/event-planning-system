@@ -31,13 +31,13 @@
              @if (Model.IsEditMode)
             {
                 <input asp-for="UpdateDto!.Date" type="datetime-local" class="form-control"
-                    min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" step="60" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+                    min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" step="60" asp-format="{0:yyyy-MM-ddTHH:mm}" onclick="this.showPicker()" />
                 <span asp-validation-for="UpdateDto!.Date" class="text-danger small mt-1 d-block"></span>
             }
             else
             {
                 <input asp-for="CreateDto!.Date" type="datetime-local" class="form-control"
-                    min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" step="60" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+                    min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" step="60" asp-format="{0:yyyy-MM-ddTHH:mm}" onclick="this.showPicker()" />
                 <span asp-validation-for="CreateDto!.Date" class="text-danger small mt-1 d-block"></span>
             }
         </div>
