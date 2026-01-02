@@ -14,4 +14,12 @@ public static class LogRedactor
         var prefix = email.Substring(0, Math.Min(3, atIndex));
         return $"{prefix}***{email.Substring(atIndex)}";
     }
+
+    public static string RedactPhoneNumber(string? phoneNumber)
+    {
+        if (string.IsNullOrWhiteSpace(phoneNumber)) return "[EMPTY]";
+        if (phoneNumber.Length < 4) return "***";
+
+        return $"{phoneNumber.Substring(0, Math.Min(3, phoneNumber.Length - 4))}****{phoneNumber.Substring(phoneNumber.Length - 2)}";
+    }
 }
