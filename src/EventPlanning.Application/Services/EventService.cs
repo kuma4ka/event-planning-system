@@ -82,32 +82,7 @@ public class EventService(
 
         var eventDetails = eventEntity.Adapt<EventDetailsDto>();
 
-        var guestsDto = eventEntity.Guests.Select(g =>
-        {
-             if (isOrganizer)
-             {
-                 var (_, localNumber) = countryService.ParsePhoneNumber(g.PhoneNumber?.Value);
-                 return new GuestDto
-                 {
-                     Id = g.Id,
-                     FirstName = g.FirstName,
-                     LastName = g.LastName,
-                     Email = g.Email.Value,
-                     CountryCode = g.CountryCode,
-                     PhoneNumber = localNumber
-                 };
-             }
-             
-             return new GuestDto
-             {
-                 Id = g.Id,
-                 FirstName = g.FirstName,
-                 LastName = g.LastName,
-                 Email = "REDACTED",
-                 CountryCode = "",
-                 PhoneNumber = ""
-             };
-        }).ToList();
+        var guestsDto = eventEntity.Guests.Select(g => MapGuestDto(g, isOrganizer)).ToList();
 
         var isJoined = domainUserId.HasValue && await guestRepository.IsUserJoinedAsync(eventEntity.Id, domainUserId.Value, cancellationToken);
 
@@ -160,14 +135,7 @@ public class EventService(
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException($"Event {eventId} not found");
 
-        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
-        if (user == null) throw new UnauthorizedAccessException("User not found");
-
-        if (eventEntity.OrganizerId != user.Id)
-        {
-            logger.LogWarning("Unauthorized event edit attempt by {UserId} on event {EventId}", userId, eventId);
-            throw new UnauthorizedAccessException("Not your event");
-        }
+        await ValidateOrganizerAccessAsync(eventEntity.OrganizerId, userId, eventId, cancellationToken);
 
         return eventEntity.Adapt<EventDto>();
     }
@@ -180,16 +148,7 @@ public class EventService(
         var eventEntity = await eventRepository.GetByIdAsync(dto.Id, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException($"Event {dto.Id} not found");
 
-        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
-        if (user == null) throw new UnauthorizedAccessException("User not found");
-
-        if (eventEntity.OrganizerId != user.Id)
-        {
-             logger.LogWarning("Unauthorized event update attempt by {UserId} on event {EventId}", userId, dto.Id);
-             throw new UnauthorizedAccessException("Not your event");
-        }
-
-
+        await ValidateOrganizerAccessAsync(eventEntity.OrganizerId, userId, dto.Id, cancellationToken);
 
         eventEntity.UpdateDetails(
             dto.Name,
@@ -207,17 +166,47 @@ public class EventService(
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
         if (eventEntity == null) return;
 
-        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
-        if (user == null) throw new UnauthorizedAccessException("User not found");
-
-        if (eventEntity.OrganizerId != user.Id)
-        {
-            logger.LogWarning("Unauthorized event delete attempt by {UserId} on event {EventId}", userId, eventId);
-            throw new UnauthorizedAccessException("Not your event");
-        }
+        await ValidateOrganizerAccessAsync(eventEntity.OrganizerId, userId, eventId, cancellationToken);
 
         await eventRepository.DeleteAsync(eventEntity, cancellationToken);
     }
 
+    private async Task ValidateOrganizerAccessAsync(Guid eventOrganizerId, Guid userId, Guid eventId, CancellationToken cancellationToken)
+    {
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) throw new UnauthorizedAccessException("User not found");
 
+        if (eventOrganizerId != user.Id)
+        {
+            logger.LogWarning("Unauthorized event access attempt by {UserId} on event {EventId}", userId, eventId);
+            throw new UnauthorizedAccessException("Not your event");
+        }
+    }
+
+    private GuestDto MapGuestDto(Guest g, bool isOrganizer)
+    {
+        if (isOrganizer)
+        {
+            var (_, localNumber) = countryService.ParsePhoneNumber(g.PhoneNumber?.Value);
+            return new GuestDto
+            {
+                Id = g.Id,
+                FirstName = g.FirstName,
+                LastName = g.LastName,
+                Email = g.Email.Value,
+                CountryCode = g.CountryCode,
+                PhoneNumber = localNumber
+            };
+        }
+
+        return new GuestDto
+        {
+            Id = g.Id,
+            FirstName = g.FirstName,
+            LastName = g.LastName,
+            Email = "REDACTED",
+            CountryCode = "",
+            PhoneNumber = ""
+        };
+    }
 }
