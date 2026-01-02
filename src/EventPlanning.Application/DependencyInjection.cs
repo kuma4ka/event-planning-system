@@ -18,6 +18,8 @@ public static class DependencyInjection
                 provider.GetRequiredService<EventService>(),
                 provider.GetRequiredService<ICacheService>()
             ));
+        services.AddScoped<IEventReadService>(provider => provider.GetRequiredService<IEventService>());
+        services.AddScoped<IEventWriteService>(provider => provider.GetRequiredService<IEventService>());
         services.AddScoped<IVenueService, VenueService>();
         services.AddScoped<IGuestService, GuestService>();
         services.AddScoped<IEventParticipationService, EventParticipationService>();
