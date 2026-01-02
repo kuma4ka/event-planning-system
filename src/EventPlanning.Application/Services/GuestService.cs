@@ -144,7 +144,14 @@ public class GuestService(
 
     private static Guest CreateGuestEntity(GuestBaseDto dto)
     {
-        return dto.Adapt<Guest>();
+        return new Guest(
+            dto.FirstName,
+            dto.LastName,
+            dto.Email,
+            dto.EventId,
+            dto.CountryCode,
+            dto.CountryCode + dto.PhoneNumber
+        );
     }
 
     private async Task CheckCapacityAsync(Event eventEntity, Guid eventId, CancellationToken cancellationToken)
