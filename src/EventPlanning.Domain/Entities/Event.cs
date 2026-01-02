@@ -64,4 +64,10 @@ public class Event
         if (Venue == null || Venue.Capacity <= 0) return false;
         return currentGuestCount >= Venue.Capacity;
     }
+
+    public void CanAddGuest(int currentGuestCount)
+    {
+        if (Date < DateTime.UtcNow) throw new InvalidOperationException("Cannot add guests to an event that has already ended.");
+        if (IsFull(currentGuestCount)) throw new InvalidOperationException("Venue is fully booked.");
+    }
 }

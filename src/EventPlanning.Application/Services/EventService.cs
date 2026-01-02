@@ -7,6 +7,7 @@ using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using EventPlanning.Domain.ValueObjects;
 using FluentValidation;
+using Mapster;
 using Microsoft.Extensions.Logging;
 
 namespace EventPlanning.Application.Services;
@@ -44,17 +45,7 @@ public class EventService(
             cancellationToken
         );
 
-        var eventDtos = pagedEvents.Items.Select(e => new EventDto(
-            e.Id,
-            e.Name,
-            e.Description ?? string.Empty,
-            e.Date,
-            e.Type,
-            e.OrganizerId,
-            e.Venue?.Name ?? "TBD",
-            e.VenueId,
-            e.Venue?.ImageUrl
-        )).ToList();
+        var eventDtos = pagedEvents.Items.Adapt<List<EventDto>>();
 
         return new PagedResult<EventDto>(
             eventDtos, pagedEvents.TotalCount, pagedEvents.PageNumber, pagedEvents.PageSize
@@ -66,17 +57,7 @@ public class EventService(
         var e = await eventRepository.GetByIdAsync(id, cancellationToken);
         if (e == null) return null;
 
-        return new EventDto(
-            e.Id,
-            e.Name,
-            e.Description ?? string.Empty,
-            e.Date,
-            e.Type,
-            e.OrganizerId,
-            e.Venue?.Name ?? "TBD",
-            e.VenueId,
-            e.Venue?.ImageUrl
-        );
+        return e.Adapt<EventDto>();
     }
 
     public async Task<EventDetailsDto?> GetEventDetailsAsync(Guid id, Guid? userId, CancellationToken cancellationToken = default)

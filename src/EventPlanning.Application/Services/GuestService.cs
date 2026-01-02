@@ -1,8 +1,10 @@
 ﻿using EventPlanning.Application.DTOs.Guest;
 using EventPlanning.Application.Interfaces;
+using EventPlanning.Application.Constants;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
+using Mapster;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -136,30 +138,19 @@ public class GuestService(
 
     private void InvalidateEventCache(Guid eventId)
     {
-        cache.Remove($"{EventCacheKeyPrefix}{eventId}_public");
-        cache.Remove($"{EventCacheKeyPrefix}{eventId}_organizer");
+        cache.Remove(CacheKeyGenerator.GetEventKeyPublic(eventId));
+        cache.Remove(CacheKeyGenerator.GetEventKeyOrganizer(eventId));
     }
 
     private static Guest CreateGuestEntity(GuestBaseDto dto)
     {
-        return new Guest(
-            dto.FirstName,
-            dto.LastName,
-            dto.Email,
-            dto.EventId,
-            dto.CountryCode,
-            dto.CountryCode + dto.PhoneNumber
-        );
+        return dto.Adapt<Guest>();
     }
 
     private async Task CheckCapacityAsync(Event eventEntity, Guid eventId, CancellationToken cancellationToken)
     {
-        if (eventEntity.Venue is { Capacity: > 0 })
-        {
-            var guestCount = await guestRepository.CountGuestsAtEventAsync(eventId, cancellationToken);
-            if (guestCount >= eventEntity.Venue.Capacity)
-                throw new InvalidOperationException("Venue is fully booked.");
-        }
+        var guestCount = await guestRepository.CountGuestsAtEventAsync(eventId, cancellationToken);
+        eventEntity.CanAddGuest(guestCount);
     }
 
     private async Task CheckUniqueEmailAsync(Guid eventId, string email, Guid? excludeGuestId, CancellationToken cancellationToken)
