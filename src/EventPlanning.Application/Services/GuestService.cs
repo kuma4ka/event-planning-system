@@ -20,26 +20,7 @@ public class GuestService(
     ILogger<GuestService> logger) : IGuestService
 {
 
-    public async Task AddGuestAsync(Guid userId, CreateGuestDto dto, CancellationToken cancellationToken = default)
-    {
-        var validationResult = await createValidator.ValidateAsync(dto, cancellationToken);
-        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
-        var eventEntity = await eventRepository.GetByIdAsync(dto.EventId, cancellationToken);
-
-        
-        if (eventEntity == null) throw new KeyNotFoundException("Event not found");
-        
-        await ValidateOrganizerAccessAsync(eventEntity.OrganizerId, userId, cancellationToken);
-
-
-        await CheckUniqueEmailAsync(dto.EventId, dto.Email, null, cancellationToken);
-
-        var guest = CreateGuestEntity(dto);
-        await guestRepository.AddAsync(guest, cancellationToken);
-
-        InvalidateEventCache(dto.EventId);
-    }
 
     public async Task AddGuestManuallyAsync(Guid currentUserId, AddGuestManuallyDto dto,
         CancellationToken cancellationToken = default)
