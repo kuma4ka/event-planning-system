@@ -36,7 +36,6 @@ public class EventController(
         var viewModel = new EventDetailsViewModel
         {
             Event = eventDetails,
-            Event = eventDetails,
             GoogleMapsApiKey = configuration["GoogleMaps:ApiKey"] ?? configuration["Google:Maps:ApiKey"],
             Countries = new SelectList(countryService.GetSupportedCountries(), "Code", "DisplayValue")
         };
@@ -69,7 +68,6 @@ public class EventController(
 
         try
         {
-            var eventId = await eventService.CreateEventAsync(userId, model, cancellationToken);
             var eventId = await eventService.CreateEventAsync(userId, model, cancellationToken);
             logger.LogInformation("Event created: {EventId} by {UserId}", eventId, userId);
             return RedirectToAction(nameof(MyEvents));
@@ -125,7 +123,6 @@ public class EventController(
         try
         {
             await eventService.UpdateEventAsync(userId, model, cancellationToken);
-            await eventService.UpdateEventAsync(userId, model, cancellationToken);
             logger.LogInformation("Event updated: {EventId} by {UserId}", id, userId);
             return RedirectToAction(nameof(MyEvents));
         }
@@ -159,7 +156,6 @@ public class EventController(
         var userId = Guid.Parse(userIdString!);
         try
         {
-            await eventService.DeleteEventAsync(userId, id, cancellationToken);
             await eventService.DeleteEventAsync(userId, id, cancellationToken);
             logger.LogInformation("Event deleted: {EventId} by {UserId}", id, userId);
             return RedirectToAction(nameof(MyEvents));

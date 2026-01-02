@@ -23,7 +23,7 @@
 <div class="row g-3 mb-3">
     <div class="col-4">
         <label for="@(prefix)CountryCode" class="form-label small text-muted fw-bold">Code</label>
-        <select id="@(prefix)CountryCode" name="CountryCode" class="form-select" autocomplete="tel-country-code" asp-items="(IEnumerable<SelectListItem>)ViewData["Countries"]">
+        <select id="@(prefix)CountryCode" name="CountryCode" class="form-select" autocomplete="tel-country-code" asp-items='@((IEnumerable<SelectListItem>)ViewData["Countries"]!)'>
         </select>
     </div>
     <div class="col-8">
