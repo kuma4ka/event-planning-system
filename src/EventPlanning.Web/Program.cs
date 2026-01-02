@@ -1,13 +1,11 @@
 using EventPlanning.Application;
 using EventPlanning.Infrastructure;
-using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.RateLimiting;
 
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// SERILOG CONFIGURATION
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
     .ReadFrom.Services(services)
@@ -19,6 +17,7 @@ builder.Services.AddApplication();
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
+    options.Filters.Add<EventPlanning.Web.Filters.GlobalExceptionFilter>();
 });
 
 builder.Services.AddRateLimiter(options =>
@@ -93,8 +92,6 @@ try
 }
 catch (HostAbortedException)
 {
-    // Expected behavior when running dotnet-ef commands (e.g. database drop/update)
-    // The host is built but aborted before running the app.
 }
 catch (Exception ex)
 {
