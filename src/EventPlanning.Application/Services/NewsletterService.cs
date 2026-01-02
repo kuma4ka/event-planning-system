@@ -1,4 +1,5 @@
 using EventPlanning.Application.Interfaces;
+using EventPlanning.Application.Utils;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -69,7 +70,7 @@ public class NewsletterService(
         if (subscriber.IsConfirmed) return true;
         if (subscriber.ConfirmationToken != token)
         {
-            logger.LogWarning("Invalid confirmation token provided for {Email}", email);
+            logger.LogWarning("Invalid confirmation token provided for {Email}", LogRedactor.RedactEmail(email));
             return false;
         }
 

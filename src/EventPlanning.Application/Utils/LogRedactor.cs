@@ -1,0 +1,17 @@
+using System.Text.RegularExpressions;
+
+namespace EventPlanning.Application.Utils;
+
+public static class LogRedactor
+{
+    public static string RedactEmail(string? email)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return "[EMPTY]";
+
+        var atIndex = email.IndexOf('@');
+        if (atIndex <= 1) return "***@***.com"; // Too short to show prefix
+
+        var prefix = email.Substring(0, Math.Min(3, atIndex));
+        return $"{prefix}***{email.Substring(atIndex)}";
+    }
+}

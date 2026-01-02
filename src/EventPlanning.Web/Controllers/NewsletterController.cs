@@ -1,4 +1,5 @@
 using EventPlanning.Application.Interfaces;
+using EventPlanning.Application.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 using Microsoft.AspNetCore.RateLimiting;
@@ -16,7 +17,7 @@ public class NewsletterController(INewsletterService newsletterService, ILogger<
         // Honeypot check
         if (!string.IsNullOrEmpty(website))
         {
-            logger.LogWarning("Honeypot triggered for newsletter by {Email}", email);
+            logger.LogWarning("Honeypot triggered for newsletter by {Email}", LogRedactor.RedactEmail(email));
             return Json(new { success = true, message = "Please check your email to confirm your subscription." });
         }
 
@@ -32,7 +33,7 @@ public class NewsletterController(INewsletterService newsletterService, ILogger<
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error subscribing to newsletter: {Email}", email);
+            logger.LogError(ex, "Error subscribing to newsletter: {Email}", LogRedactor.RedactEmail(email));
             return Json(new { success = false, message = "An error occurred. Please try again later." });
         }
     }
@@ -53,7 +54,7 @@ public class NewsletterController(INewsletterService newsletterService, ILogger<
         }
         else
         {
-            logger.LogWarning("Failed newsletter confirmation for {Email}", email);
+            logger.LogWarning("Failed newsletter confirmation for {Email}", LogRedactor.RedactEmail(email));
             return BadRequest("Invalid or expired confirmation token.");
         }
     }
