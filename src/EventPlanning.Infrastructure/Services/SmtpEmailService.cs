@@ -41,12 +41,11 @@ public class SmtpEmailService(
             await client.SendAsync(message, cancellationToken);
             await client.DisconnectAsync(true, cancellationToken);
 
-            logger.LogInformation("Email sent successfully to {To}", to);
+            logger.LogInformation("Email sent successfully.");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to send email to {To}", to);
-            // Suppress exception to prevent flow interruption; SMTP failure shouldn't block user action.
+            logger.LogError(ex, "Failed to send email.");
         }
     }
 }
