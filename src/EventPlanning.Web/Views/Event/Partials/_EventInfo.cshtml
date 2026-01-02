@@ -25,16 +25,15 @@
     </div>
 
     @* --- GOOGLE MAPS EMBED --- *@
-    @if (!string.IsNullOrEmpty(ViewBag.GoogleMapsApiKey as string) &&
+    @if (ViewData["GoogleMapsApiKey"] is string apiKey && !string.IsNullOrEmpty(apiKey) &&
     !string.IsNullOrEmpty(Model.VenueAddress))
     {
         var addressQuery = $"{Model.VenueName}, {Model.VenueAddress}";
         var encodedQuery = System.Net.WebUtility.UrlEncode(addressQuery);
-        var apiKey = ViewBag.GoogleMapsApiKey;
         var mapUrl = $"https://www.google.com/maps/embed/v1/place?key={apiKey}&q={encodedQuery}";
 
         <div class="ratio ratio-21x9 event-map-container">
-            <iframe class="event-map-frame" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
+            <iframe class="event-map-frame" loading="lazy" allowfullscreen referrerpolicy="origin"
                 src="@mapUrl">
             </iframe>
         </div>

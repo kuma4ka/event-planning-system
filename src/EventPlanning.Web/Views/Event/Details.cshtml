@@ -10,7 +10,7 @@
 
     <div class="row g-5">
         <div class="col-lg-8">
-            <partial name="Partials/_EventInfo" model="Model.Event" />
+            <partial name="Partials/_EventInfo" model="Model.Event" view-data='new ViewDataDictionary(ViewData) { { "GoogleMapsApiKey", Model.GoogleMapsApiKey } }' />
         </div>
 
         <div class="col-lg-4">
