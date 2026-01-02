@@ -1,7 +1,6 @@
 ﻿using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Models;
-using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Enums;
 using EventPlanning.Infrastructure.Identity;
 using EventPlanning.Web.Extensions;
@@ -34,10 +33,14 @@ public class EventController(
         var eventDetails = await eventService.GetEventDetailsAsync(id, userId, cancellationToken);
         if (eventDetails == null) return NotFound();
 
-        ViewBag.GoogleMapsApiKey = configuration["GoogleMaps:ApiKey"];
-        ViewBag.Countries = new SelectList(countryService.GetSupportedCountries(), "Code", "DisplayValue");
+        var viewModel = new EventDetailsViewModel
+        {
+            Event = eventDetails,
+            GoogleMapsApiKey = configuration["GoogleMaps:ApiKey"],
+            Countries = new SelectList(countryService.GetSupportedCountries(), "Code", "DisplayValue")
+        };
 
-        return View(eventDetails);
+        return View(viewModel);
     }
 
     [HttpGet("create")]
@@ -170,7 +173,7 @@ public class EventController(
         EventType? type,
         DateTime? from,
         DateTime? to,
-        string? sortOrder,
+        SortOrder? sortOrder,
         string viewType = "upcoming",
         int page = 1,
         CancellationToken cancellationToken = default)
@@ -181,18 +184,28 @@ public class EventController(
 
         var searchFrom = from;
         var searchTo = to;
-        var searchSort = sortOrder;
+        SortOrder searchSort;
 
         if (viewType == "past")
         {
             searchTo ??= now;
-            searchSort = string.IsNullOrEmpty(sortOrder) ? "date_desc" : sortOrder;
+            searchSort = sortOrder ?? SortOrder.DateDesc;
         }
         else
         {
             searchFrom ??= now;
-            searchSort = string.IsNullOrEmpty(sortOrder) ? "date_asc" : sortOrder;
+            searchSort = sortOrder ?? SortOrder.DateAsc;
         }
+
+        var sortString = searchSort switch
+        {
+            SortOrder.DateAsc => "date_asc",
+            SortOrder.DateDesc => "date_desc",
+            SortOrder.NameAsc => "name_asc",
+            SortOrder.NameDesc => "name_desc",
+            SortOrder.Newest => "newest",
+            _ => "date_asc"
+        };
 
         var searchDto = new EventSearchDto
         {
@@ -207,7 +220,7 @@ public class EventController(
         PagedResult<EventDto> result;
         try
         {
-            result = await eventService.GetEventsAsync(userId, userId, searchDto, searchSort, cancellationToken);
+            result = await eventService.GetEventsAsync(userId, userId, searchDto, sortString, cancellationToken);
         }
         catch (ValidationException ex)
         {

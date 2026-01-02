@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using EventPlanning.Domain.Enums;
 using EventPlanning.Web.Models.Shared;
-using EventPlanning.Web.Extensions; // Assuming this is where ToSelectList is
+using EventPlanning.Web.Extensions;
 
 namespace EventPlanning.Web.ViewComponents;
 
@@ -15,7 +14,7 @@ public class EventFilterViewComponent : ViewComponent
         EventType? type = null,
         DateTime? from = null,
         DateTime? to = null,
-        string? sortOrder = null,
+        SortOrder? sortOrder = null,
         string? viewType = null,
         bool isHeroOverlay = false,
         bool showSearch = false)

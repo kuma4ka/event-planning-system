@@ -1,8 +1,6 @@
 ﻿using EventPlanning.Application.DTOs.Auth;
-using EventPlanning.Domain.Entities;
-using EventPlanning.Domain.Enums;
-using EventPlanning.Domain.Interfaces;
 using EventPlanning.Infrastructure.Identity;
+using EventPlanning.Application.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,7 +11,7 @@ namespace EventPlanning.Web.Controllers;
 public class AccountController(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
-    IUserRepository userRepository,
+    IIdentityService identityService,
     IValidator<RegisterUserDto> registerValidator,
     IValidator<LoginUserDto> loginValidator,
     IEmailSender<ApplicationUser> emailSender,
@@ -38,44 +36,23 @@ public class AccountController(
             return View(model);
         }
 
-        var appUser = new ApplicationUser
+        try
         {
-            UserName = model.Email,
-            Email = model.Email,
-            PhoneNumber = model.PhoneNumber
-        };
+            var (succeeded, errors, userId, code) = await identityService.RegisterUserAsync(model);
 
-        var result = await userManager.CreateAsync(appUser, model.Password);
-
-        if (result.Succeeded)
-        {
-            try 
+            if (succeeded && userId.HasValue && !string.IsNullOrEmpty(code))
             {
-                var domainUser = new User(
-                    appUser.Id,
-                    model.FirstName,
-                    model.LastName,
-                    UserRole.User,
-                    model.Email,
-                    model.Email,
-                    model.PhoneNumber,
-                    model.CountryCode
-                );
-
-                await userRepository.AddAsync(domainUser);
-
-                var userId = await userManager.GetUserIdAsync(appUser);
-                var code = await userManager.GenerateEmailConfirmationTokenAsync(appUser);
+                var appUser = await userManager.FindByIdAsync(userId.Value.ToString());
                 
                 var callbackUrl = Url.Action(
                     "ConfirmEmail",
                     "Account",
-                    new { userId, code },
+                    new { userId = userId.Value, code },
                     protocol: Request.Scheme);
 
-                if (string.IsNullOrEmpty(callbackUrl))
+                if (string.IsNullOrEmpty(callbackUrl) || appUser == null)
                 {
-                    logger.LogError("Error generating confirmation email link for {Email}", model.Email);
+                    logger.LogError("Error generating confirmation mechanism for {Email}", model.Email);
                     ModelState.AddModelError(string.Empty, "Error generating confirmation email.");
                     return View(model);
                 }
@@ -93,21 +70,19 @@ public class AccountController(
                     return RedirectToAction("Index", "Home");
                 }
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error creating domain user profile for {Email}", model.Email);
-                await userManager.DeleteAsync(appUser);
-                ModelState.AddModelError(string.Empty, "An error occurred while creating your profile. Please try again.");
-                return View(model);
-            }
+            
+            foreach (var error in errors)
+                ModelState.AddModelError(string.Empty, error);
+
+            logger.LogWarning("Registration failed for {Email}: {Errors}", model.Email, string.Join(", ", errors));
+            return View(model);
         }
-
-        foreach (var error in result.Errors)
-            ModelState.AddModelError(string.Empty, error.Description);
-
-        logger.LogWarning("Registration failed for {Email}: {Errors}", model.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
-
-        return View(model);
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected error during registration for {Email}", model.Email);
+            ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
+            return View(model);
+        }
     }
 
     [HttpGet]

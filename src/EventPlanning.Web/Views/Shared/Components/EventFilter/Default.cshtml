@@ -1,4 +1,5 @@
 @using EventPlanning.Web.Models.Shared
+@using EventPlanning.Domain.Enums
 @model EventFilterViewModel
 
 @{
@@ -21,12 +22,12 @@
         <div class="filter-segment">
             <i class="bi bi-sort-down filter-segment-icon"></i>
             <select name="sortOrder" class="form-select" style="cursor: pointer;" onchange="this.form.submit()">
-                <!option value="date_desc"
-                    selected="@(Model.SortOrder == "date_desc" || string.IsNullOrEmpty(Model.SortOrder))">
+                <!option value="DateDesc"
+                    selected="@(Model.SortOrder == SortOrder.DateDesc || !Model.SortOrder.HasValue)">
                     Newest First</!option>
-                <!option value="date_asc" selected="@(Model.SortOrder == "date_asc")">Oldest First</!option>
-                <!option value="name_asc" selected="@(Model.SortOrder == "name_asc")">Name: A-Z</!option>
-                <!option value="name_desc" selected="@(Model.SortOrder == "name_desc")">Name: Z-A</!option>
+                <!option value="DateAsc" selected="@(Model.SortOrder == SortOrder.DateAsc)">Oldest First</!option>
+                <!option value="NameAsc" selected="@(Model.SortOrder == SortOrder.NameAsc)">Name: A-Z</!option>
+                <!option value="NameDesc" selected="@(Model.SortOrder == SortOrder.NameDesc)">Name: Z-A</!option>
             </select>
         </div>
 
