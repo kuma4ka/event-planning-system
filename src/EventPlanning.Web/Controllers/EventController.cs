@@ -86,30 +86,19 @@ public class EventController(
         var userIdString = userManager.GetUserId(User);
         var userId = Guid.Parse(userIdString!);
         
-        try
-        {
-            var eventDto = await eventService.GetEventForEditAsync(id, userId, cancellationToken);
-            
-            var updateModel = new UpdateEventDto(
-                eventDto.Id,
-                eventDto.Name,
-                eventDto.Description,
-                eventDto.Date,
-                eventDto.Type,
-                eventDto.VenueId ?? Guid.Empty
-            );
+        var eventDto = await eventService.GetEventForEditAsync(id, userId, cancellationToken);
+        
+        var updateModel = new UpdateEventDto(
+            eventDto.Id,
+            eventDto.Name,
+            eventDto.Description,
+            eventDto.Date,
+            eventDto.Type,
+            eventDto.VenueId ?? Guid.Empty
+        );
 
-            var venues = await GetVenuesList(cancellationToken);
-            return View(EventFormViewModel.ForEdit(updateModel, venues));
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Forbid();
-        }
+        var venues = await GetVenuesList(cancellationToken);
+        return View(EventFormViewModel.ForEdit(updateModel, venues));
     }
 
     [HttpPost("edit/{id:guid}")]
@@ -146,14 +135,6 @@ public class EventController(
             viewModel.Venues = await GetVenuesList(cancellationToken);
             return View(viewModel);
         }
-        catch (UnauthorizedAccessException)
-        {
-            return Forbid();
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
     }
 
     [HttpPost("delete/{id}")]
@@ -162,17 +143,10 @@ public class EventController(
     {
         var userIdString = userManager.GetUserId(User);
         var userId = Guid.Parse(userIdString!);
-        try
-        {
-            await eventService.DeleteEventAsync(userId, id, cancellationToken);
-            logger.LogInformation("Event deleted: {EventId} by {UserId}", id, userId);
-            return RedirectToAction(nameof(MyEvents));
-        }
-        catch (UnauthorizedAccessException)
-        {
-            logger.LogWarning("Unauthorized delete attempt: Event {EventId} by {UserId}", id, userId);
-            return Forbid();
-        }
+
+        await eventService.DeleteEventAsync(userId, id, cancellationToken);
+        logger.LogInformation("Event deleted: {EventId} by {UserId}", id, userId);
+        return RedirectToAction(nameof(MyEvents));
     }
 
     [HttpGet("my-events")]
