@@ -1,5 +1,6 @@
 ﻿using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Application.Interfaces;
+using EventPlanning.Application.Utils;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
@@ -63,7 +64,7 @@ public class ProfileService(
 
             if (isPhoneTaken)
             {
-                logger.LogWarning("Profile update failed: Phone number {PhoneNumber} taken", newFullPhoneNumber);
+                logger.LogWarning("Profile update failed: Phone number {PhoneNumber} taken", LogRedactor.RedactPhoneNumber(newFullPhoneNumber));
                 throw new ValidationException([
                     new ValidationFailure("PhoneNumber", "This phone number is already linked to another account.")
                 ]);

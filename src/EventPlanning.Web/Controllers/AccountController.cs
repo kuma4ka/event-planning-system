@@ -1,6 +1,7 @@
 ﻿using EventPlanning.Application.DTOs.Auth;
 using EventPlanning.Infrastructure.Identity;
 using EventPlanning.Application.Interfaces;
+using EventPlanning.Application.Utils;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -53,7 +54,7 @@ public class AccountController(
 
                 if (string.IsNullOrEmpty(callbackUrl) || appUser == null)
                 {
-                    logger.LogError("Error generating confirmation mechanism for {Email}", model.Email);
+                    logger.LogError("Error generating confirmation mechanism for {Email}", LogRedactor.RedactEmail(model.Email));
                     ModelState.AddModelError(string.Empty, "Error generating confirmation email.");
                     return View(model);
                 }
@@ -75,12 +76,12 @@ public class AccountController(
             foreach (var error in errors)
                 ModelState.AddModelError(string.Empty, error);
 
-            logger.LogWarning("Registration failed for {Email}: {Errors}", model.Email, string.Join(", ", errors));
+            logger.LogWarning("Registration failed for {Email}: {Errors}", LogRedactor.RedactEmail(model.Email), string.Join(", ", errors));
             return View(model);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unexpected error during registration for {Email}", model.Email);
+            logger.LogError(ex, "Unexpected error during registration for {Email}", LogRedactor.RedactEmail(model.Email));
             ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
             return View(model);
         }
@@ -117,12 +118,12 @@ public class AccountController(
 
         if (result.IsLockedOut)
         {
-            logger.LogWarning("User {Email} locked out.", model.Email);
+            logger.LogWarning("User {Email} locked out.", LogRedactor.RedactEmail(model.Email));
             ModelState.AddModelError(string.Empty, "Account is locked out.");
         }
         else
         {
-            logger.LogWarning("Failed login attempt for {Email}.", model.Email);
+            logger.LogWarning("Failed login attempt for {Email}.", LogRedactor.RedactEmail(model.Email));
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
         }
 
