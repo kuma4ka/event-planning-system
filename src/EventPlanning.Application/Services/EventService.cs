@@ -1,11 +1,9 @@
 ﻿using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.DTOs.Guest;
-using EventPlanning.Application.Constants;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
-using EventPlanning.Domain.ValueObjects;
 using FluentValidation;
 using Mapster;
 using Microsoft.Extensions.Logging;
@@ -32,9 +30,12 @@ public class EventService(
         var validationResult = await searchValidator.ValidateAsync(searchDto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        var domainUserId = user?.Id ?? userId;
+
         var pagedEvents = await eventRepository.GetFilteredAsync(
             organizerIdFilter,
-            userId,
+            domainUserId,
             searchDto.SearchTerm,
             searchDto.FromDate,
             searchDto.ToDate,
@@ -65,52 +66,33 @@ public class EventService(
         var eventEntity = await eventRepository.GetDetailsByIdAsync(id, cancellationToken);
         if (eventEntity == null) return null;
 
-        var isOrganizer = userId.HasValue && eventEntity.OrganizerId == userId.Value;
+        Guid? domainUserId = null;
+        if (userId.HasValue)
+        {
+            var user = await userRepository.GetByIdentityIdAsync(userId.Value.ToString(), cancellationToken);
+            domainUserId = user?.Id;
+        }
+
+        var isOrganizer = domainUserId.HasValue && eventEntity.OrganizerId == domainUserId.Value;
+
+        var eventDetails = eventEntity.Adapt<EventDetailsDto>();
 
         var guestsDto = eventEntity.Guests.Select(g =>
         {
-            if (!isOrganizer)
-            {
-                return new GuestDto(
-                    g.Id,
-                    g.FirstName,
-                    g.LastName,
-                    "REDACTED",
-                    "",
-                    ""
-                );
-            }
-
-            var (_, localNumber) = countryService.ParsePhoneNumber(g.PhoneNumber?.Value);
-
-            return new GuestDto(
-                g.Id,
-                g.FirstName,
-                g.LastName,
-                g.Email,
-                g.CountryCode,
-                localNumber
-            );
+             if (isOrganizer)
+             {
+                 var (_, localNumber) = countryService.ParsePhoneNumber(g.PhoneNumber?.Value);
+                 return new GuestDto(g.Id, g.FirstName, g.LastName, g.Email, g.CountryCode, localNumber);
+             }
+             
+             return new GuestDto(g.Id, g.FirstName, g.LastName, "REDACTED", "", "");
         }).ToList();
 
-        var isJoined = userId.HasValue && await guestRepository.IsUserJoinedAsync(eventEntity.Id, userId.Value, cancellationToken);
+        var isJoined = domainUserId.HasValue && await guestRepository.IsUserJoinedAsync(eventEntity.Id, domainUserId.Value, cancellationToken);
 
-        var eventDetails = new EventDetailsDto(
-            eventEntity.Venue?.Capacity ?? 0,
-            eventEntity.IsPrivate,
-            guestsDto,
-            eventEntity.Id,
-            eventEntity.Name,
-            eventEntity.Description ?? string.Empty,
-            eventEntity.Date,
-            eventEntity.Type,
-            eventEntity.OrganizerId,
-            eventEntity.Venue?.Name ?? "TBD",
-            eventEntity.VenueId,
-            eventEntity.Venue?.ImageUrl,
-            eventEntity.Venue?.Address
-        )
-        {
+        eventDetails = eventDetails with 
+        { 
+            Guests = guestsDto,
             IsOrganizer = isOrganizer,
             IsJoined = isJoined
         };
@@ -137,12 +119,15 @@ public class EventService(
             throw new ValidationException(validationResult.Errors);
         }
 
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) throw new InvalidOperationException("User profile not found");
+
         var eventEntity = new Event(
             dto.Name,
             dto.Description,
             dto.Date,
             dto.Type,
-            userId,
+            user.Id,
             dto.VenueId == Guid.Empty ? null : dto.VenueId
         );
 
@@ -157,7 +142,10 @@ public class EventService(
         var eventEntity = await eventRepository.GetByIdAsync(dto.Id, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException($"Event {dto.Id} not found");
 
-        if (eventEntity.OrganizerId != userId)
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) throw new UnauthorizedAccessException("User not found");
+
+        if (eventEntity.OrganizerId != user.Id)
         {
              logger.LogWarning("Unauthorized event update attempt by {UserId} on event {EventId}", userId, dto.Id);
              throw new UnauthorizedAccessException("Not your event");
@@ -181,7 +169,10 @@ public class EventService(
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
         if (eventEntity == null) return;
 
-        if (eventEntity.OrganizerId != userId)
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) throw new UnauthorizedAccessException("User not found");
+
+        if (eventEntity.OrganizerId != user.Id)
         {
             logger.LogWarning("Unauthorized event delete attempt by {UserId} on event {EventId}", userId, eventId);
             throw new UnauthorizedAccessException("Not your event");
