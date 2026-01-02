@@ -24,12 +24,12 @@ public class EventParticipationController(
         try
         {
             await participationService.JoinEventAsync(id, userId, cancellationToken);
-            logger.LogInformation("User {User} joined event {EventId}", User.Identity?.Name, id);
+            logger.LogInformation("User {UserId} joined event {EventId}", userId, id);
             TempData["SuccessMessage"] = "You have successfully joined the event!";
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error joining event: {EventId} by {User}", id, User.Identity?.Name);
+            logger.LogError(ex, "Error joining event: {EventId} by {UserId}", id, userId);
             TempData["ErrorMessage"] = ex.Message;
         }
 
@@ -54,12 +54,12 @@ public class EventParticipationController(
         try
         {
             await participationService.LeaveEventAsync(id, userId, cancellationToken);
-            logger.LogInformation("User {User} left event {EventId}", User.Identity?.Name, id);
+            logger.LogInformation("User {UserId} left event {EventId}", userId, id);
             TempData["SuccessMessage"] = "You have left the event.";
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error leaving event: {EventId} by {User}", id, User.Identity?.Name);
+            logger.LogError(ex, "Error leaving event: {EventId} by {UserId}", id, userId);
             TempData["ErrorMessage"] = ex.Message;
         }
 
