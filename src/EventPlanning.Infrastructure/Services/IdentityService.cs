@@ -35,7 +35,7 @@ public class IdentityService(
 
     public async Task<(bool Succeeded, string[] Errors, Guid? UserId, string? Code)> RegisterUserAsync(RegisterUserDto model)
     {
-        using var transaction = await context.Database.BeginTransactionAsync();
+        await using var transaction = await context.Database.BeginTransactionAsync();
         try
         {
             var appUser = new ApplicationUser
@@ -52,7 +52,7 @@ public class IdentityService(
             }
 
             var domainUser = new User(
-                appUser.Id,
+                appUser.Id.ToString(),
                 model.FirstName,
                 model.LastName,
                 UserRole.User,
@@ -69,7 +69,7 @@ public class IdentityService(
 
             await transaction.CommitAsync();
 
-            return (true, Array.Empty<string>(), Guid.Parse(userId), code);
+            return (true, [], Guid.Parse(userId), code);
         }
         catch (Exception)
         {

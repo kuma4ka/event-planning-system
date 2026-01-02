@@ -4,7 +4,6 @@ using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
-using Microsoft.Extensions.Logging;
 
 namespace EventPlanning.Application.Services;
 
@@ -13,7 +12,8 @@ public class VenueService(
     IEventRepository eventRepository,
     IImageService imageService,
     IValidator<CreateVenueDto> createValidator,
-    IValidator<UpdateVenueDto> updateValidator
+    IValidator<UpdateVenueDto> updateValidator,
+    IUserRepository userRepository
 ) : IVenueService
 {
     public async Task<List<VenueDto>> GetVenuesAsync(CancellationToken cancellationToken = default)
@@ -72,11 +72,14 @@ public class VenueService(
         if (dto.ImageFile != null)
             imageUrl = await imageService.UploadImageAsync(dto.ImageFile, "venues", cancellationToken);
 
+        var user = await userRepository.GetByIdentityIdAsync(adminId.ToString(), cancellationToken);
+        if (user == null) throw new InvalidOperationException("User profile not found");
+
         var venue = new Venue(
             dto.Name,
             dto.Address,
             dto.Capacity,
-            adminId,
+            user.Id,
             dto.Description,
             imageUrl
         );

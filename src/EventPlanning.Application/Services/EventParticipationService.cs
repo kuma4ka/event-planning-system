@@ -21,13 +21,13 @@ public class EventParticipationService(
         if (eventEntity.Date < DateTime.UtcNow)
             throw new InvalidOperationException("Cannot join an event that has already ended.");
 
-        if (eventEntity.OrganizerId == userId)
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) throw new KeyNotFoundException($"User profile not found for identity {userId}");
+
+        if (eventEntity.OrganizerId == user.Id)
             throw new InvalidOperationException("You cannot join your own event as a guest.");
 
-        var user = await userRepository.GetByIdAsync(userId, cancellationToken);
-        if (user == null) throw new KeyNotFoundException($"User {userId} not found");
-
-        var emailExists = await guestRepository.EmailExistsAtEventAsync(eventId, user.Email!, null, cancellationToken);
+        var emailExists = await guestRepository.EmailExistsAtEventAsync(eventId, user.Email, null, cancellationToken);
         if (emailExists) throw new InvalidOperationException("You are already registered for this event.");
 
         if (user.PhoneNumber != null)
@@ -39,7 +39,7 @@ public class EventParticipationService(
         var guest = new Guest(
             user.FirstName,
             user.LastName,
-            user.Email!,
+            user.Email,
             eventId,
             user.CountryCode,
             user.PhoneNumber?.Value,
@@ -58,13 +58,19 @@ public class EventParticipationService(
 
     public async Task LeaveEventAsync(Guid eventId, Guid userId, CancellationToken cancellationToken = default)
     {
-        await guestRepository.RemoveGuestByUserIdAsync(eventId, userId, cancellationToken);
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) return;
+
+        await guestRepository.RemoveGuestByUserIdAsync(eventId, user.Id, cancellationToken);
         InvalidateEventCache(eventId);
     }
 
     public async Task<bool> IsUserJoinedAsync(Guid eventId, Guid userId, CancellationToken cancellationToken = default)
     {
-        return await guestRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) return false;
+
+        return await guestRepository.IsUserJoinedAsync(eventId, user.Id, cancellationToken);
     }
 
     private void InvalidateEventCache(Guid eventId)

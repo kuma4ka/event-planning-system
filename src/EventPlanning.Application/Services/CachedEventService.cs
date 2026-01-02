@@ -70,6 +70,11 @@ public class CachedEventService(
         InvalidateEventCache(eventId);
     }
 
+    public Task<EventDto> GetEventForEditAsync(Guid eventId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return innerService.GetEventForEditAsync(eventId, userId, cancellationToken);
+    }
+
 
 
     private void InvalidateEventCache(Guid eventId)

@@ -1,14 +1,14 @@
 ﻿namespace EventPlanning.Application.DTOs.Guest;
 
-public record GuestDto(
-    Guid Id,
-    string FirstName,
-    string LastName,
-    string Email,
-    string CountryCode,
-    string PhoneNumber
-)
+public record GuestDto
 {
+    public Guid Id { get; init; }
+    public string FirstName { get; init; } = string.Empty;
+    public string LastName { get; init; } = string.Empty;
+    public string Email { get; init; } = string.Empty;
+    public string CountryCode { get; init; } = string.Empty;
+    public string PhoneNumber { get; init; } = string.Empty;
+
     public string FullName => $"{FirstName} {LastName}".Trim();
 
     public string Initials

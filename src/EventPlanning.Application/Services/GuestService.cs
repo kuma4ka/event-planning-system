@@ -15,6 +15,7 @@ public class GuestService(
     IValidator<CreateGuestDto> createValidator,
     IValidator<AddGuestManuallyDto> manualAddValidator,
     IValidator<UpdateGuestDto> updateValidator,
+    IUserRepository userRepository,
     IMemoryCache cache,
     ILogger<GuestService> logger) : IGuestService
 {
@@ -27,7 +28,10 @@ public class GuestService(
         var eventEntity = await eventRepository.GetByIdAsync(dto.EventId, cancellationToken);
 
         if (eventEntity == null) throw new KeyNotFoundException("Event not found");
-        if (eventEntity.OrganizerId != userId)
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) throw new UnauthorizedAccessException("User not found");
+
+        if (eventEntity.OrganizerId != user.Id)
         {
             logger.LogWarning("Unauthorized guest add attempt by {UserId} for event {EventId}", userId, dto.EventId);
             throw new UnauthorizedAccessException("Not your event");
@@ -51,7 +55,10 @@ public class GuestService(
         var eventEntity = await eventRepository.GetByIdAsync(dto.EventId, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException("Event not found");
 
-        if (eventEntity.OrganizerId != currentUserId)
+        var user = await userRepository.GetByIdentityIdAsync(currentUserId.ToString(), cancellationToken);
+        if (user == null) throw new UnauthorizedAccessException("User not found");
+
+        if (eventEntity.OrganizerId != user.Id)
             throw new UnauthorizedAccessException("Only the organizer can add guests manually.");
 
         if (eventEntity.Date < DateTime.Now)
@@ -85,7 +92,10 @@ public class GuestService(
         var eventEntity = guest.Event ?? await eventRepository.GetByIdAsync(guest.EventId, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException("Event not found.");
 
-        if (eventEntity.OrganizerId != currentUserId)
+        var user = await userRepository.GetByIdentityIdAsync(currentUserId.ToString(), cancellationToken);
+        if (user == null) throw new UnauthorizedAccessException("User not found");
+
+        if (eventEntity.OrganizerId != user.Id)
             throw new UnauthorizedAccessException("Not your event. Only the organizer can update guests.");
 
         if (guest.UserId != null)
@@ -118,13 +128,16 @@ public class GuestService(
 
         Guid eventId = guest.EventId;
 
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) return;
+
         if (guest.Event == null)
         {
             var eventEntity = await eventRepository.GetByIdAsync(guest.EventId, cancellationToken);
-            if (eventEntity == null || eventEntity.OrganizerId != userId)
+            if (eventEntity == null || eventEntity.OrganizerId != user.Id)
                 throw new UnauthorizedAccessException("Not your event");
         }
-        else if (guest.Event.OrganizerId != userId)
+        else if (guest.Event.OrganizerId != user.Id)
         {
             throw new UnauthorizedAccessException("Not your event");
         }

@@ -140,24 +140,18 @@ public static class DbInitializer
              if (!result.Succeeded)
                 throw new Exception($"Failed to create user {email}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             
-            domainUser = new User(appUser.Id, fName, lName, Enum.Parse<UserRole>(role), email, email, phoneNumber, "+1");
+            domainUser = new User(appUser.Id.ToString(), fName, lName, Enum.Parse<UserRole>(role), email, email, phoneNumber, "+1");
             await context.Users.AddAsync(domainUser);
             await context.SaveChangesAsync();
         }
         else
         {
-            // Sync/Fix logic
-            domainUser = await context.Users.FindAsync(appUser.Id);
+            domainUser = await context.Users.FirstOrDefaultAsync(u => u.IdentityId == appUser.Id.ToString());
             if (domainUser == null)
             {
-                // Self-heal key mismatch
-                domainUser = new User(appUser.Id, fName, lName, Enum.Parse<UserRole>(role), email, email, phoneNumber, "+1");
+                domainUser = new User(appUser.Id.ToString(), fName, lName, Enum.Parse<UserRole>(role), email, email, phoneNumber, "+1");
                 await context.Users.AddAsync(domainUser);
                 await context.SaveChangesAsync();
-            }
-            else if (domainUser.PhoneNumber != phoneNumber)
-            {
-                // Sync phone number
             }
         }
 

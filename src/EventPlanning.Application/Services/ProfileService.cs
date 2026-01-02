@@ -21,13 +21,13 @@ public class ProfileService(
 {
     public async Task<EditProfileDto> GetProfileAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        var user = await userRepository.GetByIdAsync(userId, cancellationToken);
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
         if (user == null) throw new KeyNotFoundException("User not found");
 
         var organizedEvents = await eventRepository.GetFilteredAsync(
-            userId, null, null, null, null, null, null, 1, 1, cancellationToken);
+            user.Id, null, null, null, null, null, null, 1, 1, cancellationToken);
 
-        var joinedCount = await guestRepository.CountJoinedEventsAsync(userId, cancellationToken);
+        var joinedCount = await guestRepository.CountJoinedEventsAsync(user.Id, cancellationToken);
 
         var (code, number) = countryService.ParsePhoneNumber(user.PhoneNumber?.Value);
 
@@ -50,7 +50,7 @@ public class ProfileService(
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
-        var user = await userRepository.GetByIdAsync(userId, cancellationToken);
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
         if (user == null) throw new KeyNotFoundException("User not found");
 
         var newFullPhoneNumber = string.IsNullOrEmpty(dto.PhoneNumber)
@@ -59,7 +59,7 @@ public class ProfileService(
 
         if ((user.PhoneNumber?.Value) != newFullPhoneNumber && !string.IsNullOrEmpty(newFullPhoneNumber))
         {
-            var isPhoneTaken = await userRepository.IsPhoneNumberTakenAsync(newFullPhoneNumber, userId, cancellationToken);
+            var isPhoneTaken = await userRepository.IsPhoneNumberTakenAsync(newFullPhoneNumber, user.Id, cancellationToken);
 
             if (isPhoneTaken)
             {

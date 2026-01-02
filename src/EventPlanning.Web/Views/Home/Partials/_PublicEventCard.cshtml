@@ -36,8 +36,9 @@
             </h5>
 
             <p class="card-text text-muted small mb-3 flex-grow-1" style="line-height: 1.6;">
-                @(Model.Description.Length > 100 ? Model.Description.Substring(0, 97) + "..." :
-                    Model.Description)
+                @(!string.IsNullOrEmpty(Model.Description) && Model.Description.Length > 100 
+                    ? Model.Description.Substring(0, 97) + "..." 
+                    : Model.Description)
             </p>
 
             <div class="d-flex align-items-center text-muted small pt-3 border-top mt-auto"

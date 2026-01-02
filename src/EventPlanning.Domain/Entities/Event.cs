@@ -10,7 +10,7 @@ public class Event
     public DateTime Date { get; private set; }
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
-    public bool IsPrivate { get; private set; } = false;
+    public bool IsPrivate { get; private set; }
 
     public EventType Type { get; private set; }
 
@@ -19,7 +19,7 @@ public class Event
 
     public Guid OrganizerId { get; private set; }
 
-    public ICollection<Guest> Guests { get; private set; } = new List<Guest>();
+    public ICollection<Guest> Guests { get; } = new List<Guest>();
 
     private Event()
     {
@@ -59,10 +59,12 @@ public class Event
         VenueId = venueId;
     }
 
+    public bool HasCapacityLimit => Venue != null && Venue.Capacity > 0;
+
     public bool IsFull(int currentGuestCount)
     {
-        if (Venue == null || Venue.Capacity <= 0) return false;
-        return currentGuestCount >= Venue.Capacity;
+        if (!HasCapacityLimit) return false;
+        return currentGuestCount >= Venue!.Capacity;
     }
 
     public void CanAddGuest(int currentGuestCount)

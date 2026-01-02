@@ -25,6 +25,12 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository
         return await context.Users.FindAsync([userId], cancellationToken);
     }
 
+    public async Task<EventPlanning.Domain.Entities.User?> GetByIdentityIdAsync(string identityId, CancellationToken cancellationToken)
+    {
+        return await context.Users
+            .FirstOrDefaultAsync(u => u.IdentityId == identityId, cancellationToken);
+    }
+
     public async Task AddAsync(EventPlanning.Domain.Entities.User user, CancellationToken cancellationToken = default)
     {
         await context.Users.AddAsync(user, cancellationToken);
