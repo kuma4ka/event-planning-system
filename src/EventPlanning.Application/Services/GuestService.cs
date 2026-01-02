@@ -19,7 +19,7 @@ public class GuestService(
 {
     private const string EventCacheKeyPrefix = "event_details_";
 
-    public async Task AddGuestAsync(string userId, CreateGuestDto dto, CancellationToken cancellationToken = default)
+    public async Task AddGuestAsync(Guid userId, CreateGuestDto dto, CancellationToken cancellationToken = default)
     {
         var validationResult = await createValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
@@ -41,7 +41,7 @@ public class GuestService(
         InvalidateEventCache(dto.EventId);
     }
 
-    public async Task AddGuestManuallyAsync(string currentUserId, AddGuestManuallyDto dto,
+    public async Task AddGuestManuallyAsync(Guid currentUserId, AddGuestManuallyDto dto,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await manualAddValidator.ValidateAsync(dto, cancellationToken);
@@ -73,7 +73,7 @@ public class GuestService(
         InvalidateEventCache(dto.EventId);
     }
 
-    public async Task UpdateGuestAsync(string currentUserId, UpdateGuestDto dto,
+    public async Task UpdateGuestAsync(Guid currentUserId, UpdateGuestDto dto,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await updateValidator.ValidateAsync(dto, cancellationToken);
@@ -111,7 +111,7 @@ public class GuestService(
         InvalidateEventCache(guest.EventId);
     }
 
-    public async Task RemoveGuestAsync(string userId, Guid guestId, CancellationToken cancellationToken = default)
+    public async Task RemoveGuestAsync(Guid userId, Guid guestId, CancellationToken cancellationToken = default)
     {
         var guest = await guestRepository.GetByIdAsync(guestId, cancellationToken);
         if (guest == null) return;

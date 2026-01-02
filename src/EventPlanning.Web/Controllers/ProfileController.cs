@@ -26,8 +26,9 @@ public class ProfileController(
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var userId = userManager.GetUserId(User);
-        if (userId == null) return RedirectToAction("Login", "Account");
+        var userIdString = userManager.GetUserId(User);
+        if (userIdString == null) return RedirectToAction("Login", "Account");
+        var userId = Guid.Parse(userIdString);
 
         var model = await profileService.GetProfileAsync(userId, cancellationToken);
 
@@ -43,8 +44,9 @@ public class ProfileController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateInfo(EditProfileDto model, CancellationToken cancellationToken)
     {
-        var userId = userManager.GetUserId(User);
-        if (userId == null) return RedirectToAction("Login", "Account");
+        var userIdString = userManager.GetUserId(User);
+        if (userIdString == null) return RedirectToAction("Login", "Account");
+        var userId = Guid.Parse(userIdString);
 
         try
         {
@@ -81,8 +83,9 @@ public class ProfileController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangePassword(ChangePasswordDto passwordModel, CancellationToken cancellationToken)
     {
-        var userId = userManager.GetUserId(User);
-        if (userId == null) return RedirectToAction("Login", "Account");
+        var userIdString = userManager.GetUserId(User);
+        if (userIdString == null) return RedirectToAction("Login", "Account");
+        var userId = Guid.Parse(userIdString);
 
         try
         {

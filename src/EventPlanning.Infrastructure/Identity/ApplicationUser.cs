@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace EventPlanning.Infrastructure.Identity;
 
-public class ApplicationUser : IdentityUser
+public class ApplicationUser : IdentityUser<Guid>
 {
     // Additional identity-specific properties can go here if needed.
     // For now, standard IdentityUser is sufficient.

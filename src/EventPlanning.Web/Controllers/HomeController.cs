@@ -31,7 +31,8 @@ public class HomeController(
         int page = 1,
         CancellationToken cancellationToken = default)
     {
-        var userId = userManager.GetUserId(User) ?? string.Empty;
+        var userIdString = userManager.GetUserId(User);
+        var userId = string.IsNullOrEmpty(userIdString) ? Guid.Empty : Guid.Parse(userIdString);
         var now = DateTime.Now;
 
         var searchDto = new EventSearchDto

@@ -61,7 +61,7 @@ public class VenueService(
         );
     }
 
-    public async Task CreateVenueAsync(string adminId, CreateVenueDto dto,
+    public async Task CreateVenueAsync(Guid adminId, CreateVenueDto dto,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await createValidator.ValidateAsync(dto, cancellationToken);

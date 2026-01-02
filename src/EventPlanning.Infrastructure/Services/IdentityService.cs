@@ -10,26 +10,26 @@ public class IdentityService(
     UserManager<ApplicationUser> userManager,
     IUserRepository userRepository) : IIdentityService
 {
-    public async Task<User?> GetUserByIdAsync(string userId)
+    public async Task<User?> GetUserByIdAsync(Guid userId)
     {
-        var appUser = await userManager.FindByIdAsync(userId);
+        var appUser = await userManager.FindByIdAsync(userId.ToString());
         if (appUser == null) return null;
 
         return await userRepository.GetByIdAsync(userId, default);
     }
 
-    public async Task<(bool Succeeded, string[] Errors)> ChangePasswordAsync(string userId, string currentPassword, string newPassword)
+    public async Task<(bool Succeeded, string[] Errors)> ChangePasswordAsync(Guid userId, string currentPassword, string newPassword)
     {
-        var appUser = await userManager.FindByIdAsync(userId);
+        var appUser = await userManager.FindByIdAsync(userId.ToString());
         if (appUser == null) return (false, ["User not found"]);
 
         var result = await userManager.ChangePasswordAsync(appUser, currentPassword, newPassword);
         return (result.Succeeded, result.Errors.Select(e => e.Description).ToArray());
     }
 
-    public async Task<(bool Succeeded, string[] Errors)> UpdatePhoneNumberAsync(string userId, string phoneNumber)
+    public async Task<(bool Succeeded, string[] Errors)> UpdatePhoneNumberAsync(Guid userId, string phoneNumber)
     {
-        var appUser = await userManager.FindByIdAsync(userId);
+        var appUser = await userManager.FindByIdAsync(userId.ToString());
         if (appUser == null) return (false, ["User not found"]);
 
         var token = await userManager.GenerateChangePhoneNumberTokenAsync(appUser, phoneNumber);

@@ -1,13 +1,14 @@
 ﻿using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.ValueObjects;
 using EventPlanning.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace EventPlanning.Infrastructure.Persistence;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : IdentityDbContext<ApplicationUser>(options)
+    : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
 {
     public new DbSet<User> Users => Set<User>();
     public DbSet<Event> Events => Set<Event>();
@@ -19,17 +20,20 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         base.OnModelCreating(builder);
 
-        // Configure Domain User
         builder.Entity<User>(entity =>
         {
-            entity.ToTable("Users"); // Separate table for Domain Users
+            entity.ToTable("Users");
             entity.HasKey(u => u.Id);
             
             entity.Property(u => u.UserName).IsRequired();
             entity.Property(u => u.Email).IsRequired();
             entity.Property(u => u.FirstName).IsRequired();
             entity.Property(u => u.LastName).IsRequired();
-            // Properties mapped via relationships from Events/Venues use u.Id which must match ApplicationUser.Id
+            
+            entity.Property(u => u.PhoneNumber)
+                .HasConversion(
+                    v => v != null ? v.Value : null,
+                    v => v != null ? PhoneNumber.Create(v) : null);
         });
 
         builder.Entity<Event>(entity =>

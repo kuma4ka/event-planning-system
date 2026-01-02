@@ -11,7 +11,7 @@ public class CachedEventService(
 {
     public const string EventCacheKeyPrefix = "event_details_";
 
-    public Task<PagedResult<EventDto>> GetEventsAsync(string userId, string? organizerIdFilter, EventSearchDto searchDto, string? sortOrder, CancellationToken cancellationToken = default)
+    public Task<PagedResult<EventDto>> GetEventsAsync(Guid userId, Guid? organizerIdFilter, EventSearchDto searchDto, string? sortOrder, CancellationToken cancellationToken = default)
     {
         return innerService.GetEventsAsync(userId, organizerIdFilter, searchDto, sortOrder, cancellationToken);
     }
@@ -21,14 +21,14 @@ public class CachedEventService(
         return innerService.GetEventByIdAsync(id, cancellationToken);
     }
 
-    public async Task<EventDetailsDto?> GetEventDetailsAsync(Guid id, string? userId, CancellationToken cancellationToken = default)
+    public async Task<EventDetailsDto?> GetEventDetailsAsync(Guid id, Guid? userId, CancellationToken cancellationToken = default)
     {
         var publicCacheKey = $"{EventCacheKeyPrefix}{id}_public";
         var organizerCacheKey = $"{EventCacheKeyPrefix}{id}_organizer";
 
         if (cache.Get<EventDetailsDto>(organizerCacheKey) is { } organizerCachedEvent)
         {
-            if (organizerCachedEvent.OrganizerId == userId)
+            if (userId.HasValue && organizerCachedEvent.OrganizerId == userId.Value)
             {
                 return organizerCachedEvent;
             }
@@ -36,7 +36,7 @@ public class CachedEventService(
 
         if (cache.Get<EventDetailsDto>(publicCacheKey) is { } publicCachedEvent)
         {
-            if (publicCachedEvent.OrganizerId != userId)
+            if (!userId.HasValue || publicCachedEvent.OrganizerId != userId.Value)
             {
                 return publicCachedEvent;
             }
@@ -62,18 +62,18 @@ public class CachedEventService(
         return result;
     }
 
-    public async Task<Guid> CreateEventAsync(string userId, CreateEventDto dto, CancellationToken cancellationToken = default)
+    public async Task<Guid> CreateEventAsync(Guid userId, CreateEventDto dto, CancellationToken cancellationToken = default)
     {
         return await innerService.CreateEventAsync(userId, dto, cancellationToken);
     }
 
-    public async Task UpdateEventAsync(string userId, UpdateEventDto dto, CancellationToken cancellationToken = default)
+    public async Task UpdateEventAsync(Guid userId, UpdateEventDto dto, CancellationToken cancellationToken = default)
     {
         await innerService.UpdateEventAsync(userId, dto, cancellationToken);
         InvalidateEventCache(dto.Id);
     }
 
-    public async Task DeleteEventAsync(string userId, Guid eventId, CancellationToken cancellationToken = default)
+    public async Task DeleteEventAsync(Guid userId, Guid eventId, CancellationToken cancellationToken = default)
     {
         await innerService.DeleteEventAsync(userId, eventId, cancellationToken);
         InvalidateEventCache(eventId);

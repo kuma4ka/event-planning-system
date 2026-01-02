@@ -8,7 +8,7 @@ public record EventDto(
     string Description,
     DateTime Date,
     EventType Type,
-    string OrganizerId,
+    Guid OrganizerId,
     string VenueName,
     Guid? VenueId,
     string? VenueImageUrl

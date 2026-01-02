@@ -14,7 +14,7 @@ public class Guest
 
     public Guid EventId { get; private set; }
     public Event? Event { get; private set; }
-    public string? UserId { get; private set; }
+    public Guid? UserId { get; private set; }
 
     // For EF Core
     private Guest()
@@ -25,7 +25,7 @@ public class Guest
         CountryCode = null!;
     }
 
-    public Guest(string firstName, string lastName, string email, Guid eventId, string countryCode, string? phoneNumber = null, string? userId = null)
+    public Guest(string firstName, string lastName, string email, Guid eventId, string countryCode, string? phoneNumber = null, Guid? userId = null)
     {
         if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("First Name is required.", nameof(firstName));
         if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("Last Name is required.", nameof(lastName));

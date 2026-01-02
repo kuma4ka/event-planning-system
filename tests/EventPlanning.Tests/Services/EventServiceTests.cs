@@ -51,7 +51,7 @@ public class EventServiceTests
     public async Task CreateEventAsync_ShouldCallRepository_AndReturnId_WhenDtoIsValid()
     {
         // Arrange
-        var userId = "user-1";
+        var userId = Guid.NewGuid();
         var expectedEventId = Guid.NewGuid();
 
         var dto = new CreateEventDto(
@@ -89,7 +89,7 @@ public class EventServiceTests
     public async Task CreateEventAsync_ShouldThrowValidationException_WhenDtoIsInvalid()
     {
         // Arrange
-        var userId = "user-1";
+        var userId = Guid.NewGuid();
         var dto = new CreateEventDto("", "", DateTime.UtcNow, EventType.Conference, Guid.Empty);
 
         var validationFailure = new ValidationResult([new ValidationFailure("Name", "Required")]);
@@ -114,8 +114,8 @@ public class EventServiceTests
     {
         // Arrange
         var eventId = Guid.NewGuid();
-        var organizerId = "user-1";
-        var currentUserId = "user-2";
+        var organizerId = Guid.NewGuid();
+        var currentUserId = Guid.NewGuid();
 
         var guest = new Guest("Test", "Guest", "guest@test.com", eventId, "+1", "+1234567890");
 
@@ -153,8 +153,8 @@ public class EventServiceTests
     {
         // Arrange
         var eventId = Guid.NewGuid();
-        var organizerId = "user-1";
-        var currentUserId = "user-1"; // Is Organizer
+        var organizerId = Guid.NewGuid();
+        Guid? currentUserId = organizerId; // Is Organizer
 
         var guest = new Guest("Test", "Guest", "guest@test.com", eventId, "+1", "+1234567890");
 
@@ -192,7 +192,7 @@ public class EventServiceTests
     {
         // Arrange
         var eventId = Guid.NewGuid();
-        var organizerId = "user-1";
+        var organizerId = Guid.NewGuid();
         var user = new User(organizerId, "John", "Doe", UserRole.User, "john@example.com", "john@example.com", "+123456789", "+1");
 
         var eventEntity = new Event(
@@ -212,7 +212,7 @@ public class EventServiceTests
             .ReturnsAsync(user);
 
         // Act
-        var result = await _service.GetEventDetailsAsync(eventId, null);
+        var result = await _service.GetEventDetailsAsync(eventId, (Guid?)null);
 
         // Assert
         result.Should().NotBeNull();

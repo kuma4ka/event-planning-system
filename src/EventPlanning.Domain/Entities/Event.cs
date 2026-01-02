@@ -17,21 +17,21 @@ public class Event
     public Guid? VenueId { get; private set; }
     public Venue? Venue { get; private set; }
 
-    public string OrganizerId { get; private set; }
+    public Guid OrganizerId { get; private set; }
 
     public ICollection<Guest> Guests { get; private set; } = new List<Guest>();
 
     private Event()
     {
         Name = null!;
-        OrganizerId = null!;
+        OrganizerId = Guid.Empty;
     }
 
-    public Event(string name, string? description, DateTime date, EventType type, string organizerId, Guid? venueId = null, bool isPrivate = false)
+    public Event(string name, string? description, DateTime date, EventType type, Guid organizerId, Guid? venueId = null, bool isPrivate = false)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name cannot be empty.", nameof(name));
         if (date < DateTime.UtcNow) throw new ArgumentException("Date must be in the future.", nameof(date));
-        if (string.IsNullOrWhiteSpace(organizerId)) throw new ArgumentException("OrganizerId is required.", nameof(organizerId));
+        if (organizerId == Guid.Empty) throw new ArgumentException("OrganizerId is required.", nameof(organizerId));
 
         Name = name;
         Description = description;

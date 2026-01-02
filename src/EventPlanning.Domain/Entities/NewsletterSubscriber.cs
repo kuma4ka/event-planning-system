@@ -5,7 +5,7 @@ namespace EventPlanning.Domain.Entities;
 public class NewsletterSubscriber
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; private set; } = Guid.CreateVersion7();
 
     [Required]
     [EmailAddress]

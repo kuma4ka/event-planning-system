@@ -1,13 +1,14 @@
 ﻿using EventPlanning.Domain.Enums;
+using EventPlanning.Domain.ValueObjects;
 
 namespace EventPlanning.Domain.Entities;
 
 public class User
 {
-    public string Id { get; private set; }
+    public Guid Id { get; private set; } = Guid.CreateVersion7();
     public string UserName { get; private set; }
     public string Email { get; private set; }
-    public string? PhoneNumber { get; private set; }
+    public PhoneNumber? PhoneNumber { get; private set; }
     
     public string CountryCode { get; private set; }
     public string FirstName { get; private set; }
@@ -16,7 +17,6 @@ public class User
 
     private User()
     {
-        Id = Guid.NewGuid().ToString();
         UserName = null!;
         Email = null!;
         CountryCode = null!;
@@ -24,9 +24,9 @@ public class User
         LastName = null!;
     }
 
-    public User(string id, string firstName, string lastName, UserRole role, string userName, string email, string phoneNumber, string countryCode)
+    public User(Guid id, string firstName, string lastName, UserRole role, string userName, string email, string? phoneNumber, string countryCode)
     {
-        if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("Id is required.", nameof(id));
+        if (id == Guid.Empty) throw new ArgumentException("Id is required.", nameof(id));
         if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("First Name is required.", nameof(firstName));
         if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("Last Name is required.", nameof(lastName));
         if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email is required.", nameof(email));
@@ -36,7 +36,7 @@ public class User
         Id = id;
         UserName = userName;
         Email = email;
-        PhoneNumber = phoneNumber;
+        PhoneNumber = phoneNumber != null ? PhoneNumber.Create(phoneNumber) : null;
 
         CountryCode = countryCode;
         FirstName = firstName;
@@ -53,14 +53,10 @@ public class User
         LastName = lastName;
     }
 
-    public void SetCountryCode(string countryCode)
+    public void UpdateContactInfo(string countryCode, string? phoneNumber)
     {
-        if (string.IsNullOrWhiteSpace(countryCode)) throw new ArgumentException("Country Code is required.", nameof(countryCode));
-        CountryCode = countryCode;
-    }
-
-    public void UpdatePhoneNumber(string? phoneNumber)
-    {
-        PhoneNumber = phoneNumber;
+         if (string.IsNullOrWhiteSpace(countryCode)) throw new ArgumentException("Country Code is required.", nameof(countryCode));
+         CountryCode = countryCode;
+         PhoneNumber = phoneNumber != null ? PhoneNumber.Create(phoneNumber) : null;
     }
 }

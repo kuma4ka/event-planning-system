@@ -12,7 +12,7 @@ public class EventParticipationService(
     ICacheService cacheService,
     ILogger<EventParticipationService> logger) : IEventParticipationService
 {
-    public async Task JoinEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task JoinEventAsync(Guid eventId, Guid userId, CancellationToken cancellationToken = default)
     {
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
         if (eventEntity == null) throw new KeyNotFoundException($"Event {eventId} not found");
@@ -29,9 +29,9 @@ public class EventParticipationService(
         var emailExists = await guestRepository.EmailExistsAtEventAsync(eventId, user.Email!, null, cancellationToken);
         if (emailExists) throw new InvalidOperationException("You are already registered for this event.");
 
-        if (!string.IsNullOrEmpty(user.PhoneNumber))
+        if (user.PhoneNumber != null)
         {
-             var phoneExists = await guestRepository.PhoneExistsAtEventAsync(eventId, user.PhoneNumber, null, cancellationToken);
+             var phoneExists = await guestRepository.PhoneExistsAtEventAsync(eventId, user.PhoneNumber.Value, null, cancellationToken);
              if (phoneExists)  throw new InvalidOperationException("You are already registered for this event.");
         }
 
@@ -41,7 +41,7 @@ public class EventParticipationService(
             user.Email!,
             eventId,
             user.CountryCode,
-            user.PhoneNumber,
+            user.PhoneNumber?.Value,
             user.Id
         );
 
@@ -55,13 +55,13 @@ public class EventParticipationService(
         InvalidateEventCache(eventId);
     }
 
-    public async Task LeaveEventAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task LeaveEventAsync(Guid eventId, Guid userId, CancellationToken cancellationToken = default)
     {
         await guestRepository.RemoveGuestByUserIdAsync(eventId, userId, cancellationToken);
         InvalidateEventCache(eventId);
     }
 
-    public async Task<bool> IsUserJoinedAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task<bool> IsUserJoinedAsync(Guid eventId, Guid userId, CancellationToken cancellationToken = default)
     {
         return await guestRepository.IsUserJoinedAsync(eventId, userId, cancellationToken);
     }
