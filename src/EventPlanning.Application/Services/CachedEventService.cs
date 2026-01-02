@@ -1,8 +1,6 @@
 using EventPlanning.Application.DTOs.Event;
 using EventPlanning.Application.Constants;
 using EventPlanning.Application.Interfaces;
-using Mapster;
-using Microsoft.Extensions.Caching.Memory;
 using EventPlanning.Application.Models;
 
 namespace EventPlanning.Application.Services;
@@ -11,7 +9,6 @@ public class CachedEventService(
     IEventService innerService,
     ICacheService cache) : IEventService
 {
-    public const string EventCacheKeyPrefix = "event_details_";
 
     public Task<PagedResult<EventDto>> GetEventsAsync(Guid userId, Guid? organizerIdFilter, EventSearchDto searchDto, string? sortOrder, CancellationToken cancellationToken = default)
     {

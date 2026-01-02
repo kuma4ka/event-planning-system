@@ -4,7 +4,6 @@ using EventPlanning.Application.Constants;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
-using Mapster;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -19,7 +18,6 @@ public class GuestService(
     IMemoryCache cache,
     ILogger<GuestService> logger) : IGuestService
 {
-    private const string EventCacheKeyPrefix = "event_details_";
 
     public async Task AddGuestAsync(Guid userId, CreateGuestDto dto, CancellationToken cancellationToken = default)
     {

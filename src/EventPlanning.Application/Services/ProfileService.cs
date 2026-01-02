@@ -4,6 +4,7 @@ using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
+using EventPlanning.Application.Constants;
 
 namespace EventPlanning.Application.Services;
 
@@ -91,8 +92,8 @@ public class ProfileService(
 
         foreach (var eventId in affectedEventIds)
         {
-            cacheService.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId}_public");
-            cacheService.Remove($"{CachedEventService.EventCacheKeyPrefix}{eventId}_organizer");
+            cacheService.Remove(CacheKeyGenerator.GetEventKeyPublic(eventId));
+            cacheService.Remove(CacheKeyGenerator.GetEventKeyOrganizer(eventId));
         }
     }
 
