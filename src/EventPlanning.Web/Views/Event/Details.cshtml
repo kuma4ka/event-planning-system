@@ -19,4 +19,4 @@
     </div>
 </div>
 
-<partial name="Partials/_EventModals" model="Model.Event" />
+<partial name="Partials/_EventModals" model="Model.Event" view-data='new ViewDataDictionary(ViewData) { { "Countries", Model.Countries } }' />
