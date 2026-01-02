@@ -37,7 +37,7 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Event>> GetByOrganizerAsync(string organizerId,
+    public async Task<List<Event>> GetByOrganizerAsync(Guid organizerId,
         CancellationToken cancellationToken = default)
     {
         return await context.Events
@@ -68,8 +68,8 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
     }
 
     public async Task<PagedList<Event>> GetFilteredAsync(
-        string? organizerId,
-        string? viewerId,
+        Guid? organizerId,
+        Guid? viewerId,
         string? searchTerm,
         DateTime? from,
         DateTime? to,
@@ -84,11 +84,11 @@ public class EventRepository(ApplicationDbContext context) : IEventRepository
             .AsNoTracking()
             .AsQueryable();
 
-        query = !string.IsNullOrEmpty(viewerId)
+        query = viewerId.HasValue
             ? query.Where(e => !e.IsPrivate || e.OrganizerId == viewerId)
             : query.Where(e => !e.IsPrivate);
 
-        if (!string.IsNullOrEmpty(organizerId))
+        if (organizerId.HasValue)
             query = query.Where(e => e.OrganizerId == organizerId);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))

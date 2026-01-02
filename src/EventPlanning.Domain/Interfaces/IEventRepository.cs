@@ -12,8 +12,8 @@ public interface IEventRepository
     Task DeleteAsync(Event eventEntity, CancellationToken cancellationToken = default);
 
     Task<PagedList<Event>> GetFilteredAsync(
-        string? organizerId,
-        string? viewerId,
+        Guid? organizerId,
+        Guid? viewerId,
         string? searchTerm,
         DateTime? from,
         DateTime? to,

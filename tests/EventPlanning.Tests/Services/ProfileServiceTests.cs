@@ -54,7 +54,7 @@ public class ProfileServiceTests
     {
         // Arrange
 
-        var userId = "user1";
+        var userId = Guid.NewGuid();
         var user = new User(userId, "John", "Doe", UserRole.User, "john@example.com", "john@example.com", "5550001", "+1");
         var dto = new EditProfileDto { FirstName = "Johnny", LastName = "Doe", CountryCode = "+1", PhoneNumber = "5551234" };
         var eventId1 = Guid.NewGuid();
@@ -69,7 +69,7 @@ public class ProfileServiceTests
         _guestRepositoryMock.Setup(r => r.UpdateGuestDetailsByEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Guid> { eventId1, eventId2 });
 
-        _identityServiceMock.Setup(i => i.UpdatePhoneNumberAsync(It.IsAny<string>(), It.IsAny<string>()))
+        _identityServiceMock.Setup(i => i.UpdatePhoneNumberAsync(It.IsAny<Guid>(), It.IsAny<string>()))
             .ReturnsAsync((true, new string[] { }));
 
         // Act

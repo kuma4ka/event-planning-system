@@ -22,8 +22,8 @@ public class EventService(
     ILogger<EventService> logger) : IEventService
 {
     public async Task<PagedResult<EventDto>> GetEventsAsync(
-        string userId,
-        string? organizerIdFilter,
+        Guid userId,
+        Guid? organizerIdFilter,
         EventSearchDto searchDto,
         string? sortOrder,
         CancellationToken cancellationToken = default)
@@ -79,12 +79,12 @@ public class EventService(
         );
     }
 
-    public async Task<EventDetailsDto?> GetEventDetailsAsync(Guid id, string? userId, CancellationToken cancellationToken = default)
+    public async Task<EventDetailsDto?> GetEventDetailsAsync(Guid id, Guid? userId, CancellationToken cancellationToken = default)
     {
         var eventEntity = await eventRepository.GetDetailsByIdAsync(id, cancellationToken);
         if (eventEntity == null) return null;
 
-        var isOrganizer = !string.IsNullOrEmpty(userId) && eventEntity.OrganizerId == userId;
+        var isOrganizer = userId.HasValue && eventEntity.OrganizerId == userId.Value;
 
         var guestsDto = eventEntity.Guests.Select(g =>
         {
@@ -112,7 +112,7 @@ public class EventService(
             );
         }).ToList();
 
-        var isJoined = !string.IsNullOrEmpty(userId) && await guestRepository.IsUserJoinedAsync(eventEntity.Id, userId, cancellationToken);
+        var isJoined = userId.HasValue && await guestRepository.IsUserJoinedAsync(eventEntity.Id, userId.Value, cancellationToken);
 
         var eventDetails = new EventDetailsDto(
             eventEntity.Venue?.Capacity ?? 0,
@@ -146,7 +146,7 @@ public class EventService(
         return eventDetails;
     }
 
-    public async Task<Guid> CreateEventAsync(string userId, CreateEventDto dto,
+    public async Task<Guid> CreateEventAsync(Guid userId, CreateEventDto dto,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await createValidator.ValidateAsync(dto, cancellationToken);
@@ -168,7 +168,7 @@ public class EventService(
         return await eventRepository.AddAsync(eventEntity, cancellationToken);
     }
 
-    public async Task UpdateEventAsync(string userId, UpdateEventDto dto, CancellationToken cancellationToken = default)
+    public async Task UpdateEventAsync(Guid userId, UpdateEventDto dto, CancellationToken cancellationToken = default)
     {
         var validationResult = await updateValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
@@ -195,7 +195,7 @@ public class EventService(
         await eventRepository.UpdateAsync(eventEntity, cancellationToken);
     }
 
-    public async Task DeleteEventAsync(string userId, Guid eventId, CancellationToken cancellationToken = default)
+    public async Task DeleteEventAsync(Guid userId, Guid eventId, CancellationToken cancellationToken = default)
     {
         var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
         if (eventEntity == null) return;

@@ -1,6 +1,4 @@
-﻿using EventPlanning.Application.Constants;
-using EventPlanning.Domain.ValueObjects;
-using EventPlanning.Application.DTOs.Profile;
+﻿using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Application.Interfaces;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
@@ -20,7 +18,7 @@ public class ProfileService(
     ICacheService cacheService,
     ILogger<ProfileService> logger) : IProfileService
 {
-    public async Task<EditProfileDto> GetProfileAsync(string userId, CancellationToken cancellationToken = default)
+    public async Task<EditProfileDto> GetProfileAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var user = await userRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null) throw new KeyNotFoundException("User not found");
@@ -30,7 +28,7 @@ public class ProfileService(
 
         var joinedCount = await guestRepository.CountJoinedEventsAsync(userId, cancellationToken);
 
-        var (code, number) = countryService.ParsePhoneNumber(user.PhoneNumber);
+        var (code, number) = countryService.ParsePhoneNumber(user.PhoneNumber?.Value);
 
         return new EditProfileDto
         {
@@ -44,7 +42,7 @@ public class ProfileService(
         };
     }
 
-    public async Task UpdateProfileAsync(string userId, EditProfileDto dto,
+    public async Task UpdateProfileAsync(Guid userId, EditProfileDto dto,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await profileValidator.ValidateAsync(dto, cancellationToken);
@@ -58,7 +56,7 @@ public class ProfileService(
             ? null
             : $"{dto.CountryCode}{dto.PhoneNumber}";
 
-        if (newFullPhoneNumber != user.PhoneNumber && !string.IsNullOrEmpty(newFullPhoneNumber))
+        if ((user.PhoneNumber?.Value) != newFullPhoneNumber && !string.IsNullOrEmpty(newFullPhoneNumber))
         {
             var isPhoneTaken = await userRepository.IsPhoneNumberTakenAsync(newFullPhoneNumber, userId, cancellationToken);
 
@@ -79,13 +77,7 @@ public class ProfileService(
         }
 
         user.UpdateProfile(dto.FirstName, dto.LastName);
-        
-        if (newFullPhoneNumber != user.PhoneNumber)
-        {
-             user.UpdatePhoneNumber(newFullPhoneNumber);
-        }
-        
-        user.SetCountryCode(dto.CountryCode);
+        user.UpdateContactInfo(dto.CountryCode, newFullPhoneNumber);
 
         await userRepository.UpdateAsync(user, cancellationToken);
 
@@ -94,7 +86,7 @@ public class ProfileService(
             user.FirstName, 
             user.LastName, 
             user.CountryCode, 
-            user.PhoneNumber, 
+            user.PhoneNumber?.Value, 
             cancellationToken);
 
         foreach (var eventId in affectedEventIds)
@@ -104,7 +96,7 @@ public class ProfileService(
         }
     }
 
-    public async Task ChangePasswordAsync(string userId, ChangePasswordDto dto,
+    public async Task ChangePasswordAsync(Guid userId, ChangePasswordDto dto,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await passwordValidator.ValidateAsync(dto, cancellationToken);

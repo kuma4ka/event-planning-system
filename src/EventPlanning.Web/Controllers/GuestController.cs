@@ -21,11 +21,12 @@ public class GuestController(
     [HttpPost("add-manually")]
     public async Task<IActionResult> AddManually(AddGuestManuallyDto model, CancellationToken cancellationToken)
     {
-        var userId = userManager.GetUserId(User);
+        var userIdString = userManager.GetUserId(User);
+        var userId = Guid.Parse(userIdString!);
 
         try
         {
-            await guestService.AddGuestManuallyAsync(userId!, model, cancellationToken);
+            await guestService.AddGuestManuallyAsync(userId, model, cancellationToken);
             TempData["SuccessMessage"] = $"{model.FirstName} has been added to the list.";
         }
         catch (ValidationException ex)
@@ -61,11 +62,12 @@ public class GuestController(
             return RedirectToAction("Details", "Event", new { id = model.EventId });
         }
 
-        var userId = userManager.GetUserId(User);
+        var userIdString = userManager.GetUserId(User);
+        var userId = Guid.Parse(userIdString!);
 
         try
         {
-            await guestService.UpdateGuestAsync(userId!, model, cancellationToken);
+            await guestService.UpdateGuestAsync(userId, model, cancellationToken);
             TempData["SuccessMessage"] = "Guest information updated successfully.";
         }
         catch (ValidationException ex)
@@ -89,10 +91,11 @@ public class GuestController(
     [HttpPost("remove")]
     public async Task<IActionResult> Remove(Guid eventId, Guid guestId, CancellationToken cancellationToken)
     {
-        var userId = userManager.GetUserId(User);
+        var userIdString = userManager.GetUserId(User);
+        var userId = Guid.Parse(userIdString!);
         try
         {
-            await guestService.RemoveGuestAsync(userId!, guestId, cancellationToken);
+            await guestService.RemoveGuestAsync(userId, guestId, cancellationToken);
             TempData["SuccessMessage"] = "Guest removed from the list.";
         }
         catch (UnauthorizedAccessException)

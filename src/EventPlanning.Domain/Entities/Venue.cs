@@ -10,7 +10,7 @@ public sealed class Venue
     public string? Description { get; private set; }
     public string? ImageUrl { get; private set; }
 
-    public string OrganizerId { get; private set; }
+    public Guid OrganizerId { get; private set; }
 
     public ICollection<Event> Events { get; private set; } = new List<Event>();
 
@@ -19,15 +19,15 @@ public sealed class Venue
     {
         Name = null!;
         Address = null!;
-        OrganizerId = null!;
+        OrganizerId = Guid.Empty;
     }
 
-    public Venue(string name, string address, int capacity, string organizerId, string? description = null, string? imageUrl = null)
+    public Venue(string name, string address, int capacity, Guid organizerId, string? description = null, string? imageUrl = null)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name is required.", nameof(name));
         if (string.IsNullOrWhiteSpace(address)) throw new ArgumentException("Address is required.", nameof(address));
         if (capacity < 0) throw new ArgumentException("Capacity cannot be negative.", nameof(capacity));
-        if (string.IsNullOrWhiteSpace(organizerId)) throw new ArgumentException("OrganizerId is required.", nameof(organizerId));
+        if (organizerId == Guid.Empty) throw new ArgumentException("OrganizerId is required.", nameof(organizerId));
 
         Name = name;
         Address = address;

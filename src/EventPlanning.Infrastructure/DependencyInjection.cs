@@ -23,9 +23,9 @@ public static class DependencyInjection
             options.UseSqlServer(connectionString));
 
         services.AddMemoryCache();
-        services.AddHttpContextAccessor(); // Required for generating absolute links dynamically
+        services.AddHttpContextAccessor();
 
-            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
                 options.Password.RequireDigit = true;
@@ -63,7 +63,6 @@ public static class DependencyInjection
 
         services.AddScoped<IIdentityService, IdentityService>();
 
-        // Email
         services.Configure<Application.Models.EmailSettings>(configuration.GetSection(Application.Models.EmailSettings.SectionName));
         services.AddTransient<IEmailService, SmtpEmailService>();
         services.AddTransient<IEmailSender<ApplicationUser>, IdentityEmailSender>();

@@ -32,7 +32,7 @@ public class GuestRepository(ApplicationDbContext context) : IGuestRepository
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<bool> IsUserJoinedAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task<bool> IsUserJoinedAsync(Guid eventId, Guid userId, CancellationToken cancellationToken = default)
     {
         var user = await context.Users.FindAsync([userId], cancellationToken);
         if (user == null || string.IsNullOrEmpty(user.Email)) return false;
@@ -41,7 +41,7 @@ public class GuestRepository(ApplicationDbContext context) : IGuestRepository
             .AnyAsync(g => g.EventId == eventId && (string)g.Email == user.Email, cancellationToken);
     }
 
-    public async Task RemoveGuestByUserIdAsync(Guid eventId, string userId, CancellationToken cancellationToken = default)
+    public async Task RemoveGuestByUserIdAsync(Guid eventId, Guid userId, CancellationToken cancellationToken = default)
     {
         var user = await context.Users.FindAsync([userId], cancellationToken);
         if (user == null || string.IsNullOrEmpty(user.Email)) return;
@@ -56,7 +56,7 @@ public class GuestRepository(ApplicationDbContext context) : IGuestRepository
         }
     }
 
-    public async Task<int> CountJoinedEventsAsync(string userId, CancellationToken cancellationToken = default)
+    public async Task<int> CountJoinedEventsAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var user = await context.Users.FindAsync([userId], cancellationToken);
         if (user == null || string.IsNullOrEmpty(user.Email)) return 0;

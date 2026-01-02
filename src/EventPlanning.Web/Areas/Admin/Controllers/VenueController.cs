@@ -35,11 +35,12 @@ public class VenueController(
     {
         if (!ModelState.IsValid) return View(model);
 
-        var adminId = userManager.GetUserId(User);
+        var adminIdString = userManager.GetUserId(User);
+        var adminId = Guid.Parse(adminIdString!);
 
         try
         {
-            await venueService.CreateVenueAsync(adminId!, model, cancellationToken);
+            await venueService.CreateVenueAsync(adminId, model, cancellationToken);
             return RedirectToAction(nameof(Index));
         }
         catch (ValidationException ex)

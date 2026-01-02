@@ -6,21 +6,21 @@ namespace EventPlanning.Application.Interfaces;
 public interface IEventService
 {
     Task<PagedResult<EventDto>> GetEventsAsync(
-        string userId,
-        string? organizerIdFilter,
+        Guid userId,
+        Guid? organizerIdFilter,
         EventSearchDto searchDto,
         string? sortOrder,
         CancellationToken cancellationToken = default);
 
     Task<EventDto?> GetEventByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
-    Task<EventDetailsDto?> GetEventDetailsAsync(Guid id, string? userId, CancellationToken cancellationToken = default);
+    Task<EventDetailsDto?> GetEventDetailsAsync(Guid id, Guid? userId, CancellationToken cancellationToken = default);
 
-    Task<Guid> CreateEventAsync(string userId, CreateEventDto dto, CancellationToken cancellationToken = default);
+    Task<Guid> CreateEventAsync(Guid userId, CreateEventDto dto, CancellationToken cancellationToken = default);
 
-    Task UpdateEventAsync(string userId, UpdateEventDto dto, CancellationToken cancellationToken = default);
+    Task UpdateEventAsync(Guid userId, UpdateEventDto dto, CancellationToken cancellationToken = default);
 
-    Task DeleteEventAsync(string userId, Guid eventId, CancellationToken cancellationToken = default);
+    Task DeleteEventAsync(Guid userId, Guid eventId, CancellationToken cancellationToken = default);
 
 
 }

@@ -40,14 +40,14 @@ public class EventParticipationServiceTests
     {
         // Arrange
         var eventId = Guid.NewGuid();
-        var userId = "user-123";
+        var userId = Guid.NewGuid();
 
         var eventEntity = new Event(
             "Test Event",
             "Description",
             DateTime.UtcNow.AddDays(5),
             EventType.Conference,
-            "other-organizer",
+            Guid.NewGuid(),
             null);
 
         // Reflection to set Id for testing
@@ -83,14 +83,14 @@ public class EventParticipationServiceTests
     {
         // Arrange
         var eventId = Guid.NewGuid();
-        var userId = "user-123";
+        var userId = Guid.NewGuid();
 
         var eventEntity = new Event(
             "Test Event",
             "Description",
             DateTime.UtcNow.AddDays(5),
             EventType.Conference,
-            "other-organizer",
+            Guid.NewGuid(),
             null);
         typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
 

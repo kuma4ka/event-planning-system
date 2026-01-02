@@ -28,7 +28,9 @@ public class EventController(
     [AllowAnonymous]
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
     {
-        var userId = userManager.GetUserId(User);
+        var paramsUserId = userManager.GetUserId(User);
+        Guid? userId = paramsUserId == null ? null : Guid.Parse(paramsUserId);
+        
         var eventDetails = await eventService.GetEventDetailsAsync(id, userId, cancellationToken);
         if (eventDetails == null) return NotFound();
 
@@ -58,11 +60,12 @@ public class EventController(
             return View(viewModel);
         }
 
-        var userId = userManager.GetUserId(User);
+        var userIdString = userManager.GetUserId(User);
+        var userId = Guid.Parse(userIdString!);
 
         try
         {
-            var eventId = await eventService.CreateEventAsync(userId!, model, cancellationToken);
+            var eventId = await eventService.CreateEventAsync(userId, model, cancellationToken);
             logger.LogInformation("Event created: {EventId} by {User}", eventId, User.Identity?.Name);
             return RedirectToAction(nameof(MyEvents));
         }
@@ -77,7 +80,9 @@ public class EventController(
     [HttpGet("edit/{id:guid}")]
     public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
-        var userId = userManager.GetUserId(User);
+        var userIdString = userManager.GetUserId(User);
+        var userId = Guid.Parse(userIdString!);
+        
         var eventDto = await eventService.GetEventByIdAsync(id, cancellationToken);
 
         if (eventDto == null) return NotFound();
@@ -109,11 +114,12 @@ public class EventController(
             return View(viewModel);
         }
 
-        var userId = userManager.GetUserId(User);
+        var userIdString = userManager.GetUserId(User);
+        var userId = Guid.Parse(userIdString!);
 
         try
         {
-            await eventService.UpdateEventAsync(userId!, model, cancellationToken);
+            await eventService.UpdateEventAsync(userId, model, cancellationToken);
             logger.LogInformation("Event updated: {EventId} by {User}", id, User.Identity?.Name);
             return RedirectToAction(nameof(MyEvents));
         }
@@ -143,10 +149,11 @@ public class EventController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        var userId = userManager.GetUserId(User);
+        var userIdString = userManager.GetUserId(User);
+        var userId = Guid.Parse(userIdString!);
         try
         {
-            await eventService.DeleteEventAsync(userId!, id, cancellationToken);
+            await eventService.DeleteEventAsync(userId, id, cancellationToken);
             logger.LogInformation("Event deleted: {EventId} by {User}", id, User.Identity?.Name);
             return RedirectToAction(nameof(MyEvents));
         }
@@ -168,7 +175,8 @@ public class EventController(
         int page = 1,
         CancellationToken cancellationToken = default)
     {
-        var userId = userManager.GetUserId(User);
+        var userIdString = userManager.GetUserId(User);
+        var userId = Guid.Parse(userIdString!);
         var now = DateTime.Now;
 
         var searchFrom = from;
@@ -199,7 +207,7 @@ public class EventController(
         PagedResult<EventDto> result;
         try
         {
-            result = await eventService.GetEventsAsync(userId!, userId, searchDto, searchSort, cancellationToken);
+            result = await eventService.GetEventsAsync(userId, userId, searchDto, searchSort, cancellationToken);
         }
         catch (ValidationException ex)
         {

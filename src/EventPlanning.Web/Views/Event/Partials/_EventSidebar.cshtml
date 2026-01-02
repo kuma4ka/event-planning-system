@@ -52,7 +52,7 @@
         }
         else
         {
-            <form asp-action="Join" asp-route-id="@Model.Id" method="post">
+            <form asp-controller="EventParticipation" asp-action="Join" asp-route-id="@Model.Id" method="post">
                 <button type="submit" class="btn btn-primary w-100 py-2 shadow-sm">Join Event</button>
             </form>
         }

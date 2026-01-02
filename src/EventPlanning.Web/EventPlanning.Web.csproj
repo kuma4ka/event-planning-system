@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Views\Shared\" />
+    <Folder Include="logs\" />
   </ItemGroup>
 
   <ItemGroup>

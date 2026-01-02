@@ -17,8 +17,9 @@ public class EventParticipationController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Join(Guid id, CancellationToken cancellationToken)
     {
-        var userId = userManager.GetUserId(User);
-        if (userId == null) return RedirectToAction("Login", "Account");
+        var paramsUserId = userManager.GetUserId(User);
+        if (paramsUserId == null) return RedirectToAction("Login", "Account");
+        var userId = Guid.Parse(paramsUserId);
 
         try
         {
@@ -46,8 +47,9 @@ public class EventParticipationController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Leave(Guid id, CancellationToken cancellationToken)
     {
-        var userId = userManager.GetUserId(User);
-        if (userId == null) return RedirectToAction("Login", "Account");
+        var paramsUserId = userManager.GetUserId(User);
+        if (paramsUserId == null) return RedirectToAction("Login", "Account");
+        var userId = Guid.Parse(paramsUserId);
 
         try
         {

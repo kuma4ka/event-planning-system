@@ -47,10 +47,10 @@ public class GuestServiceTests
     public async Task UpdateGuestAsync_ShouldThrowInvalidOperationException_WhenGuestIsRegisteredUser()
     {
         // Arrange
-        var userId = "organizer1";
+        var userId = Guid.NewGuid();
         var guestId = Guid.NewGuid();
         var eventId = Guid.NewGuid();
-        var registeredUserId = "user1";
+        var registeredUserId = Guid.NewGuid();
 
         var dto = new UpdateGuestDto(guestId, eventId, "New", "Name", "new@example.com", "+1", "1234567");
 
@@ -95,7 +95,7 @@ public class GuestServiceTests
     public async Task UpdateGuestAsync_ShouldSucceed_WhenGuestIsManual()
     {
         // Arrange
-        var userId = "organizer1";
+        var userId = Guid.NewGuid();
         var guestId = Guid.NewGuid();
         var eventId = Guid.NewGuid();
 

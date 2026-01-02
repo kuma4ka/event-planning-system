@@ -14,7 +14,7 @@ public static class DbInitializer
     {
         var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
         var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
         var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
         await context.Database.MigrateAsync();
@@ -122,9 +122,9 @@ public static class DbInitializer
         }
     }
 
-    private static async Task EnsureRoleAsync(RoleManager<IdentityRole> roleManager, string roleName)
+    private static async Task EnsureRoleAsync(RoleManager<IdentityRole<Guid>> roleManager, string roleName)
     {
-        if (!await roleManager.RoleExistsAsync(roleName)) await roleManager.CreateAsync(new IdentityRole(roleName));
+        if (!await roleManager.RoleExistsAsync(roleName)) await roleManager.CreateAsync(new IdentityRole<Guid>(roleName));
     }
 
     private static async Task<User> EnsureUserAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, string email, string password,

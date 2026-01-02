@@ -6,13 +6,21 @@ namespace EventPlanning.Infrastructure.Repositories;
 
 public class UserRepository(ApplicationDbContext context) : IUserRepository
 {
-    public async Task<bool> IsPhoneNumberTakenAsync(string phoneNumber, string userId, CancellationToken cancellationToken)
+    public async Task<bool> IsPhoneNumberTakenAsync(string phoneNumber, Guid userId, CancellationToken cancellationToken)
     {
-        return await context.Users
-            .AnyAsync(u => u.PhoneNumber == phoneNumber && u.Id != userId, cancellationToken);
+        try
+        {
+            var phone = EventPlanning.Domain.ValueObjects.PhoneNumber.Create(phoneNumber);
+            return await context.Users
+                .AnyAsync(u => u.PhoneNumber == phone && u.Id != userId, cancellationToken);
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
     }
 
-    public async Task<EventPlanning.Domain.Entities.User?> GetByIdAsync(string userId, CancellationToken cancellationToken)
+    public async Task<EventPlanning.Domain.Entities.User?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
         return await context.Users.FindAsync([userId], cancellationToken);
     }

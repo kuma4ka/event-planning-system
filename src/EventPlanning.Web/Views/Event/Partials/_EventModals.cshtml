@@ -45,7 +45,7 @@
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                    <form asp-action="Leave" asp-route-id="@Model.Id" method="post">
+                    <form asp-controller="EventParticipation" asp-action="Leave" asp-route-id="@Model.Id" method="post">
                         <button type="submit" class="btn btn-danger px-4">Leave Event</button>
                     </form>
                 </div>
