@@ -86,22 +86,30 @@ public class EventController(
         var userIdString = userManager.GetUserId(User);
         var userId = Guid.Parse(userIdString!);
         
-        var eventDto = await eventService.GetEventByIdAsync(id, cancellationToken);
+        try
+        {
+            var eventDto = await eventService.GetEventForEditAsync(id, userId, cancellationToken);
+            
+            var updateModel = new UpdateEventDto(
+                eventDto.Id,
+                eventDto.Name,
+                eventDto.Description,
+                eventDto.Date,
+                eventDto.Type,
+                eventDto.VenueId ?? Guid.Empty
+            );
 
-        if (eventDto == null) return NotFound();
-        if (eventDto.OrganizerId != userId) return Forbid();
-
-        var updateModel = new UpdateEventDto(
-            eventDto.Id,
-            eventDto.Name,
-            eventDto.Description,
-            eventDto.Date,
-            eventDto.Type,
-            eventDto.VenueId ?? Guid.Empty
-        );
-
-        var venues = await GetVenuesList(cancellationToken);
-        return View(EventFormViewModel.ForEdit(updateModel, venues));
+            var venues = await GetVenuesList(cancellationToken);
+            return View(EventFormViewModel.ForEdit(updateModel, venues));
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
     }
 
     [HttpPost("edit/{id:guid}")]

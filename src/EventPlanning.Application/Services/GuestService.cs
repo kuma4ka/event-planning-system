@@ -129,7 +129,7 @@ public class GuestService(
         Guid eventId = guest.EventId;
 
         var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
-        if (user == null) return; // Or throw
+        if (user == null) return;
 
         if (guest.Event == null)
         {

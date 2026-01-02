@@ -4,7 +4,7 @@ namespace EventPlanning.Application.DTOs.Event;
 
 public abstract record EventBaseDto(
     string Name,
-    string Description,
+    string? Description,
     DateTime Date,
     EventType Type,
     Guid VenueId

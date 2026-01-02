@@ -3,26 +3,26 @@ using EventPlanning.Domain.Enums;
 
 namespace EventPlanning.Application.DTOs.Event;
 
-public record EventDetailsDto(
-    int VenueCapacity,
-    bool IsPrivate,
-    List<GuestDto> Guests,
-    Guid Id,
-    string Name,
-    string Description,
-    DateTime Date,
-    EventType Type,
-    Guid OrganizerId,
-    string VenueName,
-    Guid? VenueId,
-    string? VenueImageUrl,
-    string? VenueAddress,
-    string OrganizerName = "Unknown",
-    string OrganizerEmail = ""
-) : EventDto(Id, Name, Description, Date, Type, OrganizerId, VenueName, VenueId, VenueImageUrl)
+public record EventDetailsDto
 {
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public DateTime Date { get; set; }
+    public EventType Type { get; set; }
+    public Guid OrganizerId { get; set; }
+    public string VenueName { get; set; } = string.Empty;
+    public Guid? VenueId { get; set; }
+    public string? VenueImageUrl { get; set; }
+    public int VenueCapacity { get; set; }
+    public bool IsPrivate { get; set; }
+    public string? VenueAddress { get; set; }
+    public string OrganizerName { get; set; } = "Unknown";
+    public string OrganizerEmail { get; set; } = string.Empty;
+
     public bool IsOrganizer { get; set; }
     public bool IsJoined { get; set; }
+    public List<GuestDto> Guests { get; init; } = new();
 
     public bool IsPast => Date < DateTime.Now;
 

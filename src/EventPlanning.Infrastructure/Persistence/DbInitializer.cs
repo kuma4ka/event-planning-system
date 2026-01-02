@@ -146,16 +146,12 @@ public static class DbInitializer
         }
         else
         {
-            domainUser = await context.Users.FindAsync(appUser.Id);
+            domainUser = await context.Users.FirstOrDefaultAsync(u => u.IdentityId == appUser.Id.ToString());
             if (domainUser == null)
             {
                 domainUser = new User(appUser.Id.ToString(), fName, lName, Enum.Parse<UserRole>(role), email, email, phoneNumber, "+1");
                 await context.Users.AddAsync(domainUser);
                 await context.SaveChangesAsync();
-            }
-            else if (domainUser.PhoneNumber != phoneNumber)
-            {
-                
             }
         }
 

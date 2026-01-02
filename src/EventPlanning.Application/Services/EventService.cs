@@ -33,6 +33,11 @@ public class EventService(
         var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
         var domainUserId = user?.Id ?? userId;
 
+        if (organizerIdFilter.HasValue && organizerIdFilter.Value == userId)
+        {
+            organizerIdFilter = domainUserId;
+        }
+
         var pagedEvents = await eventRepository.GetFilteredAsync(
             organizerIdFilter,
             domainUserId,
@@ -82,10 +87,26 @@ public class EventService(
              if (isOrganizer)
              {
                  var (_, localNumber) = countryService.ParsePhoneNumber(g.PhoneNumber?.Value);
-                 return new GuestDto(g.Id, g.FirstName, g.LastName, g.Email, g.CountryCode, localNumber);
+                 return new GuestDto
+                 {
+                     Id = g.Id,
+                     FirstName = g.FirstName,
+                     LastName = g.LastName,
+                     Email = g.Email.Value,
+                     CountryCode = g.CountryCode,
+                     PhoneNumber = localNumber
+                 };
              }
              
-             return new GuestDto(g.Id, g.FirstName, g.LastName, "REDACTED", "", "");
+             return new GuestDto
+             {
+                 Id = g.Id,
+                 FirstName = g.FirstName,
+                 LastName = g.LastName,
+                 Email = "REDACTED",
+                 CountryCode = "",
+                 PhoneNumber = ""
+             };
         }).ToList();
 
         var isJoined = domainUserId.HasValue && await guestRepository.IsUserJoinedAsync(eventEntity.Id, domainUserId.Value, cancellationToken);
@@ -132,6 +153,23 @@ public class EventService(
         );
 
         return await eventRepository.AddAsync(eventEntity, cancellationToken);
+    }
+
+    public async Task<EventDto> GetEventForEditAsync(Guid eventId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var eventEntity = await eventRepository.GetByIdAsync(eventId, cancellationToken);
+        if (eventEntity == null) throw new KeyNotFoundException($"Event {eventId} not found");
+
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) throw new UnauthorizedAccessException("User not found");
+
+        if (eventEntity.OrganizerId != user.Id)
+        {
+            logger.LogWarning("Unauthorized event edit attempt by {UserId} on event {EventId}", userId, eventId);
+            throw new UnauthorizedAccessException("Not your event");
+        }
+
+        return eventEntity.Adapt<EventDto>();
     }
 
     public async Task UpdateEventAsync(Guid userId, UpdateEventDto dto, CancellationToken cancellationToken = default)

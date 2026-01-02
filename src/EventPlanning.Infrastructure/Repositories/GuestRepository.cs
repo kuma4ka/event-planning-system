@@ -117,7 +117,7 @@ public class GuestRepository(ApplicationDbContext context) : IGuestRepository
         
         return await strategy.ExecuteAsync(async () =>
         {
-            using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
+            await using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
             try
             {
                 var eventEntity = await context.Events
@@ -126,7 +126,7 @@ public class GuestRepository(ApplicationDbContext context) : IGuestRepository
                 
                 if (eventEntity == null) return false;
 
-                if (eventEntity.VenueId.HasValue && eventEntity.Venue != null && eventEntity.Venue.Capacity > 0)
+                if (eventEntity.HasCapacityLimit)
                 {
                    var currentCount = await context.Guests
                        .CountAsync(g => g.EventId == guest.EventId, cancellationToken);

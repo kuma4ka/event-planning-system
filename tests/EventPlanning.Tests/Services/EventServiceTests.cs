@@ -47,7 +47,8 @@ public class EventServiceTests
             _loggerMock.Object
         );
 
-        TypeAdapterConfig.GlobalSettings.Scan(typeof(Application.Mappings.EventMappingConfig).Assembly);
+
+        new Application.Mappings.EventMappingConfig().Register(TypeAdapterConfig.GlobalSettings);
     }
 
     [Fact]
@@ -126,10 +127,10 @@ public class EventServiceTests
         var organizerId = Guid.NewGuid();
         var currentUserId = Guid.NewGuid();
         
-        var organizerUser = new User(organizerId.ToString(), "Org", "Anizer", UserRole.User, "org@test.com", "org@test.com", "123", "+1");
+        var organizerUser = new User(organizerId.ToString(), "Org", "Anizer", UserRole.User, "org@test.com", "org@test.com", "+1234567890", "+1");
         
         _userRepoMock.Setup(x => x.GetByIdentityIdAsync(currentUserId.ToString(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new User(currentUserId.ToString(), "Viewer", "User", UserRole.User, "viewer@test.com", "viewer@test.com", "456", "+1"));
+            .ReturnsAsync(new User(currentUserId.ToString(), "Viewer", "User", UserRole.User, "viewer@test.com", "viewer@test.com", "+1987654321", "+1"));
 
         var guest = new Guest("Test", "Guest", "guest@test.com", eventId, "+1", "+1234567890");
 

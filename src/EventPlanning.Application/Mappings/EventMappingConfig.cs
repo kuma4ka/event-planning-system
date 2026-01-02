@@ -22,7 +22,9 @@ public class EventMappingConfig : IRegister
             .Map(dest => dest.VenueAddress, src => src.Venue != null ? src.Venue.Address : null)
             .Map(dest => dest.VenueCapacity, src => src.Venue != null ? src.Venue.Capacity : 0)
             .Map(dest => dest.IsPrivate, src => src.IsPrivate)
-            .Map(dest => dest.Guests, src => src.Guests);
+            .Map(dest => dest.Guests, src => src.Guests.Adapt<List<GuestDto>>())
+            .Map(dest => dest.OrganizerName, src => "Unknown")
+            .Map(dest => dest.OrganizerEmail, src => "");
 
         config.NewConfig<Event, EventDto>()
             .Map(dest => dest.VenueName, src => src.Venue != null ? src.Venue.Name : "TBD");

@@ -22,5 +22,7 @@ public interface IEventService
 
     Task DeleteEventAsync(Guid userId, Guid eventId, CancellationToken cancellationToken = default);
 
+    Task<EventDto> GetEventForEditAsync(Guid eventId, Guid userId, CancellationToken cancellationToken = default);
+
 
 }
