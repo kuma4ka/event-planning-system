@@ -43,7 +43,7 @@ public class GuestController(
         catch (InvalidOperationException ex)
         {
             logger.LogWarning("Invalid operation adding guest: {Message}", ex.Message);
-            TempData["ErrorMessage"] = ex.Message;
+            TempData["ErrorMessage"] = "Could not add guest due to rule violation (e.g. duplicate or capacity).";
         }
         catch (Exception ex)
         {

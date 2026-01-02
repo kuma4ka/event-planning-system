@@ -108,7 +108,7 @@ public class AccountController(
             return View(model);
         }
 
-        var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+        var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, true);
 
         if (result.Succeeded)
         {

@@ -131,7 +131,8 @@ public class EventController(
         }
         catch (InvalidOperationException ex)
         {
-            TempData["ErrorMessage"] = ex.Message;
+            logger.LogWarning("Invalid operation during event edit: {Message}", ex.Message);
+            TempData["ErrorMessage"] = "An error occurred while updating the event. Please ensure all rules are met.";
             viewModel.Venues = await GetVenuesList(cancellationToken);
             return View(viewModel);
         }
