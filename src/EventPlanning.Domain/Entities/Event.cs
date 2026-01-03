@@ -1,4 +1,5 @@
-﻿using EventPlanning.Domain.Enums;
+﻿using System.Diagnostics.CodeAnalysis;
+using EventPlanning.Domain.Enums;
 
 namespace EventPlanning.Domain.Entities;
 
@@ -46,6 +47,7 @@ public class Event
         SetDetails(name, description, date, type, venueId);
     }
 
+    [MemberNotNull(nameof(Name))]
     private void SetDetails(string name, string? description, DateTime date, EventType type, Guid? venueId)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name cannot be empty.", nameof(name));

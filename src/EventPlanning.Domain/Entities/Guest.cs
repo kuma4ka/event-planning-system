@@ -1,4 +1,5 @@
-﻿using EventPlanning.Domain.ValueObjects;
+﻿using System.Diagnostics.CodeAnalysis;
+using EventPlanning.Domain.ValueObjects;
 
 namespace EventPlanning.Domain.Entities;
 
@@ -39,6 +40,7 @@ public class Guest
         SetDetails(firstName, lastName, email, countryCode, phoneNumber);
     }
 
+    [MemberNotNull(nameof(FirstName), nameof(LastName), nameof(Email), nameof(CountryCode))]
     private void SetDetails(string firstName, string lastName, string email, string countryCode, string? phoneNumber)
     {
         if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("First Name is required.", nameof(firstName));
