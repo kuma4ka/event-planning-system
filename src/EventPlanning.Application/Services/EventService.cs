@@ -18,7 +18,7 @@ public class EventService(
     IValidator<EventSearchDto> searchValidator,
     IUserRepository userRepository,
     ICountryService countryService,
-    ILogger<EventService> logger) : IEventService, IEventReadService, IEventWriteService
+    ILogger<EventService> logger) : IEventService
 {
     public async Task<PagedResult<EventDto>> GetEventsAsync(
         Guid userId,

@@ -24,20 +24,18 @@ public sealed class Venue
 
     public Venue(string name, string address, int capacity, Guid organizerId, string? description = null, string? imageUrl = null)
     {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name is required.", nameof(name));
-        if (string.IsNullOrWhiteSpace(address)) throw new ArgumentException("Address is required.", nameof(address));
-        if (capacity < 0) throw new ArgumentException("Capacity cannot be negative.", nameof(capacity));
         if (organizerId == Guid.Empty) throw new ArgumentException("OrganizerId is required.", nameof(organizerId));
-
-        Name = name;
-        Address = address;
-        Capacity = capacity;
         OrganizerId = organizerId;
-        Description = description;
-        ImageUrl = imageUrl;
+        
+        SetDetails(name, address, capacity, description, imageUrl);
     }
 
     public void UpdateDetails(string name, string address, int capacity, string? description, string? imageUrl)
+    {
+        SetDetails(name, address, capacity, description, imageUrl);
+    }
+
+    private void SetDetails(string name, string address, int capacity, string? description, string? imageUrl)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name is required.", nameof(name));
         if (string.IsNullOrWhiteSpace(address)) throw new ArgumentException("Address is required.", nameof(address));

@@ -29,17 +29,11 @@ public class Event
 
     public Event(string name, string? description, DateTime date, EventType type, Guid organizerId, Guid? venueId = null, bool isPrivate = false)
     {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name cannot be empty.", nameof(name));
-        if (date < DateTime.UtcNow) throw new ArgumentException("Date must be in the future.", nameof(date));
         if (organizerId == Guid.Empty) throw new ArgumentException("OrganizerId is required.", nameof(organizerId));
-
-        Name = name;
-        Description = description;
-        Date = date;
-        Type = type;
         OrganizerId = organizerId;
-        VenueId = venueId;
         IsPrivate = isPrivate;
+        
+        SetDetails(name, description, date, type, venueId);
     }
 
     public void AddGuest(Guest guest)
@@ -49,8 +43,13 @@ public class Event
 
     public void UpdateDetails(string name, string? description, DateTime date, EventType type, Guid? venueId)
     {
+        SetDetails(name, description, date, type, venueId);
+    }
+
+    private void SetDetails(string name, string? description, DateTime date, EventType type, Guid? venueId)
+    {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name cannot be empty.", nameof(name));
-        if (date < DateTime.UtcNow) throw new ArgumentException("Cannot move event to the past.", nameof(date));
+        if (date < DateTime.UtcNow) throw new ArgumentException("Date/Time cannot be in the past.", nameof(date));
 
         Name = name;
         Description = description;
