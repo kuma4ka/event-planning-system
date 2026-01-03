@@ -40,15 +40,15 @@ public class EventParticipationServiceTests
     public async Task JoinEventAsync_ShouldThrowInvalidOperation_WhenUserAlreadyJoined()
     {
         // Arrange
-        var eventId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var eventId = Guid.CreateVersion7();
+        var userId = Guid.CreateVersion7();
 
         var eventEntity = new Event(
             "Test Event",
             "Description",
             DateTime.UtcNow.AddDays(5),
             EventType.Conference,
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             null);
 
         typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
@@ -58,17 +58,17 @@ public class EventParticipationServiceTests
             .ReturnsAsync(eventEntity);
 
 
-
         _guestRepoMock
             .Setup(r => r.EmailExistsAtEventAsync(eventId, "test@test.com", null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         _userRepoMock
             .Setup(r => r.GetByIdentityIdAsync(userId.ToString(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new User(userId.ToString(), "Test", "User", UserRole.User, "test@test.com", "test@test.com", "+123456789", "+1"));
+            .ReturnsAsync(new User(userId.ToString(), "Test", "User", UserRole.User, "test@test.com", "test@test.com",
+                "1234567890", "+1"));
 
         // Act
-        Func<Task> act = async () => await _service.JoinEventAsync(eventId, userId);
+        var act = async () => await _service.JoinEventAsync(eventId, userId);
 
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>()
@@ -81,33 +81,41 @@ public class EventParticipationServiceTests
     public async Task JoinEventAsync_ShouldSucceed_WhenUserNotJoined()
     {
         // Arrange
-        var eventId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var eventId = Guid.CreateVersion7();
+        var userId = Guid.CreateVersion7();
 
         var eventEntity = new Event(
             "Test Event",
             "Description",
             DateTime.UtcNow.AddDays(5),
             EventType.Conference,
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             null);
         typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
 
         _eventRepoMock.Setup(r => r.GetByIdAsync(eventId, It.IsAny<CancellationToken>())).ReturnsAsync(eventEntity);
-        _guestRepoMock.Setup(r => r.EmailExistsAtEventAsync(eventId, "test@test.com", null, It.IsAny<CancellationToken>())).ReturnsAsync(false);
-        _guestRepoMock.Setup(r => r.PhoneExistsAtEventAsync(eventId, It.IsAny<string>(), null, It.IsAny<CancellationToken>())).ReturnsAsync(false);
-        _guestRepoMock.Setup(r => r.TryJoinEventAsync(It.IsAny<Guest>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
-        
+        _guestRepoMock
+            .Setup(r => r.EmailExistsAtEventAsync(eventId, "test@test.com", null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+        _guestRepoMock
+            .Setup(r => r.PhoneExistsAtEventAsync(eventId, It.IsAny<string>(), null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+        _guestRepoMock.Setup(r => r.TryJoinEventAsync(It.IsAny<Guest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
         _userRepoMock.Setup(r => r.GetByIdentityIdAsync(userId.ToString(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new User(userId.ToString(), "Test", "User", UserRole.User, "test@test.com", "test@test.com", "+123456789", "+1"));
+            .ReturnsAsync(new User(userId.ToString(), "Test", "User", UserRole.User, "test@test.com", "test@test.com",
+                "+123456789", "+1"));
 
 
         // Act
         await _service.JoinEventAsync(eventId, userId);
 
         // Assert
-        _guestRepoMock.Verify(x => x.TryJoinEventAsync(It.Is<Guest>(g => g.Email.Value == "test@test.com" && g.UserId != userId), It.IsAny<CancellationToken>()), Times.Once); // UserId should be DomainId (Random), not IdentityId
-        
+        _guestRepoMock.Verify(
+            x => x.TryJoinEventAsync(It.Is<Guest>(g => g.Email.Value == "test@test.com" && g.UserId != userId),
+                It.IsAny<CancellationToken>()), Times.Once); // UserId should be DomainId (Random), not IdentityId
+
         _cacheServiceMock.Verify(x => x.Remove(CacheKeyGenerator.GetEventKeyPublic(eventId)), Times.Once);
         _cacheServiceMock.Verify(x => x.Remove(CacheKeyGenerator.GetEventKeyOrganizer(eventId)), Times.Once);
     }

@@ -7,6 +7,7 @@ using FluentValidation.Results;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
+using EventPlanning.Domain.Enums;
 
 namespace EventPlanning.Tests.Services;
 
@@ -48,25 +49,26 @@ public class GuestServiceTests
     [Fact]
     public async Task UpdateGuestAsync_ShouldThrowInvalidOperationException_WhenGuestIsRegisteredUser()
     {
-        // Arrange
-        var userId = Guid.NewGuid();
-        var guestId = Guid.NewGuid();
-        var eventId = Guid.NewGuid();
-        
-        var organizerUser = new User(userId.ToString(), "Org", "User", Domain.Enums.UserRole.User, "org@test.com", "org@test.com", "1234567890", "+1");
-        // Force User.Id to match what we might need? Or just use user.Id in event.
-        
+        var userId = Guid.CreateVersion7();
+        var guestId = Guid.CreateVersion7();
+        var eventId = Guid.CreateVersion7();
+
+        var organizerUser = new User(userId.ToString(), "Org", "User", UserRole.User, "org@test.com", "org@test.com",
+            "1234567890", "+1");
+
         var dto = new UpdateGuestDto(guestId, eventId, "New", "Name", "new@example.com", "+1", "1234567");
-        var eventEntity = new Event("Event", "Desc", DateTime.UtcNow.AddDays(1), Domain.Enums.EventType.Conference, organizerUser.Id, null);
-        
-        var guest = new Guest("First", "Last", "old@example.com", eventId, "+1", "0000000", Guid.NewGuid()); // Registered user
+        var eventEntity = new Event("Event", "Desc", DateTime.UtcNow.AddDays(1), EventType.Conference, organizerUser.Id,
+            null);
+
+        var guest = new Guest("First", "Last", "old@example.com", eventId, "+1", "0000000",
+            Guid.CreateVersion7()); // Registered user
 
         _updateValidatorMock.Setup(v => v.ValidateAsync(dto, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
 
         _guestRepositoryMock.Setup(r => r.GetByIdAsync(guestId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(guest);
-            
+
         _userRepoMock.Setup(r => r.GetByIdentityIdAsync(userId.ToString(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(organizerUser);
 
@@ -76,24 +78,25 @@ public class GuestServiceTests
         _eventRepositoryMock.Setup(r => r.GetByIdAsync(guest.EventId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(eventEntity);
 
-        // Act & Assert
+
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateGuestAsync(userId, dto));
     }
 
     [Fact]
     public async Task UpdateGuestAsync_ShouldSucceed_WhenGuestIsManual()
     {
-        // Arrange
-        var userId = Guid.NewGuid();
-        var guestId = Guid.NewGuid();
-        var eventId = Guid.NewGuid();
-        
-        var organizerUser = new User(userId.ToString(), "Org", "User", Domain.Enums.UserRole.User, "org@test.com", "org@test.com", "1234567890", "+1");
+        var userId = Guid.CreateVersion7();
+        var guestId = Guid.CreateVersion7();
+        var eventId = Guid.CreateVersion7();
+
+        var organizerUser = new User(userId.ToString(), "Org", "User", UserRole.User, "org@test.com", "org@test.com",
+            "1234567890", "+1");
 
         var dto = new UpdateGuestDto(guestId, eventId, "New", "Name", "new@example.com", "+1", "1234567");
-        var eventEntity = new Event("Event", "Desc", DateTime.UtcNow.AddDays(1), Domain.Enums.EventType.Conference, organizerUser.Id, null);
+        var eventEntity = new Event("Event", "Desc", DateTime.UtcNow.AddDays(1), EventType.Conference, organizerUser.Id,
+            null);
 
-        var guest = new Guest("First", "Last", "old@example.com", eventId, "+1", "0000000", null); // No UserId
+        var guest = new Guest("First", "Last", "old@example.com", eventId, "+1", "0000000", null);
 
         _updateValidatorMock.Setup(v => v.ValidateAsync(dto, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
@@ -106,14 +109,15 @@ public class GuestServiceTests
 
         _eventRepositoryMock.Setup(r => r.GetByIdAsync(guest.EventId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(eventEntity);
-            
-        _guestRepositoryMock.Setup(r => r.EmailExistsAtEventAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
+
+        _guestRepositoryMock.Setup(r => r.EmailExistsAtEventAsync(It.IsAny<Guid>(), It.IsAny<string>(),
+                It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
-        // Act
+
         await _service.UpdateGuestAsync(userId, dto);
 
-        // Assert
+
         _guestRepositoryMock.Verify(r => r.UpdateAsync(guest, It.IsAny<CancellationToken>()), Times.Once);
     }
 }

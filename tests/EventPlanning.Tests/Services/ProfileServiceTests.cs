@@ -55,11 +55,11 @@ public class ProfileServiceTests
     {
         // Arrange
 
-        var userId = Guid.NewGuid();
+        var userId = Guid.CreateVersion7();
         var user = new User(userId.ToString(), "John", "Doe", UserRole.User, "john@example.com", "john@example.com", "5550001", "+1");
         var dto = new EditProfileDto { FirstName = "Johnny", LastName = "Doe", CountryCode = "+1", PhoneNumber = "5551234" };
-        var eventId1 = Guid.NewGuid();
-        var eventId2 = Guid.NewGuid();
+        var eventId1 = Guid.CreateVersion7();
+        var eventId2 = Guid.CreateVersion7();
 
         _profileValidatorMock.Setup(v => v.ValidateAsync(dto, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
