@@ -44,7 +44,6 @@ public class SupportController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Contact(object model)
     {
-        // In a real app, this would send an email or save to DB.
         TempData["SuccessMessage"] = "Your message has been sent. We'll get back to you soon!";
         return RedirectToAction(nameof(Contact));
     }

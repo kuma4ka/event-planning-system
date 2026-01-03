@@ -14,7 +14,6 @@ public class NewsletterController(INewsletterService newsletterService, ILogger<
     [EnableRateLimiting("newsletter-limit")]
     public async Task<IActionResult> Subscribe([FromForm] string email, [FromForm] string? website, CancellationToken cancellationToken)
     {
-        // Honeypot check
         if (!string.IsNullOrEmpty(website))
         {
             logger.LogWarning("Honeypot triggered for newsletter by {Email}", LogRedactor.RedactEmail(email));
