@@ -7,14 +7,20 @@ select {
 
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    background: transparent;
-    opacity: 0;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
     cursor: pointer;
+    padding-left: 10px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
 }
 
 /* Dark Mode Dropdown Options */
