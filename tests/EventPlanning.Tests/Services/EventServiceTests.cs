@@ -30,8 +30,8 @@ public class EventServiceTests
         _guestRepoMock = new Mock<IGuestRepository>();
         _createValidatorMock = new Mock<IValidator<CreateEventDto>>();
         _userRepoMock = new Mock<IUserRepository>();
-        Mock<IValidator<UpdateEventDto>> updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
-        Mock<IValidator<EventSearchDto>> searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
+        var updateValidatorMock = new Mock<IValidator<UpdateEventDto>>();
+        var searchValidatorMock = new Mock<IValidator<EventSearchDto>>();
         _loggerMock = new Mock<ILogger<EventService>>();
         _countryServiceMock = new Mock<ICountryService>();
         _countryServiceMock.Setup(c => c.ParsePhoneNumber(It.IsAny<string>())).Returns(("+1", "1231231234"));
@@ -54,17 +54,17 @@ public class EventServiceTests
     [Fact]
     public async Task CreateEventAsync_ShouldCallRepository_AndReturnId_WhenDtoIsValid()
     {
-        // Arrange
-        var userId = Guid.NewGuid();
-        var expectedEventId = Guid.NewGuid();
-        var user = new User(userId.ToString(), "John", "Doe", UserRole.User, "john@example.com", "john@example.com", "+123456789", "+1");
+        var userId = Guid.CreateVersion7();
+        var expectedEventId = Guid.CreateVersion7();
+        var user = new User(userId.ToString(), "John", "Doe", UserRole.User, "john@example.com", "john@example.com",
+            "+123456789", "+1");
 
         var dto = new CreateEventDto(
             "Test Event",
             "Description",
             DateTime.UtcNow.AddDays(5),
             EventType.Conference,
-            Guid.NewGuid()
+            Guid.CreateVersion7()
         );
 
         _createValidatorMock
@@ -78,10 +78,10 @@ public class EventServiceTests
         _userRepoMock.Setup(x => x.GetByIdentityIdAsync(userId.ToString(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
-        // Act
+
         var result = await _service.CreateEventAsync(userId, dto);
 
-        // Assert
+
         result.Should().Be(expectedEventId);
 
         _eventRepoMock.Verify(x => x.AddAsync(It.Is<Event>(e =>
@@ -95,8 +95,7 @@ public class EventServiceTests
     [Fact]
     public async Task CreateEventAsync_ShouldThrowValidationException_WhenDtoIsInvalid()
     {
-        // Arrange
-        var userId = Guid.NewGuid();
+        var userId = Guid.CreateVersion7();
         var dto = new CreateEventDto("", "", DateTime.UtcNow, EventType.Conference, Guid.Empty);
 
         var validationFailure = new ValidationResult([new ValidationFailure("Name", "Required")]);
@@ -106,31 +105,31 @@ public class EventServiceTests
             .ReturnsAsync(validationFailure);
 
         _userRepoMock.Setup(x => x.GetByIdentityIdAsync(userId.ToString(), It.IsAny<CancellationToken>()))
-             .ReturnsAsync((User?)null); // Validation fails first so this might be skipped, but safe to mock
+            .ReturnsAsync((User?)null);
 
-        // Act
+
         Func<Task> act = async () => await _service.CreateEventAsync(userId, dto);
 
-        // Assert
+
         await act.Should().ThrowAsync<ValidationException>();
 
         _eventRepoMock.Verify(x => x.AddAsync(It.IsAny<Event>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
 
-
     [Fact]
     public async Task GetEventDetailsAsync_ShouldMaskData_WhenUserIsNotOrganizer()
     {
-        // Arrange
-        var eventId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
-        var currentUserId = Guid.NewGuid();
-        
-        var organizerUser = new User(organizerId.ToString(), "Org", "Anizer", UserRole.User, "org@test.com", "org@test.com", "+1234567890", "+1");
-        
+        var eventId = Guid.CreateVersion7();
+        var organizerId = Guid.CreateVersion7();
+        var currentUserId = Guid.CreateVersion7();
+
+        var organizerUser = new User(organizerId.ToString(), "Org", "Anizer", UserRole.User, "org@test.com",
+            "org@test.com", "+1234567890", "+1");
+
         _userRepoMock.Setup(x => x.GetByIdentityIdAsync(currentUserId.ToString(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new User(currentUserId.ToString(), "Viewer", "User", UserRole.User, "viewer@test.com", "viewer@test.com", "+1987654321", "+1"));
+            .ReturnsAsync(new User(currentUserId.ToString(), "Viewer", "User", UserRole.User, "viewer@test.com",
+                "viewer@test.com", "+1987654321", "+1"));
 
         var guest = new Guest("Test", "Guest", "guest@test.com", eventId, "+1", "+1234567890");
 
@@ -140,7 +139,7 @@ public class EventServiceTests
             DateTime.UtcNow.AddDays(1),
             EventType.Conference,
             organizerUser.Id);
-            
+
         typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
         eventEntity.AddGuest(guest);
 
@@ -148,10 +147,10 @@ public class EventServiceTests
             .Setup(r => r.GetDetailsByIdAsync(eventId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(eventEntity);
 
-        // Act
+
         var result = await _service.GetEventDetailsAsync(eventId, currentUserId);
 
-        // Assert
+
         result.Should().NotBeNull();
         result!.Guests.Should().ContainSingle();
         var guestDto = result.Guests.First();
@@ -165,14 +164,14 @@ public class EventServiceTests
     [Fact]
     public async Task GetEventDetailsAsync_ShouldShowData_WhenUserIsOrganizer()
     {
-        // Arrange
-        var eventId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var eventId = Guid.CreateVersion7();
+        var organizerId = Guid.CreateVersion7();
         Guid? currentUserId = organizerId; // Is Organizer
 
-        var organizerUser = new User(organizerId.ToString(), "John", "Doe", UserRole.User, "john@example.com", "john@example.com", "+123456789", "+1");
+        var organizerUser = new User(organizerId.ToString(), "John", "Doe", UserRole.User, "john@example.com",
+            "john@example.com", "+123456789", "+1");
         _userRepoMock.Setup(x => x.GetByIdentityIdAsync(organizerId.ToString(), It.IsAny<CancellationToken>()))
-             .ReturnsAsync(organizerUser);
+            .ReturnsAsync(organizerUser);
 
         var guest = new Guest("Test", "Guest", "guest@test.com", eventId, "+1", "+1234567890");
 
@@ -182,7 +181,7 @@ public class EventServiceTests
             DateTime.UtcNow.AddDays(1),
             EventType.Conference,
             organizerUser.Id);
-            
+
         typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
         eventEntity.AddGuest(guest);
 
@@ -192,27 +191,27 @@ public class EventServiceTests
 
         _countryServiceMock
             .Setup(c => c.ParsePhoneNumber(It.IsAny<string>()))
-            .Returns(("+1", "234567890"));
+            .Returns(("+1", "1234567890"));
 
-        // Act
+
         var result = await _service.GetEventDetailsAsync(eventId, currentUserId);
 
-        // Assert
+
         result.Should().NotBeNull();
         var guestDto = result.Guests.First();
 
         guestDto.Email.Should().Be("guest@test.com");
-        guestDto.PhoneNumber.Should().Be("234567890"); // Parsed local number
+        guestDto.PhoneNumber.Should().Be("1234567890"); // Parsed local number
         guestDto.CountryCode.Should().Be("+1"); // Parsed Code
     }
 
     [Fact]
     public async Task GetEventDetailsAsync_ShouldPopulateOrganizerInfo_WhenUserFound()
     {
-        // Arrange
-        var eventId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
-        var user = new User(organizerId.ToString(), "John", "Doe", UserRole.User, "john@example.com", "john@example.com", "+123456789", "+1");
+        var eventId = Guid.CreateVersion7();
+        var organizerId = Guid.CreateVersion7();
+        var user = new User(organizerId.ToString(), "John", "Doe", UserRole.User, "john@example.com",
+            "john@example.com", "+123456789", "+1");
 
         var eventEntity = new Event(
             "Test Event",
@@ -220,7 +219,7 @@ public class EventServiceTests
             DateTime.UtcNow.AddDays(1),
             EventType.Conference,
             user.Id);
-            
+
         typeof(Event).GetProperty(nameof(Event.Id))!.SetValue(eventEntity, eventId);
 
         _eventRepoMock
@@ -231,10 +230,10 @@ public class EventServiceTests
             .Setup(r => r.GetByIdAsync(user.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
-        // Act
+
         var result = await _service.GetEventDetailsAsync(eventId, (Guid?)null);
 
-        // Assert
+
         result.Should().NotBeNull();
         result!.OrganizerName.Should().Be("John Doe");
         result.OrganizerEmail.Should().Be("john@example.com");
