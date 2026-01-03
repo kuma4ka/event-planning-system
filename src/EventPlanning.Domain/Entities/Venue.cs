@@ -1,4 +1,6 @@
-﻿namespace EventPlanning.Domain.Entities;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace EventPlanning.Domain.Entities;
 
 public sealed class Venue
 {
@@ -35,6 +37,7 @@ public sealed class Venue
         SetDetails(name, address, capacity, description, imageUrl);
     }
 
+    [MemberNotNull(nameof(Name), nameof(Address))]
     private void SetDetails(string name, string address, int capacity, string? description, string? imageUrl)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name is required.", nameof(name));
