@@ -64,7 +64,6 @@
 
 .filter-segment-clear:hover {
     background-color: #fee2e2;
-    /* Light red hover, or map to a var if desired */
 }
 
 /* Date Separator */

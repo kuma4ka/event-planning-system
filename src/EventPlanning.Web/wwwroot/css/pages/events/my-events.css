@@ -12,9 +12,6 @@
     letter-spacing: -0.5px;
 }
 
-/* --- TOOLBAR / FILTER SECTION --- */
-/* (Refactored to use shared partial _EventFilter) */
-
 /* --- EVENTS TABLE/LIST --- */
 .dashboard-table {
     border-collapse: separate;

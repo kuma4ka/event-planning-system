@@ -7,7 +7,6 @@
     width: 100%;
     max-width: 400px;
     pointer-events: none;
-    /* Let clicks pass through container */
 }
 
 .stanza-alert {
@@ -21,7 +20,6 @@
     align-items: flex-start;
     gap: 1rem;
     pointer-events: auto;
-    /* Re-enable clicks for the alert itself */
     animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     overflow: hidden;
@@ -55,7 +53,7 @@
 }
 
 .stanza-alert-title {
-    font-family: var(--font-heading, serif);
+    font-family: var(--font-heading, serif), serif;
     font-weight: 700;
     font-size: 1rem;
     margin-bottom: 0.2rem;

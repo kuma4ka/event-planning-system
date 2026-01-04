@@ -17,7 +17,6 @@ public class Guest
     public Event? Event { get; private set; }
     public Guid? UserId { get; private set; }
 
-    // For EF Core
     private Guest()
     {
         FirstName = null!;

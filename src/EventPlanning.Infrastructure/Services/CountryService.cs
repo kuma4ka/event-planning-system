@@ -10,15 +10,13 @@ namespace EventPlanning.Infrastructure.Services;
 
 public class CountryService : ICountryService
 {
-    private readonly IMemoryCache _cache;
     private readonly IEnumerable<CountryInfo> _supportedCountries;
     private const string DefaultCode = "+380";
     private const string CacheKey = "SupportedCountries";
 
     public CountryService(IConfiguration configuration, IWebHostEnvironment env, ILogger<CountryService> logger, IMemoryCache cache)
     {
-        _cache = cache;
-        _supportedCountries = _cache.GetOrCreate(CacheKey, entry =>
+        _supportedCountries = cache.GetOrCreate(CacheKey, entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24);
             return LoadCountries(configuration, env, logger);

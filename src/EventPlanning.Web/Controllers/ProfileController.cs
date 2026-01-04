@@ -1,8 +1,6 @@
-﻿using EventPlanning.Application.Constants;
-using EventPlanning.Domain.ValueObjects;
+﻿using EventPlanning.Domain.ValueObjects;
 using EventPlanning.Application.DTOs.Profile;
 using EventPlanning.Application.Interfaces;
-using EventPlanning.Domain.Entities;
 using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;

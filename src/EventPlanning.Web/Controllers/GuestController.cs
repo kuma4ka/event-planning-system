@@ -1,6 +1,5 @@
 ﻿using EventPlanning.Application.DTOs.Guest;
 using EventPlanning.Application.Interfaces;
-using EventPlanning.Domain.Entities;
 using EventPlanning.Infrastructure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
