@@ -38,8 +38,7 @@ public class GuestService(
         if (eventEntity.Date < DateTime.Now)
             throw new InvalidOperationException("Cannot add guests to an event that has already ended.");
 
-        await unitOfWork.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
-        try
+        await unitOfWork.ExecuteInTransactionAsync(async () =>
         {
             await CheckCapacityAsync(eventEntity, dto.EventId, cancellationToken);
             await CheckUniqueEmailAsync(dto.EventId, dto.Email, null, cancellationToken);
@@ -53,13 +52,7 @@ public class GuestService(
             var guest = CreateGuestEntity(dto);
 
             await guestRepository.AddAsync(guest, cancellationToken);
-            await unitOfWork.CommitAsync(cancellationToken);
-        }
-        catch
-        {
-            await unitOfWork.RollbackAsync(cancellationToken);
-            throw;
-        }
+        }, System.Data.IsolationLevel.Serializable, cancellationToken);
 
         InvalidateEventCache(dto.EventId);
     }
