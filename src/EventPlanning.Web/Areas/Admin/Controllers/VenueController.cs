@@ -31,6 +31,7 @@ public class VenueController(
 
     [HttpPost("create")]
     [ValidateAntiForgeryToken]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("content-creation-limit")]
     public async Task<IActionResult> Create(CreateVenueDto model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid) return View(model);
@@ -82,9 +83,12 @@ public class VenueController(
 
         if (!ModelState.IsValid) return View(model);
 
+        var adminIdString = userManager.GetUserId(User);
+        var adminId = Guid.Parse(adminIdString!);
+
         try
         {
-            await venueService.UpdateVenueAsync(model, cancellationToken);
+            await venueService.UpdateVenueAsync(adminId, model, cancellationToken);
             return RedirectToAction(nameof(Index));
         }
         catch (ValidationException ex)
@@ -97,20 +101,31 @@ public class VenueController(
         {
             return NotFound();
         }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
     }
 
     [HttpPost("delete/{id}")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
+        var adminIdString = userManager.GetUserId(User);
+        var adminId = Guid.Parse(adminIdString!);
+
         try
         {
-            await venueService.DeleteVenueAsync(id, cancellationToken);
+            await venueService.DeleteVenueAsync(adminId, id, cancellationToken);
             TempData["SuccessMessage"] = "Venue deleted successfully.";
         }
         catch (InvalidOperationException ex)
         {
             TempData["ErrorMessage"] = ex.Message;
+        }
+        catch (UnauthorizedAccessException)
+        {
+             TempData["ErrorMessage"] = "You are not authorized to delete this venue.";
         }
 
         return RedirectToAction(nameof(Index));

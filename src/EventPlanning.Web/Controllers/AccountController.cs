@@ -19,6 +19,7 @@ public class AccountController(
     ILogger<AccountController> logger) : Controller
 {
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult Register()
     {
         if (User.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
@@ -28,6 +29,7 @@ public class AccountController(
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("register-limit")]
+    [AllowAnonymous]
     public async Task<IActionResult> Register(RegisterUserDto model)
     {
         var validationResult = await registerValidator.ValidateAsync(model);
@@ -88,6 +90,7 @@ public class AccountController(
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult Login()
     {
         if (User.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
@@ -95,6 +98,7 @@ public class AccountController(
     }
 
     [HttpPost]
+    [AllowAnonymous]
     [ValidateAntiForgeryToken]
     [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("login-limit")]
     public async Task<IActionResult> Login(LoginUserDto model, string? returnUrl = null)
@@ -140,6 +144,7 @@ public class AccountController(
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult AccessDenied()
     {
         return View();
