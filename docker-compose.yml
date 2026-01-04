@@ -21,6 +21,14 @@ services:
       - EmailSettings__Password=${EmailSettings__Password}
     ports:
       - "8080:8080"
+    volumes:
+      - keys-data:/app/keys
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/ || exit 1"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
     depends_on:
       db:
         condition: service_healthy
@@ -50,3 +58,4 @@ networks:
 
 volumes:
   db-data:
+  keys-data:

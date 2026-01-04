@@ -22,5 +22,9 @@ RUN dotnet publish "./EventPlanning.Web.csproj" -c $BUILD_CONFIGURATION -o /app/
 
 FROM base AS final
 WORKDIR /app
+USER root
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /app/keys && chown -R app:app /app/keys
+USER app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "EventPlanning.Web.dll"]
