@@ -77,6 +77,11 @@ public class VenueService(
         var user = await userRepository.GetByIdentityIdAsync(adminId.ToString(), cancellationToken);
         if (user == null) throw new InvalidOperationException("User profile not found");
 
+        if (user.Role != Domain.Enums.UserRole.Admin)
+        {
+            throw new UnauthorizedAccessException("User is not authorized to create a venue.");
+        }
+
         var venue = new Venue(
             dto.Name,
             dto.Address,

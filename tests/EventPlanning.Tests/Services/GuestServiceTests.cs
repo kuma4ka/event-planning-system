@@ -5,9 +5,10 @@ using EventPlanning.Domain.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using Moq;
 using EventPlanning.Domain.Enums;
+
+using EventPlanning.Application.Interfaces;
 
 namespace EventPlanning.Tests.Services;
 
@@ -19,6 +20,7 @@ public class GuestServiceTests
     private readonly Mock<IValidator<UpdateGuestDto>> _updateValidatorMock;
     private readonly Mock<IUserRepository> _userRepoMock;
     private readonly Mock<IMemoryCache> _cacheMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly GuestService _service;
 
     public GuestServiceTests()
@@ -29,6 +31,7 @@ public class GuestServiceTests
         _updateValidatorMock = new Mock<IValidator<UpdateGuestDto>>();
         _cacheMock = new Mock<IMemoryCache>();
         _userRepoMock = new Mock<IUserRepository>();
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
 
         _service = new GuestService(
             _guestRepositoryMock.Object,
@@ -36,7 +39,8 @@ public class GuestServiceTests
             _manualAddValidatorMock.Object,
             _updateValidatorMock.Object,
             _userRepoMock.Object,
-            _cacheMock.Object
+            _cacheMock.Object,
+            _unitOfWorkMock.Object
         );
     }
 

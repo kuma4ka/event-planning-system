@@ -54,10 +54,13 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IEventRepository, EventRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IVenueRepository, VenueRepository>();
         services.AddScoped<IGuestRepository, GuestRepository>();
-        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<INewsletterRepository, NewsletterRepository>();
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        
 
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<ICacheService, MemoryCacheService>();

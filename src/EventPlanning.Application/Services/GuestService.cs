@@ -15,7 +15,8 @@ public class GuestService(
     IValidator<AddGuestManuallyDto> manualAddValidator,
     IValidator<UpdateGuestDto> updateValidator,
     IUserRepository userRepository,
-    IMemoryCache cache) : IGuestService
+    IMemoryCache cache,
+    IUnitOfWork unitOfWork) : IGuestService
 {
 
 
@@ -37,18 +38,28 @@ public class GuestService(
         if (eventEntity.Date < DateTime.Now)
             throw new InvalidOperationException("Cannot add guests to an event that has already ended.");
 
-        await CheckCapacityAsync(eventEntity, dto.EventId, cancellationToken);
-        await CheckUniqueEmailAsync(dto.EventId, dto.Email, null, cancellationToken);
-
-        var fullPhoneNumber = dto.CountryCode + dto.PhoneNumber.Replace(" ", "").Replace("-", "");
-        if (!string.IsNullOrEmpty(dto.PhoneNumber))
+        await unitOfWork.BeginTransactionAsync(System.Data.IsolationLevel.Serializable, cancellationToken);
+        try
         {
-            await CheckUniquePhoneAsync(dto.EventId, fullPhoneNumber, null, cancellationToken);
+            await CheckCapacityAsync(eventEntity, dto.EventId, cancellationToken);
+            await CheckUniqueEmailAsync(dto.EventId, dto.Email, null, cancellationToken);
+
+            var fullPhoneNumber = dto.CountryCode + dto.PhoneNumber.Replace(" ", "").Replace("-", "");
+            if (!string.IsNullOrEmpty(dto.PhoneNumber))
+            {
+                await CheckUniquePhoneAsync(dto.EventId, fullPhoneNumber, null, cancellationToken);
+            }
+
+            var guest = CreateGuestEntity(dto);
+
+            await guestRepository.AddAsync(guest, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
         }
-
-        var guest = CreateGuestEntity(dto);
-
-        await guestRepository.AddAsync(guest, cancellationToken);
+        catch
+        {
+            await unitOfWork.RollbackAsync(cancellationToken);
+            throw;
+        }
 
         InvalidateEventCache(dto.EventId);
     }
