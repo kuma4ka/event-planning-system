@@ -54,6 +54,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                   .HasForeignKey(e => e.OrganizerId)
                   .IsRequired()
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasQueryFilter(e => !e.IsDeleted);
         });
 
         builder.Entity<Venue>(entity =>
@@ -69,6 +71,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                   .HasForeignKey(v => v.OrganizerId)
                   .IsRequired()
                   .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasQueryFilter(v => !v.IsDeleted);
         });
 
         builder.Entity<Guest>(entity =>

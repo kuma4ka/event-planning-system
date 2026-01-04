@@ -52,6 +52,7 @@ public class EventController(
 
     [HttpPost("create")]
     [ValidateAntiForgeryToken]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("content-creation-limit")]
     public async Task<IActionResult> Create(EventFormViewModel viewModel, CancellationToken cancellationToken)
     {
         if (viewModel.CreateDto == null) return BadRequest();

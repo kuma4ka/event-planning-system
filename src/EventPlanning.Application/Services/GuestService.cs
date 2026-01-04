@@ -12,12 +12,10 @@ namespace EventPlanning.Application.Services;
 public class GuestService(
     IGuestRepository guestRepository,
     IEventRepository eventRepository,
-    IValidator<CreateGuestDto> createValidator,
     IValidator<AddGuestManuallyDto> manualAddValidator,
     IValidator<UpdateGuestDto> updateValidator,
     IUserRepository userRepository,
-    IMemoryCache cache,
-    ILogger<GuestService> logger) : IGuestService
+    IMemoryCache cache) : IGuestService
 {
 
 

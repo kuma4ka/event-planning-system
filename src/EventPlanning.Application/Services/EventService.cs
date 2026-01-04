@@ -159,6 +159,7 @@ public class EventService(
         );
 
         await eventRepository.UpdateAsync(eventEntity, cancellationToken);
+        logger.LogInformation("Event {EventId} updated by {UserId}. Changes: {@Changes}", dto.Id, userId, dto);
     }
 
     public async Task DeleteEventAsync(Guid userId, Guid eventId, CancellationToken cancellationToken = default)
@@ -168,7 +169,9 @@ public class EventService(
 
         await ValidateOrganizerAccessAsync(eventEntity.OrganizerId, userId, eventId, cancellationToken);
 
-        await eventRepository.DeleteAsync(eventEntity, cancellationToken);
+        eventEntity.MarkDeleted();
+        await eventRepository.UpdateAsync(eventEntity, cancellationToken);
+        logger.LogInformation("Event {EventId} soft-deleted by {UserId}", eventId, userId);
     }
 
     private async Task ValidateOrganizerAccessAsync(Guid eventOrganizerId, Guid userId, Guid eventId, CancellationToken cancellationToken)

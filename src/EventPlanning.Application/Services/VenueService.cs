@@ -4,6 +4,7 @@ using EventPlanning.Application.Models;
 using EventPlanning.Domain.Entities;
 using EventPlanning.Domain.Interfaces;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 
 namespace EventPlanning.Application.Services;
 
@@ -13,7 +14,8 @@ public class VenueService(
     IImageService imageService,
     IValidator<CreateVenueDto> createValidator,
     IValidator<UpdateVenueDto> updateValidator,
-    IUserRepository userRepository
+    IUserRepository userRepository,
+    Microsoft.Extensions.Logging.ILogger<VenueService> logger
 ) : IVenueService
 {
     public async Task<List<VenueDto>> GetVenuesAsync(CancellationToken cancellationToken = default)
@@ -87,13 +89,21 @@ public class VenueService(
         await venueRepository.AddAsync(venue, cancellationToken);
     }
 
-    public async Task UpdateVenueAsync(UpdateVenueDto dto, CancellationToken cancellationToken = default)
+    public async Task UpdateVenueAsync(Guid userId, UpdateVenueDto dto, CancellationToken cancellationToken = default)
     {
         var validationResult = await updateValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
 
         var venue = await venueRepository.GetByIdAsync(dto.Id, cancellationToken);
         if (venue == null) throw new KeyNotFoundException($"Venue {dto.Id} not found");
+
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) throw new InvalidOperationException("User not found");
+
+        if (user.Role != Domain.Enums.UserRole.Admin && venue.OrganizerId != user.Id)
+        {
+            throw new UnauthorizedAccessException("User is not authorized to update this venue.");
+        }
 
         string? newImageUrl = venue.ImageUrl;
 
@@ -113,21 +123,31 @@ public class VenueService(
         );
 
         await venueRepository.UpdateAsync(venue, cancellationToken);
+        logger.LogInformation("Venue {VenueId} updated by {UserId}. Changes: {@Changes}", dto.Id, userId, dto);
     }
 
-    public async Task DeleteVenueAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task DeleteVenueAsync(Guid userId, Guid id, CancellationToken cancellationToken = default)
     {
+        var venue = await venueRepository.GetByIdAsync(id, cancellationToken);
+        if (venue == null) return;
+        
+        var user = await userRepository.GetByIdentityIdAsync(userId.ToString(), cancellationToken);
+        if (user == null) throw new InvalidOperationException("User not found");
+
+        if (user.Role != Domain.Enums.UserRole.Admin && venue.OrganizerId != user.Id)
+        {
+            throw new UnauthorizedAccessException("User is not authorized to delete this venue.");
+        }
+
         var hasEvents = await eventRepository.HasEventsAtVenueAsync(id, cancellationToken);
         if (hasEvents)
         {
             throw new InvalidOperationException("Cannot delete venue because it is associated with existing events.");
         }
 
-        var venue = await venueRepository.GetByIdAsync(id, cancellationToken);
-        if (venue == null) return;
-
         if (!string.IsNullOrEmpty(venue.ImageUrl)) imageService.DeleteImage(venue.ImageUrl);
 
-        await venueRepository.DeleteAsync(venue, cancellationToken);
+        venue.MarkDeleted();
+        await venueRepository.UpdateAsync(venue, cancellationToken);
     }
 }

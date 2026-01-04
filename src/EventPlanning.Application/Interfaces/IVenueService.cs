@@ -9,6 +9,6 @@ public interface IVenueService
     Task<PagedResult<VenueDto>> GetVenuesPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<VenueDto?> GetVenueByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task CreateVenueAsync(Guid adminId, CreateVenueDto dto, CancellationToken cancellationToken = default);
-    Task UpdateVenueAsync(UpdateVenueDto dto, CancellationToken cancellationToken = default);
-    Task DeleteVenueAsync(Guid id, CancellationToken cancellationToken = default);
+    Task UpdateVenueAsync(Guid userId, UpdateVenueDto dto, CancellationToken cancellationToken = default);
+    Task DeleteVenueAsync(Guid userId, Guid id, CancellationToken cancellationToken = default);
 }

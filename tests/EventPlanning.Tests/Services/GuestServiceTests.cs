@@ -15,34 +15,28 @@ public class GuestServiceTests
 {
     private readonly Mock<IGuestRepository> _guestRepositoryMock;
     private readonly Mock<IEventRepository> _eventRepositoryMock;
-    private readonly Mock<IValidator<CreateGuestDto>> _createValidatorMock;
     private readonly Mock<IValidator<AddGuestManuallyDto>> _manualAddValidatorMock;
     private readonly Mock<IValidator<UpdateGuestDto>> _updateValidatorMock;
     private readonly Mock<IUserRepository> _userRepoMock;
     private readonly Mock<IMemoryCache> _cacheMock;
-    private readonly Mock<ILogger<GuestService>> _loggerMock;
     private readonly GuestService _service;
 
     public GuestServiceTests()
     {
         _guestRepositoryMock = new Mock<IGuestRepository>();
         _eventRepositoryMock = new Mock<IEventRepository>();
-        _createValidatorMock = new Mock<IValidator<CreateGuestDto>>();
         _manualAddValidatorMock = new Mock<IValidator<AddGuestManuallyDto>>();
         _updateValidatorMock = new Mock<IValidator<UpdateGuestDto>>();
         _cacheMock = new Mock<IMemoryCache>();
         _userRepoMock = new Mock<IUserRepository>();
-        _loggerMock = new Mock<ILogger<GuestService>>();
 
         _service = new GuestService(
             _guestRepositoryMock.Object,
             _eventRepositoryMock.Object,
-            _createValidatorMock.Object,
             _manualAddValidatorMock.Object,
             _updateValidatorMock.Object,
             _userRepoMock.Object,
-            _cacheMock.Object,
-            _loggerMock.Object
+            _cacheMock.Object
         );
     }
 

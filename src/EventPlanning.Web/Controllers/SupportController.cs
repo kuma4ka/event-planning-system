@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EventPlanning.Web.Controllers;
 
+[Microsoft.AspNetCore.Authorization.AllowAnonymous]
 public class SupportController : Controller
 {
     [HttpGet("support")]

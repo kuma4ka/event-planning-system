@@ -20,6 +20,12 @@ builder.Services.AddControllersWithViews(options =>
     {
         options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
     }
+
+    var policy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+    options.Filters.Add(new Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter(policy));
+
     options.Filters.Add<EventPlanning.Web.Filters.GlobalExceptionFilter>();
 });
 
@@ -43,6 +49,13 @@ builder.Services.AddRateLimiter(options =>
     options.AddFixedWindowLimiter("register-limit", limiterOptions =>
     {
         limiterOptions.PermitLimit = 3;
+        limiterOptions.Window = TimeSpan.FromHours(1);
+        limiterOptions.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 0;
+    });
+    options.AddFixedWindowLimiter("content-creation-limit", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 10;
         limiterOptions.Window = TimeSpan.FromHours(1);
         limiterOptions.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
         limiterOptions.QueueLimit = 0;
