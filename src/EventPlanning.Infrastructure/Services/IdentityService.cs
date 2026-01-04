@@ -5,6 +5,7 @@ using EventPlanning.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using EventPlanning.Application.DTOs.Auth;
 using EventPlanning.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventPlanning.Infrastructure.Services;
 
@@ -35,46 +36,50 @@ public class IdentityService(
 
     public async Task<(bool Succeeded, string[] Errors, Guid? UserId, string? Code)> RegisterUserAsync(RegisterUserDto model)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync();
-        try
+        var strategy = context.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
         {
-            var appUser = new ApplicationUser
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            try
             {
-                UserName = model.Email,
-                Email = model.Email,
-                PhoneNumber = model.PhoneNumber
-            };
+                var appUser = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber
+                };
 
-            var result = await userManager.CreateAsync(appUser, model.Password);
-            if (!result.Succeeded)
-            {
-                return (false, result.Errors.Select(e => e.Description).ToArray(), null, null);
+                var result = await userManager.CreateAsync(appUser, model.Password);
+                if (!result.Succeeded)
+                {
+                    return (false, result.Errors.Select(e => e.Description).ToArray(), null, null);
+                }
+
+                var domainUser = new User(
+                    appUser.Id.ToString(),
+                    model.FirstName,
+                    model.LastName,
+                    UserRole.User,
+                    model.Email,
+                    model.Email,
+                    model.PhoneNumber,
+                    model.CountryCode
+                );
+
+                await userRepository.AddAsync(domainUser);
+
+                var userId = await userManager.GetUserIdAsync(appUser);
+                var code = await userManager.GenerateEmailConfirmationTokenAsync(appUser);
+
+                await transaction.CommitAsync();
+
+                return (true, Array.Empty<string>(), (Guid?)Guid.Parse(userId), code);
             }
-
-            var domainUser = new User(
-                appUser.Id.ToString(),
-                model.FirstName,
-                model.LastName,
-                UserRole.User,
-                model.Email,
-                model.Email,
-                model.PhoneNumber,
-                model.CountryCode
-            );
-
-            await userRepository.AddAsync(domainUser);
-
-            var userId = await userManager.GetUserIdAsync(appUser);
-            var code = await userManager.GenerateEmailConfirmationTokenAsync(appUser);
-
-            await transaction.CommitAsync();
-
-            return (true, [], Guid.Parse(userId), code);
-        }
-        catch (Exception)
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
     }
 }

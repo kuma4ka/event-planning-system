@@ -62,4 +62,23 @@ public class UnitOfWork(ApplicationDbContext context) : IUnitOfWork
             }
         }
     }
+
+    public async Task ExecuteInTransactionAsync(Func<Task> operation, IsolationLevel isolationLevel = IsolationLevel.ReadCommitted, CancellationToken cancellationToken = default)
+    {
+        var strategy = context.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async () =>
+        {
+            await BeginTransactionAsync(isolationLevel, cancellationToken);
+            try
+            {
+                await operation();
+                await CommitAsync(cancellationToken);
+            }
+            catch
+            {
+                await RollbackAsync(cancellationToken);
+                throw;
+            }
+        });
+    }
 }
