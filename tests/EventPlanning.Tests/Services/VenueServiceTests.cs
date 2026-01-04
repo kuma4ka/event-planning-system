@@ -30,6 +30,7 @@ public class VenueServiceTests
         _createValidatorMock = new Mock<IValidator<CreateVenueDto>>();
         _updateValidatorMock = new Mock<IValidator<UpdateVenueDto>>();
         _userRepoMock = new Mock<IUserRepository>();
+        var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<VenueService>>();
 
         _service = new VenueService(
             _venueRepoMock.Object,
@@ -37,7 +38,8 @@ public class VenueServiceTests
             _imageServiceMock.Object,
             _createValidatorMock.Object,
             _updateValidatorMock.Object,
-            _userRepoMock.Object
+            _userRepoMock.Object,
+            loggerMock.Object
         );
     }
 
@@ -71,7 +73,15 @@ public class VenueServiceTests
             .ReturnsAsync(true);
 
 
-        Func<Task> act = async () => await _service.DeleteVenueAsync(venueId);
+        var userId = Guid.CreateVersion7();
+        _userRepoMock.Setup(r => r.GetByIdentityIdAsync(userId.ToString(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new User("id", "F", "L", UserRole.Admin, "u", "e", null, "+1"));
+
+        var venue = new Venue("Name", "Addr", 1, Guid.NewGuid());
+        _venueRepoMock.Setup(r => r.GetByIdAsync(venueId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(venue);
+
+        Func<Task> act = async () => await _service.DeleteVenueAsync(userId, venueId);
 
 
         await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("*associated with existing events*");
