@@ -98,6 +98,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 .WithMany(e => e.Guests)
                 .HasForeignKey(g => g.EventId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasQueryFilter(g => !g.Event.IsDeleted);
         });
     }
 }
