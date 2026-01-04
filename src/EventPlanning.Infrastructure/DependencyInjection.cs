@@ -61,7 +61,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         
-        services.AddScoped<IEmailService, EmailService>();
+
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<ICountryService, CountryService>();
 
