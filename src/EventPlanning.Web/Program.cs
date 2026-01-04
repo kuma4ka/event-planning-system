@@ -16,7 +16,10 @@ builder.Services.AddApplication();
 
 builder.Services.AddControllersWithViews(options =>
 {
-    options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
+    if (!builder.Environment.IsEnvironment("Testing"))
+    {
+        options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
+    }
     options.Filters.Add<EventPlanning.Web.Filters.GlobalExceptionFilter>();
 });
 
@@ -78,7 +81,10 @@ try
         await next();
     });
 
-    app.UseHttpsRedirection();
+    if (!app.Environment.IsEnvironment("Testing"))
+    {
+        app.UseHttpsRedirection();
+    }
     app.UseStaticFiles();
 
     app.UseSerilogRequestLogging();
@@ -111,3 +117,5 @@ finally
 {
     Log.CloseAndFlush();
 }
+
+public partial class Program { }

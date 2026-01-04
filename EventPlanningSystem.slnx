@@ -6,6 +6,7 @@
     <Project Path="src/EventPlanning.Web/EventPlanning.Web.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/EventPlanning.IntegrationTests/EventPlanning.IntegrationTests.csproj" />
     <Project Path="tests/EventPlanning.Tests/EventPlanning.Tests.csproj" />
   </Folder>
 </Solution>
