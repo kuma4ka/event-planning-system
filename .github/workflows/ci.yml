@@ -30,3 +30,6 @@ jobs:
 
     - name: Test
       run: dotnet test EventPlanningSystem.slnx --no-build --verbosity normal --configuration Release
+
+    - name: Verify Docker Image Build
+      run: docker build . -t event-planning-web:ci
