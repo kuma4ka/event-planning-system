@@ -28,7 +28,7 @@ public class VenueRepository(ApplicationDbContext context) : IVenueRepository
         var totalCount = await query.CountAsync(cancellationToken);
 
         var items = await query
-            .OrderByDescending(v => v.Id)
+            .OrderBy(v => v.Name)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
