@@ -1,6 +1,6 @@
 using EventPlanning.Application;
 using EventPlanning.Infrastructure;
-using Microsoft.AspNetCore.RateLimiting;
+using EventPlanning.Web.Extensions;
 
 using Serilog;
 
@@ -13,54 +13,8 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
-
-builder.Services.AddControllersWithViews(options =>
-{
-    if (!builder.Environment.IsEnvironment("Testing"))
-    {
-        options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
-    }
-
-    var policy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-    options.Filters.Add(new Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter(policy));
-
-    options.Filters.Add<EventPlanning.Web.Filters.GlobalExceptionFilter>();
-});
-
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    options.AddFixedWindowLimiter("newsletter-limit", limiterOptions =>
-    {
-        limiterOptions.PermitLimit = 3;
-        limiterOptions.Window = TimeSpan.FromHours(1);
-        limiterOptions.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
-        limiterOptions.QueueLimit = 0;
-    });
-    options.AddFixedWindowLimiter("login-limit", limiterOptions =>
-    {
-        limiterOptions.PermitLimit = 5;
-        limiterOptions.Window = TimeSpan.FromMinutes(10);
-        limiterOptions.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
-        limiterOptions.QueueLimit = 2;
-    });
-    options.AddFixedWindowLimiter("register-limit", limiterOptions =>
-    {
-        limiterOptions.PermitLimit = 3;
-        limiterOptions.Window = TimeSpan.FromHours(1);
-        limiterOptions.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
-        limiterOptions.QueueLimit = 0;
-    });
-    options.AddFixedWindowLimiter("content-creation-limit", limiterOptions =>
-    {
-        limiterOptions.PermitLimit = 10;
-        limiterOptions.Window = TimeSpan.FromHours(1);
-        limiterOptions.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
-        limiterOptions.QueueLimit = 0;
-    });
-});
+builder.Services.AddPresentation(builder.Environment);
+builder.Services.AddRateLimiting();
 
 try
 {
@@ -84,15 +38,7 @@ try
         app.UseHsts();
     }
 
-    app.Use(async (context, next) =>
-    {
-        context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
-        context.Response.Headers.Append("X-Frame-Options", "DENY");
-        context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
-        context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net; frame-src 'self' https://www.google.com;");
-        context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
-        await next();
-    });
+    app.UseSecurityHeaders();
 
     if (!app.Environment.IsEnvironment("Testing"))
     {
