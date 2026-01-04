@@ -1,0 +1,39 @@
+services:
+  webapp:
+    image: event-planning-web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
+      # Seeding
+      - Seed__AdminEmail=${Seed__AdminEmail}
+      - Seed__AdminPassword=${Seed__AdminPassword}
+      - Seed__OrganizerEmail=${Seed__OrganizerEmail}
+      - Seed__OrganizerPassword=${Seed__OrganizerPassword}
+      # API Keys
+      - GoogleMaps__ApiKey=${GoogleMaps__ApiKey}
+      # Email
+      - EmailSettings__SenderEmail=${EmailSettings__SenderEmail}
+      - EmailSettings__Username=${EmailSettings__Username}
+      - EmailSettings__Password=${EmailSettings__Password}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - event-net
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    networks:
+      - event-net
+
+networks:
+  event-net:
+    driver: bridge
