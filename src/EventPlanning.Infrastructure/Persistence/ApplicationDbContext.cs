@@ -99,7 +99,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 .HasForeignKey(g => g.EventId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasQueryFilter(g => !g.Event.IsDeleted);
+            entity.HasQueryFilter(g => !g.Event!.IsDeleted);
         });
     }
 }
