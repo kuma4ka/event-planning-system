@@ -19,7 +19,7 @@ public class GuestControllerTests(CustomWebApplicationFactory factory) : IClassF
     [Fact]
     public async Task AddGuestManually_ShouldSucceed_WhenUserIsOrganizer()
     {
-        // 1. Setup: Create Event
+
         using var scope = factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var organizer = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == "organizer@test.com");
@@ -30,14 +30,14 @@ public class GuestControllerTests(CustomWebApplicationFactory factory) : IClassF
         await context.SaveChangesAsync();
         var eventId = evt.Id;
 
-        // 2. Authenticate
+
         _client.DefaultRequestHeaders.Add(TestAuthHandler.UserIdHeader, organizer.IdentityId);
 
-        // 3. Get Token (from Details page)
+
         var detailsUrl = $"/events/details/{eventId}";
         var token = await HtmlHelpers.GetAntiForgeryTokenAsync(_client, detailsUrl);
 
-        // 4. Submit Add Guest
+
         var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["EventId"] = eventId.ToString(),
@@ -52,10 +52,10 @@ public class GuestControllerTests(CustomWebApplicationFactory factory) : IClassF
         var response = await _client.PostAsync("/guests/add-manually", content);
         response.EnsureSuccessStatusCode();
 
-        // 5. Verify Redirect
+
         response.RequestMessage?.RequestUri?.ToString().Should().Contain(detailsUrl);
 
-        // 6. Verify DB
+
         using var verifyScope = factory.Services.CreateScope();
         var verifyContext = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var guest = await verifyContext.Guests.AsNoTracking().FirstOrDefaultAsync(g => g.Email == "manual.guest@test.com");
@@ -66,7 +66,7 @@ public class GuestControllerTests(CustomWebApplicationFactory factory) : IClassF
     [Fact]
     public async Task EditGuest_ShouldSucceed_WhenUserIsOrganizer()
     {
-        // 1. Setup: Create Event and Guest
+
         using var scope = factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var organizer = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == "organizer@test.com");
@@ -80,14 +80,14 @@ public class GuestControllerTests(CustomWebApplicationFactory factory) : IClassF
         await context.Guests.AddAsync(guest);
         await context.SaveChangesAsync();
 
-        // 2. Authenticate
+
         _client.DefaultRequestHeaders.Add(TestAuthHandler.UserIdHeader, organizer.IdentityId);
 
-        // 3. Get Token
+
         var detailsUrl = $"/events/details/{evt.Id}";
         var token = await HtmlHelpers.GetAntiForgeryTokenAsync(_client, detailsUrl);
 
-        // 4. Submit Edit
+
         var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["Id"] = guest.Id.ToString(),
@@ -103,10 +103,10 @@ public class GuestControllerTests(CustomWebApplicationFactory factory) : IClassF
         var response = await _client.PostAsync("/guests/edit", content);
         response.EnsureSuccessStatusCode();
 
-        // 5. Verify Redirect
+
         response.RequestMessage?.RequestUri?.ToString().Should().Contain(detailsUrl);
 
-        // 6. Verify DB
+
         using var verifyScope = factory.Services.CreateScope();
         var verifyContext = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var updatedGuest = await verifyContext.Guests.AsNoTracking().FirstOrDefaultAsync(g => g.Id == guest.Id);
@@ -118,7 +118,7 @@ public class GuestControllerTests(CustomWebApplicationFactory factory) : IClassF
     [Fact]
     public async Task RemoveGuest_ShouldSucceed_WhenUserIsOrganizer()
     {
-        // 1. Setup: Create Event and Guest
+
         using var scope = factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var organizer = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == "organizer@test.com");
@@ -132,14 +132,14 @@ public class GuestControllerTests(CustomWebApplicationFactory factory) : IClassF
         await context.Guests.AddAsync(guest);
         await context.SaveChangesAsync();
 
-        // 2. Authenticate
+
         _client.DefaultRequestHeaders.Add(TestAuthHandler.UserIdHeader, organizer.IdentityId);
 
-        // 3. Get Token
+
         var detailsUrl = $"/events/details/{evt.Id}";
         var token = await HtmlHelpers.GetAntiForgeryTokenAsync(_client, detailsUrl);
 
-        // 4. Submit Remove
+
         var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["EventId"] = evt.Id.ToString(),
@@ -150,10 +150,10 @@ public class GuestControllerTests(CustomWebApplicationFactory factory) : IClassF
         var response = await _client.PostAsync("/guests/remove", content);
         response.EnsureSuccessStatusCode();
 
-        // 5. Verify Redirect
+
         response.RequestMessage?.RequestUri?.ToString().Should().Contain(detailsUrl);
 
-        // 6. Verify DB
+
         using var verifyScope = factory.Services.CreateScope();
         var verifyContext = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var removedGuest = await verifyContext.Guests.AsNoTracking().FirstOrDefaultAsync(g => g.Id == guest.Id);
