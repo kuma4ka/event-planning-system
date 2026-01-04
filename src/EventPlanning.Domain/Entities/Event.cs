@@ -21,11 +21,17 @@ public class Event
     public Guid OrganizerId { get; private set; }
 
     public ICollection<Guest> Guests { get; } = new List<Guest>();
+    public bool IsDeleted { get; private set; }
 
     private Event()
     {
         Name = null!;
         OrganizerId = Guid.Empty;
+    }
+
+    public void MarkDeleted()
+    {
+        IsDeleted = true;
     }
 
     public Event(string name, string? description, DateTime date, EventType type, Guid organizerId, Guid? venueId = null, bool isPrivate = false)

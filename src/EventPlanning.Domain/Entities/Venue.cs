@@ -15,13 +15,18 @@ public sealed class Venue
     public Guid OrganizerId { get; private set; }
 
     public ICollection<Event> Events { get; private set; } = new List<Event>();
-
+    public bool IsDeleted { get; private set; }
 
     private Venue()
     {
         Name = null!;
         Address = null!;
         OrganizerId = Guid.Empty;
+    }
+
+    public void MarkDeleted()
+    {
+        IsDeleted = true;
     }
 
     public Venue(string name, string address, int capacity, Guid organizerId, string? description = null, string? imageUrl = null)
