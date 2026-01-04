@@ -15,9 +15,7 @@ public class GuestTests
         var countryCode = "+1";
         var phone = "1234567890";
 
-
         var guest = new Guest(first, last, email, eventId, countryCode, phone);
-
 
         guest.FirstName.Should().Be(first);
         guest.LastName.Should().Be(last);
@@ -49,9 +47,7 @@ public class GuestTests
     {
         var guest = new Guest("Old", "Name", "old@test.com", Guid.CreateVersion7(), "+1", "1234567");
 
-
         guest.UpdateDetails("New", "Person", "new@test.com", "+44", "7654321");
-
 
         guest.FirstName.Should().Be("New");
         guest.LastName.Should().Be("Person");

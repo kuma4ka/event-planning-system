@@ -16,31 +16,28 @@ public class GuestServiceTests
 {
     private readonly Mock<IGuestRepository> _guestRepositoryMock;
     private readonly Mock<IEventRepository> _eventRepositoryMock;
-    private readonly Mock<IValidator<AddGuestManuallyDto>> _manualAddValidatorMock;
     private readonly Mock<IValidator<UpdateGuestDto>> _updateValidatorMock;
     private readonly Mock<IUserRepository> _userRepoMock;
-    private readonly Mock<IMemoryCache> _cacheMock;
-    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly GuestService _service;
 
     public GuestServiceTests()
     {
         _guestRepositoryMock = new Mock<IGuestRepository>();
         _eventRepositoryMock = new Mock<IEventRepository>();
-        _manualAddValidatorMock = new Mock<IValidator<AddGuestManuallyDto>>();
+        Mock<IValidator<AddGuestManuallyDto>> manualAddValidatorMock = new Mock<IValidator<AddGuestManuallyDto>>();
         _updateValidatorMock = new Mock<IValidator<UpdateGuestDto>>();
-        _cacheMock = new Mock<IMemoryCache>();
+        Mock<IMemoryCache> cacheMock = new Mock<IMemoryCache>();
         _userRepoMock = new Mock<IUserRepository>();
-        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        Mock<IUnitOfWork> unitOfWorkMock = new Mock<IUnitOfWork>();
 
         _service = new GuestService(
             _guestRepositoryMock.Object,
             _eventRepositoryMock.Object,
-            _manualAddValidatorMock.Object,
+            manualAddValidatorMock.Object,
             _updateValidatorMock.Object,
             _userRepoMock.Object,
-            _cacheMock.Object,
-            _unitOfWorkMock.Object
+            cacheMock.Object,
+            unitOfWorkMock.Object
         );
     }
 
@@ -112,9 +109,7 @@ public class GuestServiceTests
                 It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
-
         await _service.UpdateGuestAsync(userId, dto);
-
 
         _guestRepositoryMock.Verify(r => r.UpdateAsync(guest, It.IsAny<CancellationToken>()), Times.Once);
     }

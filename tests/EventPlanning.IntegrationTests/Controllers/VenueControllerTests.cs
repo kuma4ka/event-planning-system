@@ -7,25 +7,17 @@ using EventPlanning.Infrastructure.Persistence;
 
 namespace EventPlanning.IntegrationTests.Controllers;
 
-public class VenueControllerTests : IClassFixture<CustomWebApplicationFactory>
+public class VenueControllerTests(CustomWebApplicationFactory factory) : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly CustomWebApplicationFactory _factory;
-    private readonly HttpClient _client;
-
-    public VenueControllerTests(CustomWebApplicationFactory factory)
+    private readonly HttpClient _client = factory.CreateClient(new WebApplicationFactoryClientOptions
     {
-        _factory = factory;
-        _client = factory.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            AllowAutoRedirect = true
-        });
-    }
+        AllowAutoRedirect = true
+    });
 
     [Fact]
     public async Task CreateVenue_ShouldSucceed_WhenUserIsAdmin()
     {
-
-        using (var scope = _factory.Services.CreateScope())
+        using (var scope = factory.Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var admin = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == "admin@test.com");
@@ -35,10 +27,8 @@ public class VenueControllerTests : IClassFixture<CustomWebApplicationFactory>
             _client.DefaultRequestHeaders.Add("X-Test-Role", "Admin");
         }
 
-
         var createPageUrl = "/Admin/Venue/create";
         var token = await HtmlHelpers.GetAntiForgeryTokenAsync(_client, createPageUrl);
-
 
         var venueName = "Integration Test Venue";
         using var content = new MultipartFormDataContent();
@@ -56,25 +46,22 @@ public class VenueControllerTests : IClassFixture<CustomWebApplicationFactory>
         var createResponse = await _client.PostAsync("/Admin/Venue/create", content);
         createResponse.EnsureSuccessStatusCode();
 
-
         var finalUrl = createResponse.RequestMessage?.RequestUri?.ToString();
         finalUrl.Should().Contain("/Admin/Venue");
 
-
-        using (var scope = _factory.Services.CreateScope())
+        using (var scope = factory.Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var venue = await context.Venues.AsNoTracking().FirstOrDefaultAsync(v => v.Name == venueName);
             venue.Should().NotBeNull();
-            venue!.Capacity.Should().Be(500);
+            venue.Capacity.Should().Be(500);
         }
     }
 
     [Fact]
     public async Task Index_ShouldReturnVenues_WhenUserIsAdmin()
     {
-
-        using (var scope = _factory.Services.CreateScope())
+        using (var scope = factory.Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var admin = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == "admin@test.com");
@@ -82,10 +69,8 @@ public class VenueControllerTests : IClassFixture<CustomWebApplicationFactory>
             _client.DefaultRequestHeaders.Add("X-Test-Role", "Admin");
         }
 
-
         var response = await _client.GetAsync("/Admin/Venue");
         response.EnsureSuccessStatusCode();
-
 
         var content = await response.Content.ReadAsStringAsync();
         content.Should().Contain("Madison Square Garden"); // Seeded venue
@@ -94,27 +79,22 @@ public class VenueControllerTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task EditVenue_ShouldSucceed_WhenUserIsAdmin()
     {
-
-        using var scope = _factory.Services.CreateScope();
+        using var scope = factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var admin = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == "admin@test.com");
         
-        var venue = new EventPlanning.Domain.Entities.Venue(
+        var venue = new Domain.Entities.Venue(
             "Venue To Edit", "Original Address", 100, admin!.Id, 
-            "Original Description", null
-        );
+            "Original Description");
         await context.Venues.AddAsync(venue);
         await context.SaveChangesAsync();
         var venueId = venue.Id;
 
-
         _client.DefaultRequestHeaders.Add(TestAuthHandler.UserIdHeader, admin.IdentityId);
         _client.DefaultRequestHeaders.Add("X-Test-Role", "Admin");
 
-
         var editPageUrl = $"/Admin/Venue/edit/{venueId}";
         var token = await HtmlHelpers.GetAntiForgeryTokenAsync(_client, editPageUrl);
-
 
         using var content = new MultipartFormDataContent();
         content.Add(new StringContent(venueId.ToString()), "Id");
@@ -131,39 +111,33 @@ public class VenueControllerTests : IClassFixture<CustomWebApplicationFactory>
         var finalUrl = editResponse.RequestMessage?.RequestUri?.ToString();
         finalUrl.Should().Contain("/Admin/Venue");
 
-
-        using var verifyScope = _factory.Services.CreateScope();
+        using var verifyScope = factory.Services.CreateScope();
         var verifyContext = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var updatedVenue = await verifyContext.Venues.AsNoTracking().FirstOrDefaultAsync(v => v.Id == venueId);
         updatedVenue.Should().NotBeNull();
-        updatedVenue!.Name.Should().Be("Edited Venue Name");
+        updatedVenue.Name.Should().Be("Edited Venue Name");
         updatedVenue.Capacity.Should().Be(200);
     }
 
     [Fact]
     public async Task DeleteVenue_ShouldSucceed_WhenUserIsAdmin()
     {
-
-        using var scope = _factory.Services.CreateScope();
+        using var scope = factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var admin = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == "admin@test.com");
         
-        var venue = new EventPlanning.Domain.Entities.Venue(
+        var venue = new Domain.Entities.Venue(
             "Venue To Delete", "Delete Address", 100, admin!.Id, 
-            "Delete Description", null
-        );
+            "Delete Description");
         await context.Venues.AddAsync(venue);
         await context.SaveChangesAsync();
         var venueId = venue.Id;
 
-
         _client.DefaultRequestHeaders.Add(TestAuthHandler.UserIdHeader, admin.IdentityId);
         _client.DefaultRequestHeaders.Add("X-Test-Role", "Admin");
 
-
         var indexUrl = "/Admin/Venue";
         var token = await HtmlHelpers.GetAntiForgeryTokenAsync(_client, indexUrl);
-
 
         var deleteUrl = $"/Admin/Venue/delete/{venueId}";
         var deleteContent = new FormUrlEncodedContent(new Dictionary<string, string>
@@ -174,12 +148,10 @@ public class VenueControllerTests : IClassFixture<CustomWebApplicationFactory>
         var deleteResponse = await _client.PostAsync(deleteUrl, deleteContent);
         deleteResponse.EnsureSuccessStatusCode();
 
-
         var finalUrl = deleteResponse.RequestMessage?.RequestUri?.ToString();
         finalUrl.Should().Contain("/Admin/Venue");
 
-
-        using var verifyScope = _factory.Services.CreateScope();
+        using var verifyScope = factory.Services.CreateScope();
         var verifyContext = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var deletedVenue = await verifyContext.Venues.AsNoTracking().FirstOrDefaultAsync(v => v.Id == venueId);
         deletedVenue.Should().BeNull();
