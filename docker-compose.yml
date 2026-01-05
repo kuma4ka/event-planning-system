@@ -19,6 +19,8 @@ services:
       - EmailSettings__SenderEmail=${EmailSettings__SenderEmail}
       - EmailSettings__Username=${EmailSettings__Username}
       - EmailSettings__Password=${EmailSettings__Password}
+      # Data Protection
+      - DataProtection__KeyRingPath=/app/keys/DataProtection-Keys
     ports:
       - "8080:8080"
     volumes:

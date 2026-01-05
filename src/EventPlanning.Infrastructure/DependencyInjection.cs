@@ -27,12 +27,14 @@ public static class DependencyInjection
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
 
-        var keyRingPath = configuration["DataProtection:KeyRingPath"] 
-                          ?? "/app/keys/DataProtection-Keys";
-
-        services.AddDataProtection()
-            .PersistKeysToFileSystem(new DirectoryInfo(keyRingPath))
+        var keyRingPath = configuration["DataProtection:KeyRingPath"];
+        var dataProtectionBuilder = services.AddDataProtection()
             .SetApplicationName("EventPlanningSystem");
+
+        if (!string.IsNullOrEmpty(keyRingPath))
+        {
+            dataProtectionBuilder.PersistKeysToFileSystem(new DirectoryInfo(keyRingPath));
+        }
 
         services.AddHttpContextAccessor();
 
