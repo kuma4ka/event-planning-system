@@ -52,7 +52,7 @@ public class IdentityService(
                 var result = await userManager.CreateAsync(appUser, model.Password);
                 if (!result.Succeeded)
                 {
-                    return (false, result.Errors.Select(e => e.Description).ToArray(), null, null);
+                    return (false, result.Errors.Select(e => e.Description).ToArray(), null, (string?)null);
                 }
 
                 var domainUser = new User(
