@@ -89,8 +89,13 @@ The project includes an `appsettings.Production.json` file which acts as a templ
 | `ConnectionStrings__DefaultConnection` | SQL Server Connection String | `Server=prod-db;Database=...` |
 | `Seed__AdminEmail` | Initial Admin Email | `admin@stanza.com` |
 | `Seed__AdminPassword` | Initial Admin Password | `ComplexPassword!23` |
+| `EmailSettings__Server` | SMTP Server Host | `smtp.gmail.com` |
+| `EmailSettings__Port` | SMTP Port | `587` |
+| `EmailSettings__SenderName` | Display Name for Emails | `Stanza Team` |
 | `EmailSettings__SenderEmail` | Email Address for Outgoing Mail | `notifications@stanza.com` |
+| `EmailSettings__Username` | SMTP Username | `notifications@stanza.com` |
 | `EmailSettings__Password` | SMTP Password/Key | `xyz-api-key` |
+| `EmailSettings__BaseUrl` | Public URL (for links in emails) | `https://stanza-events.com` |
 | `GoogleMaps__ApiKey` | Google Maps Embed API Key | `AIzaSy...` |
 | `ASPNETCORE_ENVIRONMENT` | Set to `Production` | `Production` |
 
