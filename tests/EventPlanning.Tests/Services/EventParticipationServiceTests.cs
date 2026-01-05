@@ -16,7 +16,6 @@ public class EventParticipationServiceTests
     private readonly Mock<IGuestRepository> _guestRepoMock;
     private readonly Mock<IUserRepository> _userRepoMock;
     private readonly Mock<ICacheService> _cacheServiceMock;
-    private readonly Mock<ILogger<EventParticipationService>> _loggerMock;
     private readonly EventParticipationService _service;
 
     public EventParticipationServiceTests()
@@ -25,21 +24,20 @@ public class EventParticipationServiceTests
         _guestRepoMock = new Mock<IGuestRepository>();
         _userRepoMock = new Mock<IUserRepository>();
         _cacheServiceMock = new Mock<ICacheService>();
-        _loggerMock = new Mock<ILogger<EventParticipationService>>();
+        var loggerMock = new Mock<ILogger<EventParticipationService>>();
 
         _service = new EventParticipationService(
             _eventRepoMock.Object,
             _guestRepoMock.Object,
             _userRepoMock.Object,
             _cacheServiceMock.Object,
-            _loggerMock.Object
+            loggerMock.Object
         );
     }
 
     [Fact]
     public async Task JoinEventAsync_ShouldThrowInvalidOperation_WhenUserAlreadyJoined()
     {
-        // Arrange
         var eventId = Guid.CreateVersion7();
         var userId = Guid.CreateVersion7();
 
@@ -57,7 +55,6 @@ public class EventParticipationServiceTests
             .Setup(r => r.GetByIdAsync(eventId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(eventEntity);
 
-
         _guestRepoMock
             .Setup(r => r.EmailExistsAtEventAsync(eventId, "test@test.com", null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
@@ -67,10 +64,8 @@ public class EventParticipationServiceTests
             .ReturnsAsync(new User(userId.ToString(), "Test", "User", UserRole.User, "test@test.com", "test@test.com",
                 "1234567890", "+1"));
 
-        // Act
         var act = async () => await _service.JoinEventAsync(eventId, userId);
 
-        // Assert
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("You are already registered for this event.");
 
@@ -80,7 +75,6 @@ public class EventParticipationServiceTests
     [Fact]
     public async Task JoinEventAsync_ShouldSucceed_WhenUserNotJoined()
     {
-        // Arrange
         var eventId = Guid.CreateVersion7();
         var userId = Guid.CreateVersion7();
 
@@ -108,13 +102,11 @@ public class EventParticipationServiceTests
                 "+123456789", "+1"));
 
 
-        // Act
         await _service.JoinEventAsync(eventId, userId);
 
-        // Assert
         _guestRepoMock.Verify(
             x => x.TryJoinEventAsync(It.Is<Guest>(g => g.Email.Value == "test@test.com" && g.UserId != userId),
-                It.IsAny<CancellationToken>()), Times.Once); // UserId should be DomainId (Random), not IdentityId
+                It.IsAny<CancellationToken>()), Times.Once);
 
         _cacheServiceMock.Verify(x => x.Remove(CacheKeyGenerator.GetEventKeyPublic(eventId)), Times.Once);
         _cacheServiceMock.Verify(x => x.Remove(CacheKeyGenerator.GetEventKeyOrganizer(eventId)), Times.Once);

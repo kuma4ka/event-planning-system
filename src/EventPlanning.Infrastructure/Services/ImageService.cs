@@ -8,7 +8,7 @@ namespace EventPlanning.Infrastructure.Services;
 
 public class ImageService(IWebHostEnvironment webHostEnvironment, ILogger<ImageService> logger) : IImageService
 {
-    private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+    private readonly string[] _allowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
 
     public async Task<string> UploadImageAsync(IFormFile file, string folderName, CancellationToken cancellationToken = default)
     {

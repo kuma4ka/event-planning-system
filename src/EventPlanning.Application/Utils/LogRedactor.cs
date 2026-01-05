@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace EventPlanning.Application.Utils;
 
 public static class LogRedactor

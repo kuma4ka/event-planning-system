@@ -1,5 +1,4 @@
 ﻿using EventPlanning.Application.Interfaces;
-using EventPlanning.Domain.Entities;
 using EventPlanning.Infrastructure.Identity;
 using EventPlanning.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +10,7 @@ using EventPlanning.Infrastructure.Repositories;
 using EventPlanning.Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
 using Mapster;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace EventPlanning.Infrastructure;
 
@@ -25,6 +25,17 @@ public static class DependencyInjection
                    .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.SqlServerEventId.SavepointsDisabledBecauseOfMARS)));
 
         services.AddMemoryCache();
+        services.AddHttpContextAccessor();
+
+        var keyRingPath = configuration["DataProtection:KeyRingPath"];
+        var dataProtectionBuilder = services.AddDataProtection()
+            .SetApplicationName("EventPlanningSystem");
+
+        if (!string.IsNullOrEmpty(keyRingPath))
+        {
+            dataProtectionBuilder.PersistKeysToFileSystem(new DirectoryInfo(keyRingPath));
+        }
+
         services.AddHttpContextAccessor();
 
             services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>

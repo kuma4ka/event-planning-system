@@ -1,10 +1,5 @@
-@using EventPlanning.Web.Models
 @using EventPlanning.Domain.Enums
 @model EventFormViewModel
-
-@{
-    var dto = Model.IsEditMode ? (EventPlanning.Application.DTOs.Event.EventBaseDto)Model.UpdateDto! : Model.CreateDto!;
-}
 
 <div class="mb-4">
     <label class="st-form-label">Event Name</label>

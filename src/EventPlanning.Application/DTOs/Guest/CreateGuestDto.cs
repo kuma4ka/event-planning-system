@@ -1,6 +1,4 @@
-﻿using EventPlanning.Application.Constants;
-
-namespace EventPlanning.Application.DTOs.Guest;
+﻿namespace EventPlanning.Application.DTOs.Guest;
 
 public record CreateGuestDto(
     Guid EventId,

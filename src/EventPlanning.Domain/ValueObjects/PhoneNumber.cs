@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace EventPlanning.Domain.ValueObjects;
 
 public record PhoneNumber

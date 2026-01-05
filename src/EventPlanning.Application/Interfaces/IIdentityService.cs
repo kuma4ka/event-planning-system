@@ -1,5 +1,4 @@
-﻿using EventPlanning.Domain.Entities;
-using EventPlanning.Application.DTOs.Auth;
+﻿using EventPlanning.Application.DTOs.Auth;
 
 namespace EventPlanning.Application.Interfaces;
 

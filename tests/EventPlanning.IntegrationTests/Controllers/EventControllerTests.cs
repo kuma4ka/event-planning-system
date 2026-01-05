@@ -53,22 +53,20 @@ public class EventControllerTests(CustomWebApplicationFactory factory) : IClassF
 
         var finalUrl = createResponse.RequestMessage?.RequestUri?.ToString();
         finalUrl.Should().Contain("/events/my-events");
-            
 
-        using (var checkScope = factory.Services.CreateScope())
-        {
-            var checkContext = checkScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            var createdEvent = await checkContext.Events.AsNoTracking()
-                .FirstOrDefaultAsync(e => e.Name == "Integration Test Event");
-            createdEvent.Should().NotBeNull();
+
+        using var checkScope = factory.Services.CreateScope();
+        var checkContext = checkScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var createdEvent = await checkContext.Events.AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Name == "Integration Test Event");
+        createdEvent.Should().NotBeNull();
                 
 
-            var detailsUrl = $"/events/details/{createdEvent!.Id}";
-            var detailsResponse = await _client.GetAsync(detailsUrl);
-            detailsResponse.EnsureSuccessStatusCode();
-            var detailsHtml = await detailsResponse.Content.ReadAsStringAsync();
-            detailsHtml.Should().Contain("Integration Test Event");
-        }
+        var detailsUrl = $"/events/details/{createdEvent.Id}";
+        var detailsResponse = await _client.GetAsync(detailsUrl);
+        detailsResponse.EnsureSuccessStatusCode();
+        var detailsHtml = await detailsResponse.Content.ReadAsStringAsync();
+        detailsHtml.Should().Contain("Integration Test Event");
     }
 
     [Fact]
@@ -79,20 +77,15 @@ public class EventControllerTests(CustomWebApplicationFactory factory) : IClassF
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var organizer = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == "organizer@test.com");
         var venue = await context.Venues.AsNoTracking().FirstOrDefaultAsync();
-        
-        var eventId = Guid.NewGuid();
-        var existingEvent = new EventPlanning.Domain.Entities.Event(
+
+        Guid.CreateVersion7();
+        var existingEvent = new Domain.Entities.Event(
             "Event To Edit", "Original Description", DateTime.UtcNow.AddDays(20), 
-            EventType.Workshop, organizer!.Id, venue!.Id, false
-        );
-        // We need to bypass the constructor's ID generation or set it if possible, 
-        // but Entity usually generates it. Let's just add it and save to get ID.
-        // Actually Event entity has protected set for Id? Let's check or just let EF handle it.
-        // For simplicity let's rely on constructor or add and let EF generate.
+            EventType.Workshop, organizer!.Id, venue!.Id);
         
         await context.Events.AddAsync(existingEvent);
         await context.SaveChangesAsync();
-        eventId = existingEvent.Id; // Capture ID
+        var eventId = existingEvent.Id; // Capture ID
 
 
         _client.DefaultRequestHeaders.Add(TestAuthHandler.UserIdHeader, organizer.IdentityId);
@@ -126,7 +119,7 @@ public class EventControllerTests(CustomWebApplicationFactory factory) : IClassF
         var verifyContext = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var updatedEvent = await verifyContext.Events.AsNoTracking().FirstOrDefaultAsync(e => e.Id == eventId);
         updatedEvent.Should().NotBeNull();
-        updatedEvent!.Name.Should().Be("Edited Event Name");
+        updatedEvent.Name.Should().Be("Edited Event Name");
         updatedEvent.Type.Should().Be(EventType.NetworkingEvent);
     }
 
@@ -139,10 +132,9 @@ public class EventControllerTests(CustomWebApplicationFactory factory) : IClassF
         var organizer = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == "organizer@test.com");
         var venue = await context.Venues.AsNoTracking().FirstOrDefaultAsync();
 
-        var eventToDelete = new EventPlanning.Domain.Entities.Event(
+        var eventToDelete = new Domain.Entities.Event(
             "Event To Delete", "Delete Me", DateTime.UtcNow.AddDays(30), 
-            EventType.Concert, organizer!.Id, venue!.Id, false
-        );
+            EventType.Concert, organizer!.Id, venue!.Id);
         await context.Events.AddAsync(eventToDelete);
         await context.SaveChangesAsync();
         var eventId = eventToDelete.Id;

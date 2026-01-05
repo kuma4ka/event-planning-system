@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Testcontainers.MsSql;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace EventPlanning.IntegrationTests;
 
@@ -67,6 +68,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
                 {"Seed:OrganizerEmail", "organizer@test.com"},
                 {"Seed:OrganizerPassword", "Organizer123!"}
             });
+        });
+
+        builder.ConfigureServices(services =>
+        {
+             services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "EventPlanning_IntegrationTests_Keys")));
         });
     }
 }

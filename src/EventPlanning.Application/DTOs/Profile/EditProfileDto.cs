@@ -1,6 +1,4 @@
-﻿using EventPlanning.Application.Constants;
-
-namespace EventPlanning.Application.DTOs.Profile;
+﻿namespace EventPlanning.Application.DTOs.Profile;
 
 public record EditProfileDto
 {

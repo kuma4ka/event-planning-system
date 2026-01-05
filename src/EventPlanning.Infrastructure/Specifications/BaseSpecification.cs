@@ -3,18 +3,9 @@ using EventPlanning.Domain.Interfaces;
 
 namespace EventPlanning.Infrastructure.Specifications;
 
-public abstract class BaseSpecification<T> : ISpecification<T>
+public abstract class BaseSpecification<T>(Expression<Func<T, bool>> criteria) : ISpecification<T>
 {
-    protected BaseSpecification(Expression<Func<T, bool>> criteria)
-    {
-        Criteria = criteria;
-    }
-
-    protected BaseSpecification()
-    {
-    }
-
-    public Expression<Func<T, bool>>? Criteria { get; }
+    public Expression<Func<T, bool>>? Criteria { get; } = criteria;
     public List<Expression<Func<T, object>>> Includes { get; } = new List<Expression<Func<T, object>>>();
     public Expression<Func<T, object>>? OrderBy { get; private set; }
     public Expression<Func<T, object>>? OrderByDescending { get; private set; }

@@ -76,7 +76,6 @@
     background: var(--bg-surface-secondary);
     color: var(--text-main);
     border-radius: 8px;
-    /* Standardize radius */
     padding: 1rem 1.5rem;
 }
 

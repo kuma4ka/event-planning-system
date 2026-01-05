@@ -7,7 +7,7 @@ namespace EventPlanning.Web.Models;
 
 public class HomeIndexViewModel
 {
-    public PagedResult<EventDto> Events { get; init; } = new(new List<EventDto>(), 0, 1, 10);
+    public PagedResult<EventDto> Events { get; init; } = new([], 0, 1, 10);
 
     public string? SearchTerm { get; init; }
     public EventType? Type { get; init; }

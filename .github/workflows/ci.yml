@@ -32,4 +32,7 @@ jobs:
       run: dotnet test EventPlanningSystem.slnx --no-build --verbosity normal --configuration Release
 
     - name: Verify Docker Image Build
-      run: docker build . -t event-planning-web:ci
+      run: |
+        docker build . -t event-planning-web:ci
+        # Run a temporary container to verify permissions (smoke test)
+        docker run --rm --entrypoint /bin/sh event-planning-web:ci -c "ls -la /app/keys && touch /app/keys/test_permission_check && echo 'Permission Check Passed'"

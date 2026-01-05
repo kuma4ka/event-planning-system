@@ -12,7 +12,7 @@ public class TestAuthHandler(
     UrlEncoder encoder)
     : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
-    public const string AuthenticationScheme = "Test";
+    private const string AuthenticationScheme = "Test";
     public const string UserIdHeader = "X-Test-UserId";
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()

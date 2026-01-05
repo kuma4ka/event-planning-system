@@ -13,22 +13,20 @@ public class NewsletterServiceTests
 {
     private readonly Mock<INewsletterRepository> _repoMock;
     private readonly Mock<IEmailService> _emailMock;
-    private readonly Mock<IHttpContextAccessor> _httpMock;
-    private readonly Mock<ILogger<NewsletterService>> _loggerMock;
     private readonly NewsletterService _service;
 
     public NewsletterServiceTests()
     {
         _repoMock = new Mock<INewsletterRepository>();
         _emailMock = new Mock<IEmailService>();
-        _httpMock = new Mock<IHttpContextAccessor>();
-        _loggerMock = new Mock<ILogger<NewsletterService>>();
+        Mock<IHttpContextAccessor> httpMock = new Mock<IHttpContextAccessor>();
+        Mock<ILogger<NewsletterService>> loggerMock = new Mock<ILogger<NewsletterService>>();
 
         _service = new NewsletterService(
             _repoMock.Object,
             _emailMock.Object,
-            _httpMock.Object,
-            _loggerMock.Object
+            httpMock.Object,
+            loggerMock.Object
         );
     }
 
@@ -39,9 +37,7 @@ public class NewsletterServiceTests
         _repoMock.Setup(r => r.GetSubscriberByEmailAsync(email, It.IsAny<CancellationToken>()))
             .ReturnsAsync((NewsletterSubscriber?)null);
 
-
         await _service.SubscribeAsync(email);
-
 
         _repoMock.Verify(
             r => r.AddSubscriberAsync(It.Is<NewsletterSubscriber>(s => s.Email == email),
@@ -60,9 +56,7 @@ public class NewsletterServiceTests
         _repoMock.Setup(r => r.GetSubscriberByEmailAsync(email, It.IsAny<CancellationToken>()))
             .ReturnsAsync(subscriber);
 
-
         var result = await _service.ConfirmSubscriptionAsync(email, "invalid-token");
-
 
         result.Should().BeFalse();
         subscriber.IsConfirmed.Should().BeFalse();
@@ -78,9 +72,7 @@ public class NewsletterServiceTests
         _repoMock.Setup(r => r.GetSubscriberByEmailAsync(email, It.IsAny<CancellationToken>()))
             .ReturnsAsync(subscriber);
 
-
         var result = await _service.ConfirmSubscriptionAsync(email, "valid-token");
-
 
         result.Should().BeTrue();
         subscriber.IsConfirmed.Should().BeTrue();

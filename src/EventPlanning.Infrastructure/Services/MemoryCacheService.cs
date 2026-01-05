@@ -24,7 +24,6 @@ public class MemoryCacheService(IMemoryCache memoryCache) : ICacheService
             options.SetAbsoluteExpiration(absoluteExpiration.Value);
         }
 
-        // Default fallback if nothing specified
         if (!slidingExpiration.HasValue && !absoluteExpiration.HasValue)
         {
              options.SetSlidingExpiration(TimeSpan.FromMinutes(10));
