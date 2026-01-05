@@ -28,7 +28,8 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         services.AddDataProtection()
-            .PersistKeysToFileSystem(new DirectoryInfo("/app/keys/DataProtection-Keys"));
+            .PersistKeysToFileSystem(new DirectoryInfo("/app/keys/DataProtection-Keys"))
+            .SetApplicationName("EventPlanningSystem");
 
         services.AddHttpContextAccessor();
 
