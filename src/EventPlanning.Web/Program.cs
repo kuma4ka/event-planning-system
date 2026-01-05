@@ -24,7 +24,7 @@ try
     {
         try
         {
-            await EventPlanning.Infrastructure.Persistence.DbInitializer.SeedAsync(scope.ServiceProvider);
+            await EventPlanning.Infrastructure.Persistence.DbInitializer.SeedAsync(scope.ServiceProvider, app.Environment.IsDevelopment());
         }
         catch (Exception ex)
         {
