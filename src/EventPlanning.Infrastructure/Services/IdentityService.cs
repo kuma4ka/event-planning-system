@@ -37,7 +37,7 @@ public class IdentityService(
     public async Task<(bool Succeeded, string[] Errors, Guid? UserId, string? Code)> RegisterUserAsync(RegisterUserDto model)
     {
         var strategy = context.Database.CreateExecutionStrategy();
-        return await strategy.ExecuteAsync(async () =>
+        return await strategy.ExecuteAsync<(bool Succeeded, string[] Errors, Guid? UserId, string? Code)>(async () =>
         {
             await using var transaction = await context.Database.BeginTransactionAsync();
             try

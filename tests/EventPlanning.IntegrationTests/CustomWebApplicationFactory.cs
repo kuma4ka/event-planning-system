@@ -65,7 +65,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
                 {"Seed:AdminEmail", "admin@test.com"},
                 {"Seed:AdminPassword", "Admin123!"},
                 {"Seed:OrganizerEmail", "organizer@test.com"},
-                {"Seed:OrganizerPassword", "Organizer123!"}
+                {"Seed:OrganizerPassword", "Organizer123!"},
+                {"DataProtection:KeyRingPath", Path.Combine(Path.GetTempPath(), "EventPlanning_IntegrationTests_Keys")}
             });
         });
     }
