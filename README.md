@@ -91,6 +91,7 @@ The project includes an `appsettings.Production.json` file which acts as a templ
 | `Seed__AdminPassword` | Initial Admin Password | `ComplexPassword!23` |
 | `EmailSettings__SenderEmail` | Email Address for Outgoing Mail | `notifications@stanza.com` |
 | `EmailSettings__Password` | SMTP Password/Key | `xyz-api-key` |
+| `GoogleMaps__ApiKey` | Google Maps Embed API Key | `AIzaSy...` |
 | `ASPNETCORE_ENVIRONMENT` | Set to `Production` | `Production` |
 
 > [!IMPORTANT]
@@ -121,4 +122,3 @@ The solution follows **Clean Architecture**:
 *   `src/EventPlanning.Web`: **UI**. MVC Controllers, Views, `Program.cs`. Depends on Application & Infrastructure.
 
 ---
-&copy; 2026 Stanza Team.
